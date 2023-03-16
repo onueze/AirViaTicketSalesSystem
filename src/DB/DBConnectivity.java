@@ -3,23 +3,24 @@ package DB;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class DBConnectivity {
 
     public static Connection getConnection() {
-        Connection con = null;
         try {
-            con = DriverManager.getConnection("jdbc:mysql://smcse-stuproj00.city.ac.uk:3306" +
-                    "/in2018g01");
+            System.out.println("trying");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://smcse-stuproj00.city.ac.uk:3306/in2018g01", "in2018g01_d", "U4m4nYtm");
             con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-            System.out.println("Connection success");
+            System.out.println("Connection success 1234");
 
             return con;
 
         } catch (SQLException sqle) {
-            System.out.println(sqle.getMessage());
+            System.out.println(sqle.getMessage() + " :Exception message");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return con;
+        return null;
     }
 }

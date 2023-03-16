@@ -43,29 +43,35 @@ public class Login extends javax.swing.JFrame {
 
 
                 try(Connection con = DBConnectivity.getConnection()) {
-                    PreparedStatement stm = con.prepareStatement("Select Employee_ID, role from Staff where password = ? and username = ?");
-                    stm.setString(1,password);
-                    stm.setString(1,username);
+                    assert con != null;
+                    PreparedStatement stm = con.prepareStatement("Select Employee_ID, role from Employee where password = ? and username = ?");
+                    stm.setString(1, password);
+                    stm.setString(2, username);
                     ResultSet rs = stm.executeQuery();
-                    role = rs.getString("role");
-                    switch(role){
-                        case "officeManager":
-                            dispose();
-                            OfficeManagerHome officeHome = new OfficeManagerHome();
-                            officeHome.setVisible(true);
-                            officeHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-                            break;
-                        case "advisor":
-                            dispose();
-                            TravelAdvisorHome advisorHome = new TravelAdvisorHome();
-                            advisorHome.setVisible(true);
-                            advisorHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-                            break;
-                        case "admin":
-                            dispose();
-                            SystemAdminHome adminHome = new SystemAdminHome();
-                            adminHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-                            break;
+                    if (rs.next()) {
+                        role = rs.getString("role");
+                        switch (role) {
+                            case "officeManager" -> {
+                                dispose();
+                                OfficeManagerHome officeHome = new OfficeManagerHome();
+                                officeHome.setVisible(true);
+                                officeHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                            }
+                            case "advisor" -> {
+                                dispose();
+                                TravelAdvisorHome advisorHome = new TravelAdvisorHome();
+                                advisorHome.setVisible(true);
+                                advisorHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                            }
+                            case "admin" -> {
+                                dispose();
+                                SystemAdminHome adminHome = new SystemAdminHome();
+                                adminHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                            }
+                        }
+                    }
+                    else{
+                        System.out.println("Login failed. Invalid username or password.");
                     }
                 }
                 catch (SQLException ex) {
