@@ -1,5 +1,9 @@
+import Admin.SystemAdminHome;
+import Advisor.TravelAdvisorHome;
+import DB.DBConnectivity;
+import Manager.OfficeManagerHome;
+
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
@@ -35,27 +39,32 @@ public class Login extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 String username = usernameText.getText();
-                char[] password = passwordField.getPassword();
+                String password = String.valueOf(passwordField.getPassword());
 
 
                 try(Connection con = DBConnectivity.getConnection()) {
-                    Statement stm = con.createStatement();
-                    String sql = "Select ID, role from Staff where password = ? and username = ?";
-                    ResultSet rs = stm.executeQuery(sql);
+                    PreparedStatement stm = con.prepareStatement("Select Employee_ID, role from Staff where password = ? and username = ?");
+                    stm.setString(1,password);
+                    stm.setString(1,username);
+                    ResultSet rs = stm.executeQuery();
                     role = rs.getString("role");
                     switch(role){
                         case "officeManager":
                             dispose();
                             OfficeManagerHome officeHome = new OfficeManagerHome();
-//                            officeHome.setVisible(true);
+                            officeHome.setVisible(true);
+                            officeHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                             break;
                         case "advisor":
                             dispose();
                             TravelAdvisorHome advisorHome = new TravelAdvisorHome();
+                            advisorHome.setVisible(true);
+                            advisorHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                             break;
                         case "admin":
                             dispose();
                             SystemAdminHome adminHome = new SystemAdminHome();
+                            adminHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                             break;
                     }
                 }
@@ -65,11 +74,6 @@ public class Login extends javax.swing.JFrame {
             }
         });
     }
-
-    private void loginButtonActionPerformed(){
-
-    }
-
 
     public static void main(String[]args){
         Login log = new Login();
