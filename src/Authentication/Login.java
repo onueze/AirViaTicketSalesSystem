@@ -1,3 +1,5 @@
+package Authentication;
+
 import Admin.SystemAdminHome;
 import Advisor.TravelAdvisorHome;
 import DB.DBConnectivity;
@@ -23,10 +25,13 @@ public class Login extends javax.swing.JFrame {
 
 
     public Login() {
+        // MAKES THE PAGE VISIBLE
         setContentPane(loginBackground);
         setSize(450,300);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+
+        // ACTION ON RESET BUTTON
         resetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -34,6 +39,8 @@ public class Login extends javax.swing.JFrame {
                 passwordField.setText("");
             }
         });
+
+        // ACTION ON LOGINBUTTON
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -42,6 +49,7 @@ public class Login extends javax.swing.JFrame {
                 String password = String.valueOf(passwordField.getPassword());
 
 
+                // TRY TO CONNECT TO DATABASE
                 try(Connection con = DBConnectivity.getConnection()) {
                     assert con != null;
                     PreparedStatement stm = con.prepareStatement("Select Employee_ID, role from Employee where password = ? and username = ?");
