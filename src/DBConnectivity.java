@@ -6,20 +6,17 @@ import java.util.Properties;
 public class DBConnectivity {
 
     public static Connection getConnection() {
-        Connection con = null;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://\n" +
+            Connection con = DriverManager.getConnection("jdbc:mysql://\n" +
                     "smcse-stuproj00.city.ac.uk:3306\n" +
                     "/in2018g01");
+            con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 
             return con;
 
         } catch (SQLException sqle) {
             System.out.println(sqle.getMessage());
         }
-        finally {
-            return con;
-        }
+        return null;
     }
 }
