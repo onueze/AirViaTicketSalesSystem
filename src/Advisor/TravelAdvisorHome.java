@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import Authentication.Login;
 
 public class TravelAdvisorHome extends javax.swing.JFrame {
@@ -16,11 +17,17 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
     private JPanel travelAdvisorPage;
     private JPanel logoPanel;
     private JButton individualReportButton;
+    private JLabel usernameLabel;
     private ImageIcon logoImage;
     private JLabel logoLabel;
+    private static int ID;
+    private static String username;
 
 
-    public TravelAdvisorHome(){
+    public TravelAdvisorHome(int ID, String username){
+        this.username = username;
+        this.ID = ID;
+        usernameLabel.setText("advisor: "+ username);
         logoImage = new ImageIcon("data/AirViaLogo.png");
         logoLabel = new JLabel(logoImage);
         logoImage.getImage().getScaledInstance(500,500,Image.SCALE_DEFAULT);
@@ -43,13 +50,14 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                AdvisorStock stock = new AdvisorStock();
+                AdvisorStock stock = new AdvisorStock(ID);
             }
         });
+
     }
 
     public static void main(String[] args){
-        TravelAdvisorHome advisorHome = new TravelAdvisorHome();
+        TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID, username);
         advisorHome.show();
 
     }

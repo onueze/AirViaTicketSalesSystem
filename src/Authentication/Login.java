@@ -23,6 +23,10 @@ public class Login extends javax.swing.JFrame {
     private JPanel loginBackground;
     private JPanel AirViaLogo;
 
+    private String username;
+    private String password;
+    private int ID;
+
 
     public Login() {
         // MAKES THE PAGE VISIBLE
@@ -45,8 +49,8 @@ public class Login extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                String username = usernameText.getText();
-                String password = String.valueOf(passwordField.getPassword());
+                username = usernameText.getText();
+                password = String.valueOf(passwordField.getPassword());
 
 
                 // TRY TO CONNECT TO DATABASE
@@ -58,22 +62,23 @@ public class Login extends javax.swing.JFrame {
                     ResultSet rs = stm.executeQuery();
                     if (rs.next()) {
                         role = rs.getString("role");
+                        ID = rs.getInt("Employee_ID");
                         switch (role) {
                             case "officeManager" -> {
                                 dispose();
-                                OfficeManagerHome officeHome = new OfficeManagerHome();
+                                OfficeManagerHome officeHome = new OfficeManagerHome(ID, username);
                                 officeHome.setVisible(true);
                                 officeHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                             }
                             case "advisor" -> {
                                 dispose();
-                                TravelAdvisorHome advisorHome = new TravelAdvisorHome();
+                                TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID, username);
                                 advisorHome.setVisible(true);
                                 advisorHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                             }
                             case "admin" -> {
                                 dispose();
-                                SystemAdminHome adminHome = new SystemAdminHome();
+                                SystemAdminHome adminHome = new SystemAdminHome(ID, username);
                                 adminHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                             }
                         }
@@ -87,6 +92,14 @@ public class Login extends javax.swing.JFrame {
                 }
             }
         });
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public int getID() {
+        return ID;
     }
 
     public static void main(String[]args){

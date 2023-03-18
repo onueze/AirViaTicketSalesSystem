@@ -14,8 +14,12 @@ public class SystemAdminHome extends javax.swing.JFrame {
     private JButton refundsButton;
     private JButton logOutButton;
     private JPanel adminPage;
+    private static int ID;
+    private static String username;
 
-    public SystemAdminHome(){
+    public SystemAdminHome(int ID, String username){
+        this.ID = ID;
+        this.username = username;
         setContentPane(adminPage);
         setSize(450,300);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -26,7 +30,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
 
 
     public static void main(String[] args){
-        SystemAdminHome adminHome = new  SystemAdminHome();
+        SystemAdminHome adminHome = new  SystemAdminHome(ID, username);
         adminHome.show();
     }
 }
