@@ -14,9 +14,13 @@ public class OfficeManagerHome extends javax.swing.JFrame {
     private JPanel logoField;
     private JLabel IDAndUserNameLabel;
     private JPanel officeManagerPage;
+    private static String username;
+    private static int ID;
 
 
-    public OfficeManagerHome(){
+    public OfficeManagerHome(int ID, String username){
+        OfficeManagerHome.ID = ID;
+        OfficeManagerHome.username = username;
         setContentPane(officeManagerPage);
         setSize(450,300);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -26,7 +30,7 @@ public class OfficeManagerHome extends javax.swing.JFrame {
 
 
     public static void main(String[] args){
-        OfficeManagerHome officeHome = new OfficeManagerHome();
+        OfficeManagerHome officeHome = new OfficeManagerHome(ID,username);
         officeHome.show();
     }
 
