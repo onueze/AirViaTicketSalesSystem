@@ -50,7 +50,7 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                AdvisorStock stock = new AdvisorStock(ID);
+                AdvisorStock stock = new AdvisorStock(ID,username);
             }
         });
 
