@@ -4,27 +4,29 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class OfficeManagerHome extends javax.swing.JFrame {
-    private JButton homeButton;
-    private JButton stockButton;
-    private JButton blanksButton;
-    private JButton discountPlanButton;
-    private JButton ticketStockTurnoverReportButton;
-    private JButton interlineSalesReportButton;
-    private JButton domesticSalesReportButton;
+public class OfficeManagerStock extends javax.swing.JFrame {
+    private JPanel Stock;
     private JButton logOutButton;
-    private JPanel logoField;
-    private JLabel IDAndUserNameLabel;
-    private JPanel officeManagerPage;
-    private static String username;
-    private static int ID;
+    private JTable table1;
+    private JButton domesticSalesReportButton;
+    private JButton homeButton;
+    private JButton discountPlanButton;
+    private JButton blanksButton;
+    private JButton stockButton;
+    private JButton ticketStockTurnOverButton;
+    private JButton interlineSalesReportButton;
+    private JComboBox comboBox1;
+    private JComboBox comboBox2;
+    private JButton submitAssignBlanksButton;
+    private JButton button1;
+    private JButton button2;
+    private JButton button3;
+    private JButton submitReassignBlanksButton;
+    private JComboBox comboBox3;
 
-
-    public OfficeManagerHome(int ID, String username){
-        OfficeManagerHome.ID = ID;
-        OfficeManagerHome.username = username;
-        setContentPane(officeManagerPage);
-        setSize(1000,600);
+    public OfficeManagerStock() {
+        setContentPane(Stock);
+        setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
@@ -69,11 +71,11 @@ public class OfficeManagerHome extends javax.swing.JFrame {
             }
         });
 
-        ticketStockTurnoverReportButton.addActionListener(new ActionListener() {
+        ticketStockTurnOverButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerTicketStockTurnOverReport ticketStockTurnoverReportButton = new OfficeManagerTicketStockTurnOverReport();
-                ticketStockTurnoverReportButton.setVisible(true);
+                OfficeManagerTicketStockTurnOverReport ticketStockTurnOverButton = new OfficeManagerTicketStockTurnOverReport();
+                ticketStockTurnOverButton.setVisible(true);
                 dispose();
 
             }
@@ -101,14 +103,17 @@ public class OfficeManagerHome extends javax.swing.JFrame {
 
 
 
-
     }
-
-
 
     public static void main(String[] args){
-        OfficeManagerHome officeHome = new OfficeManagerHome(ID,username);
-        officeHome.show();
+        OfficeManagerStock Stock = new OfficeManagerStock();
+        Stock.show();
     }
+
+
+
+
+
+
 
 }

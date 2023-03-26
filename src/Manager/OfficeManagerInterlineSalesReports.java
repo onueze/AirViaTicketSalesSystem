@@ -4,29 +4,25 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class OfficeManagerHome extends javax.swing.JFrame {
-    private JButton homeButton;
-    private JButton stockButton;
-    private JButton blanksButton;
-    private JButton discountPlanButton;
-    private JButton ticketStockTurnoverReportButton;
-    private JButton interlineSalesReportButton;
-    private JButton domesticSalesReportButton;
+public class OfficeManagerInterlineSalesReports extends javax.swing.JFrame {
     private JButton logOutButton;
-    private JPanel logoField;
-    private JLabel IDAndUserNameLabel;
-    private JPanel officeManagerPage;
-    private static String username;
-    private static int ID;
+    private JButton homeButton;
+    private JButton domesticSalesReportButton;
+    private JButton interlineSalesReportButton;
+    private JButton stocksButton;
+    private JButton blanksButton;
+    private JButton ticketStockTurnOverButton;
+    private JButton discountPlanButton;
+    private JPanel InterlineReport;
 
 
-    public OfficeManagerHome(int ID, String username){
-        OfficeManagerHome.ID = ID;
-        OfficeManagerHome.username = username;
-        setContentPane(officeManagerPage);
+
+    public OfficeManagerInterlineSalesReports(){
+        setContentPane(InterlineReport);
         setSize(1000,600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+
 
         homeButton.addActionListener(new ActionListener() {
             @Override
@@ -38,7 +34,7 @@ public class OfficeManagerHome extends javax.swing.JFrame {
             }
         });
 
-        stockButton.addActionListener(new ActionListener() {
+        stocksButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 OfficeManagerStock officeManagerStock = new OfficeManagerStock();
@@ -69,11 +65,11 @@ public class OfficeManagerHome extends javax.swing.JFrame {
             }
         });
 
-        ticketStockTurnoverReportButton.addActionListener(new ActionListener() {
+        ticketStockTurnOverButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerTicketStockTurnOverReport ticketStockTurnoverReportButton = new OfficeManagerTicketStockTurnOverReport();
-                ticketStockTurnoverReportButton.setVisible(true);
+                OfficeManagerTicketStockTurnOverReport ticketStockTurnOverButton = new OfficeManagerTicketStockTurnOverReport();
+                ticketStockTurnOverButton.setVisible(true);
                 dispose();
 
             }
@@ -100,15 +96,12 @@ public class OfficeManagerHome extends javax.swing.JFrame {
         });
 
 
-
-
     }
 
 
 
     public static void main(String[] args){
-        OfficeManagerHome officeHome = new OfficeManagerHome(ID,username);
-        officeHome.show();
+        OfficeManagerInterlineSalesReports InterlineReport = new OfficeManagerInterlineSalesReports();
+        InterlineReport.show();
     }
-
 }
