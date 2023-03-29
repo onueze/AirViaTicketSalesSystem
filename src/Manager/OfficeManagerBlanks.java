@@ -169,6 +169,49 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
 
             }
         });
+        submitBlankUsageReportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = "SELECT  Blank.BlankNumber, Blank.Type,Blank.isSold,Blank.isAssigned,Blank.Employee_ID" +
+                            "FROM Blank";
+
+                    ResultSet rs = st.executeQuery(query);
+                    ResultSetMetaData rsmd = rs.getMetaData();
+                    DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
+
+                    int cols = rsmd.getColumnCount();
+                    String[] colName = new String[cols];
+                    for (int i = 0; i < cols; i++) {
+                        colName[i] = rsmd.getColumnName(i + 1);
+                    }
+                    model.setColumnIdentifiers(colName);
+                    String blankNumber,type,IsSold,IsAssigned,employee_ID;
+                    while (rs.next()) {
+                        blankNumber = rs.getString(1);
+                        type = rs.getString(2);
+                        IsSold = rs.getString(3);
+                        IsAssigned = rs.getString(4);
+                        employee_ID = rs.getString(5);
+
+                        String[] row = {blankNumber,type,IsSold,IsAssigned,employee_ID};
+                        model.addRow(row);
+                    }
+                    st.close();
+
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+
+
+            }
+        });
     }
 
     public static void main(String[] args){
