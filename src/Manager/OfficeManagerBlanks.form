@@ -50,7 +50,9 @@
       </component>
       <component id="80b78" class="javax.swing.JButton" binding="discountPlanButton" default-binding="true">
         <constraints>
-          <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="120" height="65"/>
+          </grid>
         </constraints>
         <properties>
           <text value="Discount Plan"/>
@@ -143,6 +145,14 @@
           </component>
         </children>
       </scrollpane>
+      <component id="f79ff" class="javax.swing.JButton" binding="showBlanksButton" default-binding="true">
+        <constraints>
+          <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="show Blanks"/>
+        </properties>
+      </component>
     </children>
   </grid>
 </form>
