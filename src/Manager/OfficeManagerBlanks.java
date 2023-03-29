@@ -23,6 +23,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
     private JButton submitUnusedBlanksToButton;
     private JTable blanksTable;
     private JScrollPane blankTableScroll;
+    private JButton showBlanksButton;
 
     private static int ID;
     private static String username;
@@ -41,42 +42,6 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
-        try (Connection con = DBConnectivity.getConnection()) {
-            assert con != null;
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Statement st = con.createStatement();
-            String query = "SELECT  Blank.BlankNumber, Blank.type,Blank.isSold,Blank.isAssigned,Blank.Employee_ID" +
-                    "FROM Blank";
-
-
-            ResultSet rs = st.executeQuery(query);
-            ResultSetMetaData rsmd = rs.getMetaData();
-            DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
-
-            int cols = rsmd.getColumnCount();
-            String[] colName = new String[cols];
-            for (int i = 0; i < cols; i++) {
-                colName[i] = rsmd.getColumnName(i + 1);
-            }
-            model.setColumnIdentifiers(colName);
-            String blankNumber,Type,IsSold,IsAssigned,employee_ID;
-            while (rs.next()) {
-                blankNumber = rs.getString(1);
-                Type = rs.getString(2);
-                IsSold = rs.getString(3);
-                IsAssigned = rs.getString(4);
-                employee_ID = rs.getString(5);
-
-                String[] row = {blankNumber,Type,IsSold,IsAssigned,employee_ID};
-                model.addRow(row);
-            }
-            st.close();
-
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
 
 
 
@@ -210,6 +175,52 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                 }
 
 
+            }
+        });
+        showBlanksButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = "SELECT  Blank.BlankNumber, Blank.Type,Blank.isSold,Blank.isAssigned,Blank.Employee_ID,\n" +
+                            "Employee.First_Name, Employee.Last_Name\n" +
+                            "FROM Blank\n" +
+                            "INNER JOIN Employee\n" +
+                            "ON Blank.Employee_ID = Employee.Employee_ID ";
+
+
+                    ResultSet rs = st.executeQuery(query);
+                    ResultSetMetaData rsmd = rs.getMetaData();
+                    DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
+
+                    int cols = rsmd.getColumnCount();
+                    String[] colName = new String[cols];
+                    for (int i = 0; i < cols; i++) {
+                        colName[i] = rsmd.getColumnName(i + 1);
+                    }
+                    model.setColumnIdentifiers(colName);
+                    String blankNumber,Type,IsSold,IsAssigned,employee_ID, employee_first_name, employee_last_name;
+                    while (rs.next()) {
+                        blankNumber = rs.getString(1);
+                        Type = rs.getString(2);
+                        IsSold = rs.getString(3);
+                        IsAssigned = rs.getString(4);
+                        employee_ID = rs.getString(5);
+                        employee_first_name = rs.getString(6);
+                        employee_last_name = rs.getString(7);
+
+                        String[] row = {blankNumber,Type,IsSold,IsAssigned,employee_ID,employee_first_name,employee_last_name};
+                        model.addRow(row);
+                    }
+                    st.close();
+
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
     }
