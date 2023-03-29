@@ -23,8 +23,12 @@ public class OfficeManagerStock extends javax.swing.JFrame {
     private JButton button3;
     private JButton submitReassignBlanksButton;
     private JComboBox comboBox3;
+    private static int ID;
+    private static String username;
 
-    public OfficeManagerStock() {
+    public OfficeManagerStock(int ID, String username) {
+        this.username = username;
+        this.ID = ID;
         setContentPane(Stock);
         setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -33,7 +37,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerHome officeManagerPage = new OfficeManagerHome();
+                OfficeManagerHome officeManagerPage = new OfficeManagerHome(ID,username);
                 officeManagerPage.setVisible(true);
                 dispose();
 
@@ -43,7 +47,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         stockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerStock officeManagerStock = new OfficeManagerStock();
+                OfficeManagerStock officeManagerStock = new OfficeManagerStock(ID,username);
                 officeManagerStock.setVisible(true);
                 dispose();
 
@@ -53,7 +57,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         blanksButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks();
+                OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks(ID,username);
                 officeManagerBlanks.setVisible(true);
                 dispose();
 
@@ -64,7 +68,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         discountPlanButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerDiscountPlan discountPlanButton = new OfficeManagerDiscountPlan();
+                OfficeManagerDiscountPlan discountPlanButton = new OfficeManagerDiscountPlan(ID,username);
                 discountPlanButton.setVisible(true);
                 dispose();
 
@@ -74,7 +78,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         ticketStockTurnOverButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerTicketStockTurnOverReport ticketStockTurnOverButton = new OfficeManagerTicketStockTurnOverReport();
+                OfficeManagerTicketStockTurnOverReport ticketStockTurnOverButton = new OfficeManagerTicketStockTurnOverReport(ID,username);
                 ticketStockTurnOverButton.setVisible(true);
                 dispose();
 
@@ -84,7 +88,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         interlineSalesReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports();
+                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports(ID,username);
                 interlineSalesReportButton.setVisible(true);
                 dispose();
 
@@ -94,7 +98,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         domesticSalesReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport();
+                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport(ID,username);
                 domesticSalesReportButton.setVisible(true);
                 dispose();
 
@@ -106,7 +110,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
     }
 
     public static void main(String[] args){
-        OfficeManagerStock Stock = new OfficeManagerStock();
+        OfficeManagerStock Stock = new OfficeManagerStock(ID,username);
         Stock.show();
     }
 
