@@ -13,7 +13,6 @@ import java.sql.*;
 
 public class Login extends javax.swing.JFrame {
     public String role;
-    private JTextField airViaLtDTextField;
     private JTextField usernameText;
     private JLabel UsernameLabel;
     private JLabel PasswordLabel;
@@ -31,7 +30,7 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         // MAKES THE PAGE VISIBLE
         setContentPane(loginBackground);
-        setSize(450,300);
+        setSize(1000,600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
@@ -84,7 +83,7 @@ public class Login extends javax.swing.JFrame {
                         }
                     }
                     else{
-                        System.out.println("Login failed. Invalid username or password.");
+                        JOptionPane.showMessageDialog(loginBackground,"Invalid password or username");
                     }
                 }
                 catch (SQLException ex) {

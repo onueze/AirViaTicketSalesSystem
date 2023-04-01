@@ -14,7 +14,6 @@ public class DBConnectivity {
             Connection con = DriverManager.getConnection("jdbc:mysql://smcse-stuproj00.city.ac.uk:3306/in2018g01", "in2018g01_d", "U4m4nYtm");
             con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             System.out.println("Connection success");
-
             return con;
 
             // EXCEPTION MESSAGE IF DATABASE CONNECTION FAILS

@@ -35,7 +35,7 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
         logoPanel.add(logoLabel);
 //        logoPanel.add(new InsertImage("data/AirViaLogo.png"));
         setContentPane(travelAdvisorPage);
-        setSize(450,300);
+        setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
         logOutButton.addActionListener(new ActionListener() {
@@ -54,6 +54,14 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
             }
         });
 
+        ticketSalesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                SalesSearchCustomer advisorSales = new SalesSearchCustomer(ID,username);
+
+            }
+        });
     }
 
     public static void main(String[] args){

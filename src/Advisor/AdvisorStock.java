@@ -26,7 +26,7 @@ public class AdvisorStock extends javax.swing.JFrame {
         stockTableScroll.setPreferredSize(new Dimension(500,500));
         stockTable.setPreferredScrollableViewportSize(new Dimension(500,500));
         setContentPane(stockPage);
-        setSize(450,300);
+        setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
         String[] options = new String[]{"All Blanks","MCO","Interline","Domestic"};
@@ -54,15 +54,12 @@ public class AdvisorStock extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 DefaultTableModel model = (DefaultTableModel) stockTable.getModel();
                 model.setRowCount(0);
-                System.out.println(e.getSource()+"57697");
                 String selected = (String) blankType.getSelectedItem();
                 if(e.getSource() == blankType){
                     switch (selected) {
                         case "Interline" -> {
                             displayBlankTable("'Interline'");
-
                         }
-
                         case "Domestic" -> {
                          displayBlankTable("'Domestic'");
                         }
@@ -114,9 +111,7 @@ public class AdvisorStock extends javax.swing.JFrame {
             }
             st.close();
 
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (SQLException ex) {
+        } catch (ClassNotFoundException | SQLException ex) {
             ex.printStackTrace();
         }
 
@@ -126,6 +121,7 @@ public class AdvisorStock extends javax.swing.JFrame {
     public static void main(String[] args){
         AdvisorStock advisorStock = new AdvisorStock(ID,username);
         advisorStock.show();
+        advisorStock.setVisible(true);
 
     }
 }
