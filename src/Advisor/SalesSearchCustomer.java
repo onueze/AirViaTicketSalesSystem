@@ -3,7 +3,6 @@ package Advisor;
 import DB.DBConnectivity;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
@@ -14,16 +13,9 @@ public class SalesSearchCustomer extends javax.swing.JFrame {
     private JTextField emailAddressTextField;
     private JTextField phoneNumberTextField;
     private JButton checkDetailsButton;
-    private JComboBox comboBox1;
-    private JTextField textField1;
-    private JComboBox comboBox2;
-    private JComboBox comboBox3;
-    private JButton requestConversionRateButton;
     private JButton homeButton;
     private JPanel mainPanel;
     private JPanel checkCustomerpanel;
-    private JPanel payPanel;
-    private JPanel discountPanel;
     private static int ID;
     private static String username;
     private int customerID;
@@ -44,6 +36,8 @@ public class SalesSearchCustomer extends javax.swing.JFrame {
                 String email = emailAddressTextField.getText();
                 String phoneNumber = phoneNumberTextField.getText();
 
+
+
                 try(Connection con = DBConnectivity.getConnection()){
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
@@ -55,11 +49,16 @@ public class SalesSearchCustomer extends javax.swing.JFrame {
                     System.out.println(query);
                     ResultSet rs = st.executeQuery(query);
 
-                    System.out.println(requireText(firstNameTextField));
-                    System.out.println(requireText(lastNameTextField));
-                    System.out.println(requireText(emailAddressTextField));
-                    System.out.println(requireText(phoneNumberTextField));
+                    while (rs.next()) {
+                        // get the value of a column by name
+                        customerID = rs.getInt("Customer_ID");
 
+                        // do something with the values
+                        System.out.println("id of alex = " + customerID);
+                    }
+
+                    // resets result set in order to complete customer check
+                    rs = st.executeQuery(query);
 
                     // check if all fields have text in them. If yes it evaluates the information
                     if(requireText(firstNameTextField) &&
@@ -83,7 +82,7 @@ public class SalesSearchCustomer extends javax.swing.JFrame {
                                 ResultSet rsCustomer = newCustomer.executeQuery(queryCustomer);
 
                                 dispose();
-                                SalesSellTicket salesSellTicket = new SalesSellTicket(ID,username,rs);
+                                SalesSelectTicket salesSellTicket = new SalesSelectTicket(ID,username,customerID);
                                 salesSellTicket.show();
 
                             } else {
@@ -97,7 +96,7 @@ public class SalesSearchCustomer extends javax.swing.JFrame {
                                 // User clicked the "Yes" button
                                 // Do something here
                                 dispose();
-                                SalesSellTicket salesSellTicket = new SalesSellTicket(ID,username,rs);
+                                SalesSelectTicket salesSellTicket = new SalesSelectTicket(ID,username,customerID);
                                 salesSellTicket.show();
 
                             } else {
