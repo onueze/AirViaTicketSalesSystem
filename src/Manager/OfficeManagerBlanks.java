@@ -24,6 +24,9 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
     private JTable blanksTable;
     private JScrollPane blankTableScroll;
     private JButton showBlanksButton;
+    private JComboBox FilterType;
+    private JPanel blankTypePanel;
+
 
     private static int ID;
     private static String username;
@@ -41,6 +44,45 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         setSize(1500, 1000);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+
+        /*       NEED TO SORT ADD THE FILTER SYSTEM, MAKE IT THE A METHOD SO IT CAN BE CALLAED MUILT TOMES WITHOUT REAPIGN ALL THE CODE
+        String[] options = new String[]{"All Blanks","MCO","Interline","Domestic"};
+        FilterType = new JComboBox<>(options);
+        blankTypePanel.add(FilterType);
+
+
+        FilterType.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
+                model.setRowCount(0);
+                String selected = (String) FilterType.getSelectedItem();
+                if(e.getSource() == FilterType){
+                    switch (selected) {
+                        case "Interline" -> {
+                            displayBlankTable("'Interline'");
+                        }
+                        case "Domestic" -> {
+                            displayBlankTable("'Domestic'");
+                        }
+                        case "MCO" ->{
+                            displayBlankTable("'MCO'");
+                        }
+                        case "All Blanks" ->{
+                            displayBlankTable("SELECT DISTINCT Blank.Type FROM Blank");
+                        }
+
+                    }
+
+                }
+
+            }
+
+
+
+        });
+        */
 
 
 
@@ -66,7 +108,6 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                 OfficeManagerStock officeManagerStock = new OfficeManagerStock(ID,username);
                 officeManagerStock.setVisible(true);
                 dispose();
-
             }
         });
 
@@ -76,13 +117,6 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                 OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks(ID,username);
                 officeManagerBlanks.setVisible(true);
                 dispose();
-
-
-
-
-
-
-
             }
         });
 
@@ -184,11 +218,10 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     Statement st = con.createStatement();
-                    String query = "SELECT  Blank.BlankNumber, Blank.Type,Blank.isSold,Blank.isAssigned,Blank.Employee_ID,\n" +
-                            "Employee.First_Name, Employee.Last_Name\n" +
-                            "FROM Blank\n" +
-                            "INNER JOIN Employee\n" +
-                            "ON Blank.Employee_ID = Employee.Employee_ID ";
+                    String query = "SELECT Blank.*, Employee.first_name, Employee.last_name " +
+                            "FROM Blank " +
+                            "LEFT JOIN Employee ON Blank.Employee_ID = Employee.Employee_ID AND Employee.role = 'advisor';";
+
 
 
                     ResultSet rs = st.executeQuery(query);
@@ -223,6 +256,11 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                 }
             }
         });
+
+
+
+
+
     }
 
     public static void main(String[] args){

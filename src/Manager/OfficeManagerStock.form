@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="Manager.OfficeManagerStock">
-  <grid id="27dc6" binding="Stock" layout-manager="GridLayoutManager" row-count="16" column-count="11" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="Stock" layout-manager="GridLayoutManager" row-count="15" column-count="10" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
       <xy x="20" y="20" width="1292" height="642"/>
@@ -10,7 +10,9 @@
     <children>
       <component id="8031d" class="javax.swing.JButton" binding="domesticSalesReportButton" default-binding="true">
         <constraints>
-          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="200" height="57"/>
+          </grid>
         </constraints>
         <properties>
           <text value="Domestic Sales Report "/>
@@ -90,36 +92,34 @@
           <grid row="12" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Blank Type:"/>
+          <text value="Blank:"/>
         </properties>
       </component>
-      <component id="36195" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+      <component id="36195" class="javax.swing.JComboBox" binding="assignTravelAdvisor">
         <constraints>
           <grid row="11" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <model/>
+          <model>
+            <item value="view IDs"/>
+          </model>
         </properties>
       </component>
-      <component id="f909" class="javax.swing.JComboBox" binding="comboBox2" default-binding="true">
+      <component id="f909" class="javax.swing.JComboBox" binding="assignBlank">
         <constraints>
           <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties/>
+        <properties>
+          <model>
+            <item value="View Unassigned Blanks"/>
+          </model>
+        </properties>
       </component>
       <hspacer id="91547">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
       </hspacer>
-      <component id="5e552" class="javax.swing.JTable" binding="table1" default-binding="true">
-        <constraints>
-          <grid row="2" column="2" row-span="6" col-span="5" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="50"/>
-          </grid>
-        </constraints>
-        <properties/>
-      </component>
       <component id="e25f9" class="javax.swing.JLabel">
         <constraints>
           <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -144,7 +144,7 @@
       </vspacer>
       <component id="252dd" class="javax.swing.JButton" binding="submitAssignBlanksButton" default-binding="true">
         <constraints>
-          <grid row="14" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="13" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Submit Assign Blanks"/>
@@ -152,15 +152,15 @@
       </component>
       <component id="941b1" class="javax.swing.JLabel">
         <constraints>
-          <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Office Manager - Name"/>
         </properties>
       </component>
-      <component id="9c095" class="javax.swing.JComboBox" binding="comboBox3" default-binding="true">
+      <component id="9c095" class="javax.swing.JComboBox" binding="blankType">
         <constraints>
-          <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <model>
@@ -170,7 +170,7 @@
       </component>
       <component id="90b43" class="javax.swing.JButton" binding="logOutButton" default-binding="true">
         <constraints>
-          <grid row="15" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="14" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Log Out"/>
@@ -178,52 +178,22 @@
       </component>
       <hspacer id="33392">
         <constraints>
-          <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
       </hspacer>
       <vspacer id="3af60">
         <constraints>
-          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+            <preferred-size width="11" height="17"/>
+          </grid>
         </constraints>
       </vspacer>
       <component id="9b3b" class="javax.swing.JButton" binding="submitReassignBlanksButton" default-binding="true">
         <constraints>
-          <grid row="14" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="13" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Submit Reassign Blanks"/>
-        </properties>
-      </component>
-      <component id="391a0" class="javax.swing.JButton" binding="button3" default-binding="true">
-        <constraints>
-          <grid row="13" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value=""/>
-        </properties>
-      </component>
-      <component id="acfe2" class="javax.swing.JButton" binding="button2" default-binding="true">
-        <constraints>
-          <grid row="12" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value=""/>
-        </properties>
-      </component>
-      <component id="e4b9d" class="javax.swing.JButton" binding="button1" default-binding="true">
-        <constraints>
-          <grid row="11" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value=""/>
-        </properties>
-      </component>
-      <component id="55436" class="javax.swing.JLabel">
-        <constraints>
-          <grid row="13" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Travel Advisor"/>
         </properties>
       </component>
       <component id="9039f" class="javax.swing.JLabel">
@@ -232,14 +202,6 @@
         </constraints>
         <properties>
           <text value="Blank"/>
-        </properties>
-      </component>
-      <component id="d6aca" class="javax.swing.JLabel">
-        <constraints>
-          <grid row="11" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Previous Travel Advisor"/>
         </properties>
       </component>
       <component id="2ba3e" class="javax.swing.JLabel">
@@ -260,14 +222,57 @@
           <grid row="11" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
       </hspacer>
-      <scrollpane id="b56c0">
+      <component id="55436" class="javax.swing.JLabel">
         <constraints>
-          <grid row="2" column="7" row-span="6" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="11" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Travel Advisor"/>
+        </properties>
+      </component>
+      <component id="ac823" class="javax.swing.JButton" binding="showStockButton" default-binding="true">
+        <constraints>
+          <grid row="7" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="122" height="57"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="Show Stock"/>
+        </properties>
+      </component>
+      <scrollpane id="9b9bd" binding="stockTableScroll">
+        <constraints>
+          <grid row="2" column="2" row-span="6" col-span="5" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
-        <border type="none"/>
-        <children/>
+        <border type="none" title=""/>
+        <children>
+          <component id="5e552" class="javax.swing.JTable" binding="stockTable">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
       </scrollpane>
+      <component id="19689" class="javax.swing.JComboBox" binding="ReassignAdvisor">
+        <constraints>
+          <grid row="11" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="View Assigned Advisor ID"/>
+          </model>
+        </properties>
+      </component>
+      <component id="9a9ad" class="javax.swing.JComboBox" binding="reasssignBlank">
+        <constraints>
+          <grid row="12" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="View Assigned Blanks"/>
+          </model>
+        </properties>
+      </component>
     </children>
   </grid>
 </form>
