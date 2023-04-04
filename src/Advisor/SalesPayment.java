@@ -1,4 +1,248 @@
 package Advisor;
 
-public class SalesPayment {
+import DB.DBConnectivity;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+public class SalesPayment extends javax.swing.JFrame {
+    private JButton applyCommissionButton;
+    private JComboBox<String> commissionFilterr;
+    private JButton checkDiscountButton;
+    private JComboBox paymentFilter;
+    private JButton continueButton;
+    private JButton voidTicketButton;
+    private JPanel mainPanel;
+    private JLabel beforeComissionLabel;
+    private JLabel priceBeforeText;
+    private JLabel availableCommissionRateLabel;
+    private JLabel calculatedPriceLabel;
+    private JLabel totalPriceLabel;
+    private JLabel checkApplicableDiscountLabel;
+    private JLabel discountPlanLabel;
+    private JLabel discountPlanText;
+    private JLabel priceDiscountAppliedText;
+    private JLabel discountPriceText;
+    private JLabel paymentTypeLabel;
+    private JComboBox paymentPeriodDropDown;
+    private JLabel paymentPeriodLabel;
+    private JPanel commissionFilterPanel;
+    private String blankType;
+    private static int ID;
+    private static String username;
+    private static int customerID;
+    private static int flightID;
+    private static int blankNumber;
+    private float price;
+    private int commissionRows;
+    private float priceAfterCommission;
+
+    public SalesPayment(int ID, String username, int customerID, int flightID, int blankNumber) {
+        System.out.println("This is flight ID: " + flightID);
+        System.out.println("This is blank ID: " + blankNumber);
+        System.out.println("This is customer ID: " + customerID);
+        this.ID = ID;
+        this.username = username;
+        this.customerID = customerID;
+        this.flightID = flightID;
+        this.blankNumber = blankNumber;
+        setContentPane(mainPanel);
+        setSize(1000,600);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setVisible(true);
+        try(Connection con = DBConnectivity.getConnection()){
+            assert con != null;
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            Statement stFlight = con.createStatement();
+            String queryFlight = "SELECT Flight.price \n " +
+                    "FROM Flight\n " +
+                    "WHERE Flight.number = '"+flightID+"' ";
+            ResultSet rsFlight = stFlight.executeQuery(queryFlight);
+
+            if (rsFlight.next()) { // check if the ResultSet contains any rows
+                price = rsFlight.getFloat("price");
+                priceBeforeText.setText(String.valueOf(price));
+                System.out.println(price + " THE FLOAT VALUE");
+
+                // Do something with the price variable
+            }
+            stFlight.close();
+
+
+
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+
+
+
+        applyCommissionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                float selectedCommission = Float.parseFloat(Objects.requireNonNull(commissionFilterr.getSelectedItem()).toString());
+                System.out.println("SELECTED COMMISSION IS " + selectedCommission);
+                priceAfterCommission = (price * selectedCommission) + price;
+                totalPriceLabel.setText("The total price is: " +  priceAfterCommission);
+
+            }
+        });
+
+        voidTicketButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int dialogResult = JOptionPane.showConfirmDialog(mainPanel,"Are you sure you want to void this Ticket?");
+
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    // User clicked the "Yes" button
+                    // Do something here
+                    JOptionPane.showMessageDialog(mainPanel,"The Ticket has been voided");
+                    dispose();
+                    TravelAdvisorHome home = new TravelAdvisorHome(ID,username);
+                    home.getContentPane().show();
+
+                } else {
+                    // do nothing
+                }
+
+            }
+        });
+        checkDiscountButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try(Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+
+                    Statement stCustDiscount = con.createStatement();
+                    String queryCustDiscount = "SELECT AccountType , DiscountType  " +
+                            "FROM CustomerAccount " +
+                            "WHERE CustomerAccount.Customer_ID = '" + customerID + "' ";
+                    ResultSet rsCustDiscount = stCustDiscount.executeQuery(queryCustDiscount);
+
+                    if(rsCustDiscount.next()){
+                        if(rsCustDiscount.getString("AccountType").equals("regular")){
+                            discountPlanText.setText("No discount plan applicable");
+                            priceDiscountAppliedText.setText("No discount percentage applied");
+                        }
+                        else if(rsCustDiscount.getString("AccountType").equals("valued")){
+                            if(rsCustDiscount.getString("DiscountType").equals("fixed")) {
+                                Statement stCustFixed = con.createStatement();
+                                String queryCustFixed = "SELECT Rate  " +
+                                        "FROM FixedDiscount " +
+                                        "WHERE FixedDiscount.CustomerID = '" + customerID + "' ";
+                                ResultSet rsCustFixed = stCustDiscount.executeQuery(queryCustFixed);
+                                if(rsCustFixed.next()){
+                                    float fixedDiscount = Float.parseFloat(rsCustFixed.getString("Rate"));
+                                    float fixedApplied = priceAfterCommission - (priceAfterCommission * fixedDiscount);
+                                    discountPlanText.setText("Fixed");
+                                    discountPriceText.setText(String.valueOf(fixedApplied));
+                                    priceDiscountAppliedText.setText("Total price after a flexible Discount of " + fixedDiscount * 100 + "%");
+                                }
+                            }
+
+                            else if(rsCustDiscount.getString("AccountType").equals("flexible")){
+                                Statement stCustFlexible = con.createStatement();
+                                String queryCustFlexible = "SELECT Rate  " +
+                                        "FROM FlexibleDiscount " +
+                                        "WHERE FlexibleDiscount.CustomerID = '" + customerID + "' ";
+                                ResultSet rsCustFlexible = stCustDiscount.executeQuery(queryCustFlexible);
+                                if(rsCustFlexible.next()){
+                                    float flexibleDiscount = Float.parseFloat(rsCustFlexible.getString("Rate"));
+                                    float flexibleApplied = priceAfterCommission - (priceAfterCommission * flexibleDiscount);
+                                    discountPlanText.setText("Flexible");
+                                    discountPriceText.setText(String.valueOf(flexibleApplied));
+                                    priceDiscountAppliedText.setText("Total price after a flexible Discount of " + flexibleDiscount * 10 + "%");
+                                }
+
+                            }
+
+                        }
+                    }
+
+                    stCustDiscount.close();
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+
+
+            }
+        });
+        commissionFilterr.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try(Connection con = DBConnectivity.getConnection()){
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+
+                    Statement stBlank = con.createStatement();
+                    String queryBlank = "SELECT Blank.Type\n " +
+                            "FROM Blank\n " +
+                            "WHERE Blank.BlankNumber = '"+blankNumber+"' ";
+                    ResultSet rsBlank = stBlank.executeQuery(queryBlank);
+                    if(rsBlank.next()) { // Check if the ResultSet has any data
+                        blankType = rsBlank.getString(1); // Retrieve the value of the first column
+                        availableCommissionRateLabel.setText("Available commission rates for " + blankType);
+
+                    }
+
+                    Statement stRows = con.createStatement();
+                    String queryRows = "SELECT COUNT(*) FROM (SELECT Rate, blankType " +
+                            "FROM Commission " +
+                            "WHERE Commission.blankType = '"+blankType+"' ) AS subquery";
+                    System.out.println(queryRows);
+                    ResultSet rsRows = stRows.executeQuery(queryRows);
+
+                    if(rsRows.next()) {
+                        commissionRows = rsRows.getInt(1);
+                    }
+
+                    commissionFilterr.setMaximumRowCount(commissionRows);
+
+
+                    Statement st = con.createStatement();
+                    String query = "SELECT Rate, blankType " +
+                            "FROM Commission " +
+                            "WHERE Commission.blankType = '"+blankType+"' ";
+                    System.out.println(query);
+                    ResultSet rs = st.executeQuery(query);
+
+
+                    Set<String> rateSet = new HashSet<String>(); // Use a Set to store unique values
+
+                    while(rs.next()){
+                        String option = rs.getString("Rate");
+                        rateSet.add(option); // Add the value to the Set
+                    }
+                    for (String option : rateSet) { // Loop through the Set and add unique values to the combo box
+                        commissionFilterr.addItem(option);
+                    }
+                    st.close();
+
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        continueButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+    }
+
+    public static void main(String[] args){
+        SalesPayment salesPayment = new SalesPayment(ID,username,customerID,flightID,blankNumber);
+        salesPayment.show();
+    }
 }

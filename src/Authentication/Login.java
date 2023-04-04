@@ -20,7 +20,6 @@ public class Login extends javax.swing.JFrame {
     private JButton resetButton;
     private JPasswordField passwordField;
     private JPanel loginBackground;
-    private JPanel AirViaLogo;
 
     private String username;
     private String password;
@@ -28,7 +27,7 @@ public class Login extends javax.swing.JFrame {
 
 
     public Login() {
-        // MAKES THE PAGE VISIBLE
+        // MAKES THE PAGE VISIBLEu
         setContentPane(loginBackground);
         setSize(1000,600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

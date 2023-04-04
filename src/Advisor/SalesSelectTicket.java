@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class SalesSellTicket extends javax.swing.JFrame {
+public class SalesSelectTicket extends javax.swing.JFrame {
     private JTextField departureText;
     private JTextField arrivalText;
     private JComboBox selectBlankType;
@@ -24,12 +24,14 @@ public class SalesSellTicket extends javax.swing.JFrame {
     private JComboBox selectBlank;
     private static int ID;
     private static String username;
-    private static ResultSet customerID;
+    private static int customerID;
+    private static int flightID;
+    private static int blankNumberForSale;
 
-    public SalesSellTicket(int ID, String username, ResultSet customerID) {
-        SalesSellTicket.ID = ID;
-        SalesSellTicket.username = username;
-        SalesSellTicket.customerID = customerID;
+    public SalesSelectTicket(int ID, String username, int customerID) {
+        SalesSelectTicket.ID = ID;
+        SalesSelectTicket.username = username;
+        SalesSelectTicket.customerID = customerID;
         setContentPane(mainPanel);
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -47,6 +49,7 @@ public class SalesSellTicket extends javax.swing.JFrame {
                 String arrival = arrivalText.getText();
                 DefaultTableModel model = (DefaultTableModel) flightTable.getModel();
                 model.setRowCount(0);
+
                 try(Connection con = DBConnectivity.getConnection()) {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
@@ -57,6 +60,7 @@ public class SalesSellTicket extends javax.swing.JFrame {
                             "WHERE Flight.departure = '"+departure+"' AND Flight.destination = '"+arrival+"' ";
                     System.out.println(query);
                     ResultSet rs = st.executeQuery(query);
+
                     ResultSetMetaData rsmd = rs.getMetaData();
 
                     int cols = rsmd.getColumnCount();
@@ -65,7 +69,7 @@ public class SalesSellTicket extends javax.swing.JFrame {
                         colName[i] = rsmd.getColumnName(i+1);
                     }
                     model.setColumnIdentifiers(colName);
-                    String flightNumber,  flightDeparture, flightArrival, flightDestination, flightDepTime, flightArrtime,
+                    String flightNumber,  flightDeparture, flightArrival, flightDepTime, flightArrtime,
                             price, airline, flightDate;
                     while(rs.next()){
                         flightNumber = rs.getString(1);
@@ -128,10 +132,22 @@ public class SalesSellTicket extends javax.swing.JFrame {
                 int selectedRowBlank = blankTable.getSelectedRow();
                 int selectedRowFlight = flightTable.getSelectedRow();
 
+                try {
+                    flightID = Integer.parseInt(flightTable.getValueAt(selectedRowFlight, 0).toString());
+                    blankNumberForSale = Integer.parseInt(blankTable.getValueAt(selectedRowBlank, 0).toString());
+                }
+                catch(Exception exception){
+                    JOptionPane.showMessageDialog(mainPanel,"Please select both Flight and desired Blank. If there are no available /n" +
+                            "Flights please let the customer know");
+                }
+
                 if (selectedRowBlank != -1 && selectedRowFlight != -1) {
                     // A row has been selected
                     // Perform your desired action here
                     // PaymentsPage
+                    dispose();
+                    SalesPayment salesPayment = new SalesPayment(ID,username,customerID,flightID,blankNumberForSale);
+                    salesPayment.show();
                 } else {
                     // No row has been selected
                     // Handle this case as needed
@@ -151,14 +167,14 @@ public class SalesSellTicket extends javax.swing.JFrame {
             Statement st = con.createStatement();
             String query = "SELECT Blank.blankNumber, Blank.Type \n" +
                     "FROM Blank \n" +
-                    "WHERE Blank.Employee_ID = '"+ID+"' AND Blank.Type IN ("+blankConstraint+") ";
+                    "WHERE Blank.Employee_ID = '"+ID+"' AND Blank.isSold = 0 AND Blank.Type IN ("+blankConstraint+") ";
             System.out.println(query);
             ResultSet rs = st.executeQuery(query);
             ResultSetMetaData rsmd = rs.getMetaData();
 
             int cols = rsmd.getColumnCount();
             String[] colName = new String[cols];
-            for(int i = 0; i < cols; i++){
+            for(int i = 0; i < cols; i++) {
                 colName[i] = rsmd.getColumnName(i+1);
             }
             model.setColumnIdentifiers(colName);
@@ -178,7 +194,7 @@ public class SalesSellTicket extends javax.swing.JFrame {
     }
 
     public static void main (String[] args){
-        SalesSellTicket salesSellTicket = new SalesSellTicket(ID, username,customerID);
+        SalesSelectTicket salesSellTicket = new SalesSelectTicket(ID, username,customerID);
         salesSellTicket.show();
     }
 }
