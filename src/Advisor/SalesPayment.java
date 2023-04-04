@@ -44,6 +44,14 @@ public class SalesPayment extends javax.swing.JFrame {
     private float price;
     private int commissionRows;
     private float priceAfterCommission;
+    private boolean customerHasDiscount;
+    private String accountType;
+    private float flexibleApplied;
+    private float fixedApplied;
+    private String paymentOption;
+    private String paymentPeriod;
+    private String paymentType;
+
 
     public SalesPayment(int ID, String username, int customerID, int flightID, int blankNumber) {
         System.out.println("This is flight ID: " + flightID);
@@ -132,9 +140,12 @@ public class SalesPayment extends javax.swing.JFrame {
                         if(rsCustDiscount.getString("AccountType").equals("regular")){
                             discountPlanText.setText("No discount plan applicable");
                             priceDiscountAppliedText.setText("No discount percentage applied");
+                            customerHasDiscount = false;
                         }
                         else if(rsCustDiscount.getString("AccountType").equals("valued")){
+                            customerHasDiscount = true;
                             if(rsCustDiscount.getString("DiscountType").equals("fixed")) {
+                                accountType = "fixed";
                                 Statement stCustFixed = con.createStatement();
                                 String queryCustFixed = "SELECT Rate  " +
                                         "FROM FixedDiscount " +
@@ -142,7 +153,7 @@ public class SalesPayment extends javax.swing.JFrame {
                                 ResultSet rsCustFixed = stCustDiscount.executeQuery(queryCustFixed);
                                 if(rsCustFixed.next()){
                                     float fixedDiscount = Float.parseFloat(rsCustFixed.getString("Rate"));
-                                    float fixedApplied = priceAfterCommission - (priceAfterCommission * fixedDiscount);
+                                    fixedApplied = priceAfterCommission - (priceAfterCommission * fixedDiscount);
                                     discountPlanText.setText("Fixed");
                                     discountPriceText.setText(String.valueOf(fixedApplied));
                                     priceDiscountAppliedText.setText("Total price after a flexible Discount of " + fixedDiscount * 100 + "%");
@@ -150,6 +161,8 @@ public class SalesPayment extends javax.swing.JFrame {
                             }
 
                             else if(rsCustDiscount.getString("AccountType").equals("flexible")){
+                                accountType = "valued";
+                                customerHasDiscount = true;
                                 Statement stCustFlexible = con.createStatement();
                                 String queryCustFlexible = "SELECT Rate  " +
                                         "FROM FlexibleDiscount " +
@@ -157,7 +170,7 @@ public class SalesPayment extends javax.swing.JFrame {
                                 ResultSet rsCustFlexible = stCustDiscount.executeQuery(queryCustFlexible);
                                 if(rsCustFlexible.next()){
                                     float flexibleDiscount = Float.parseFloat(rsCustFlexible.getString("Rate"));
-                                    float flexibleApplied = priceAfterCommission - (priceAfterCommission * flexibleDiscount);
+                                    flexibleApplied = priceAfterCommission - (priceAfterCommission * flexibleDiscount);
                                     discountPlanText.setText("Flexible");
                                     discountPriceText.setText(String.valueOf(flexibleApplied));
                                     priceDiscountAppliedText.setText("Total price after a flexible Discount of " + flexibleDiscount * 10 + "%");
@@ -236,6 +249,29 @@ public class SalesPayment extends javax.swing.JFrame {
         continueButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                paymentPeriod = paymentPeriodDropDown.getSelectedItem().toString();
+                paymentType =  paymentFilter.getSelectedItem().toString();
+
+                int dialog = JOptionPane.showConfirmDialog(mainPanel,"Are you sure you want to continue and selected correct payment options?");
+                if (dialog == JOptionPane.YES_OPTION) {
+                    // User clicked the "Yes" button
+                    // Do something here
+
+                    if (customerHasDiscount) {
+                        if (accountType.equals("fixed")) {
+                            dispose();
+                            SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, fixedApplied,flightID,paymentPeriod,paymentType,blankNumber,blankType);
+                        } else if (accountType.equals("flexible")) {
+                            dispose();
+                            SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, flexibleApplied,flightID,paymentPeriod,paymentType,blankNumber,blankType);
+                        }
+
+                    } else {
+                        dispose();
+                        SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, priceAfterCommission,flightID,paymentPeriod,paymentType,blankNumber,blankType);
+                    }
+                }
+
 
             }
         });
