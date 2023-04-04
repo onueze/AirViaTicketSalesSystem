@@ -8,9 +8,11 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.sql.*;
 
 public class OfficeManagerStock extends javax.swing.JFrame {
+
 
     private JPanel Stock;
     private JButton logOutButton;
@@ -31,38 +33,44 @@ public class OfficeManagerStock extends javax.swing.JFrame {
     private JScrollPane stockTableScroll;
     private JComboBox ReassignAdvisor;
     private JComboBox reasssignBlank;
+    private JButton openBlankReportButton;
     private static int ID;
     private static String username;
-    private static String role;
+
+
+
+
+
+
+    private void appendToLogFile(String message) {
+        File logFile = new File("/Users/aadilghani/Desktop/AirViaTicketSalesSystem/src/LogFile Report.txt");
+
+        try (FileWriter fw = new FileWriter(logFile, true);
+             BufferedWriter bw = new BufferedWriter(fw);
+             PrintWriter out = new PrintWriter(bw)) {
+            out.println(message);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     public OfficeManagerStock(int ID, String username) {
 
-        stockTable.setPreferredScrollableViewportSize(new Dimension(500,500));
-        stockTableScroll.setPreferredSize(new Dimension(500,500));
+        stockTable.setPreferredScrollableViewportSize(new Dimension(500, 500));
+        stockTableScroll.setPreferredSize(new Dimension(500, 500));
         this.username = username;
         this.ID = ID;
-        this.role = "Advisor";
+
         setContentPane(Stock);
         setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
 
-
-
-
-
-
-
-
-
-
-
-
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerHome officeManagerPage = new OfficeManagerHome(ID,username);
+                OfficeManagerHome officeManagerPage = new OfficeManagerHome(ID, username);
                 officeManagerPage.setVisible(true);
                 dispose();
 
@@ -72,7 +80,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         stockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerStock officeManagerStock = new OfficeManagerStock(ID,username);
+                OfficeManagerStock officeManagerStock = new OfficeManagerStock(ID, username);
                 officeManagerStock.setVisible(true);
                 dispose();
 
@@ -82,7 +90,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         blanksButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks(ID,username);
+                OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks(ID, username);
                 officeManagerBlanks.setVisible(true);
                 dispose();
 
@@ -93,7 +101,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         discountPlanButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerDiscountPlan discountPlanButton = new OfficeManagerDiscountPlan(ID,username);
+                OfficeManagerDiscountPlan discountPlanButton = new OfficeManagerDiscountPlan(ID, username);
                 discountPlanButton.setVisible(true);
                 dispose();
 
@@ -103,7 +111,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         ticketStockTurnOverButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerTicketStockTurnOverReport ticketStockTurnOverButton = new OfficeManagerTicketStockTurnOverReport(ID,username);
+                OfficeManagerTicketStockTurnOverReport ticketStockTurnOverButton = new OfficeManagerTicketStockTurnOverReport(ID, username);
                 ticketStockTurnOverButton.setVisible(true);
                 dispose();
 
@@ -113,7 +121,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         interlineSalesReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports(ID,username);
+                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports(ID, username);
                 interlineSalesReportButton.setVisible(true);
                 dispose();
 
@@ -123,7 +131,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         domesticSalesReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport(ID,username);
+                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport(ID, username);
                 domesticSalesReportButton.setVisible(true);
                 dispose();
 
@@ -170,9 +178,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
             }
 
 
-
         });
-
 
 
         assignTravelAdvisor.addActionListener(new ActionListener() {
@@ -205,7 +211,6 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         });
 
 
-
         assignBlank.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -215,7 +220,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     Statement st = con.createStatement();
-                    String query =  "SELECT  Blank.BlankNumber FROM Blank WHERE isAssigned = false";
+                    String query = "SELECT  Blank.BlankNumber FROM Blank WHERE isAssigned = false";
 
 
                     ResultSet rs = st.executeQuery(query);
@@ -246,7 +251,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     Statement st = con.createStatement();
-                    String query =  "SELECT DISTINCT Blank.Employee_ID FROM Blank WHERE ";
+                    String query = "SELECT  Employee.Employee_ID FROM Employee where Employee.role = 'advisor'";
 
 
                     ResultSet rs = st.executeQuery(query);
@@ -266,7 +271,6 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
-
 
 
             }
@@ -309,8 +313,6 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                 }
 
 
-
-
             }
         });
 
@@ -326,31 +328,38 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     Statement st = con.createStatement();
-                    String query =  "UPDATE Blank SET Employee_ID = ?, isAssigned = true WHERE BlankNumber = ?";
+                    String query = "UPDATE Blank SET Employee_ID = ?, isAssigned = true WHERE BlankNumber = ?";
                     PreparedStatement preparedStatement = con.prepareStatement(query);
 
                     // Set the values for the prepared statement
                     preparedStatement.setString(1, assignAdvisorID);
-                    preparedStatement.setString(2, assignBlankNumber );
+                    preparedStatement.setString(2, assignBlankNumber);
 
 
-                    int result = preparedStatement.executeUpdate();
+                    int result2 = preparedStatement.executeUpdate();
 
-                    if (result > 0) {
+                    if (result2 > 0) {
                         // Show success message
                         JOptionPane.showMessageDialog(null, "Blank table updated successfully");
+
+                        String message = "Assigned Blank Number: " + assignBlankNumber + ", Employee ID: " + assignAdvisorID;
+                        appendToLogFile(message);
                     } else {
                         // Show error message
                         JOptionPane.showMessageDialog(null, "Failed to update Blank table");
                     }
+                    // Maybe delte one okf the jOption pane, or leave both if not really afectign runnign
 
                 } catch (ClassNotFoundException ex) {
+                    JOptionPane.showMessageDialog(null, "Database driver not found");
                     ex.printStackTrace();
                 } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "Error updating the blank table");
                     ex.printStackTrace();
                 }
 
             }
+
         });
         submitReassignBlanksButton.addActionListener(new ActionListener() {
             @Override
@@ -379,6 +388,9 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                         if (result > 0) {
                             // Show success message
                             JOptionPane.showMessageDialog(null, "Blank table updated successfully");
+
+                            String message = "Reassigned Blank Number: " + reAssignBlankNumber + ", Employee ID: " + reAssignAdvisorID;
+                            appendToLogFile(message);
                         } else {
                             // Show error message
                             JOptionPane.showMessageDialog(null, "Failed to update Blank table");
@@ -392,22 +404,14 @@ public class OfficeManagerStock extends javax.swing.JFrame {
 
 
                 }
-                }
+            }
         });
+
+
     }
-
-
 
     public static void main(String[] args){
         OfficeManagerStock Stock = new OfficeManagerStock(ID,username);
         Stock.show();
-
-    }
-
-
-
-
-
-
-
+  }
 }

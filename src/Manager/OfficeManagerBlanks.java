@@ -6,6 +6,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.sql.*;
 
 
@@ -20,10 +21,10 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
     private JButton discountPlanButton;
     private JButton ticketStockTurnOverButton;
     private JButton submitBlankUsageReportButton;
-    private JButton submitUnusedBlanksToButton;
     private JTable blanksTable;
     private JScrollPane blankTableScroll;
     private JButton showBlanksButton;
+    private JButton viewBlankUsageReportButton;
     private JComboBox FilterType;
     private JPanel blankTypePanel;
 
@@ -35,8 +36,8 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
 
 
     public OfficeManagerBlanks(int ID, String username) {
-        blanksTable.setPreferredScrollableViewportSize(new Dimension(500,500));
-        blankTableScroll.setPreferredSize(new Dimension(500,500));
+        blanksTable.setPreferredScrollableViewportSize(new Dimension(500, 500));
+        blankTableScroll.setPreferredSize(new Dimension(500, 500));
 
         this.username = username;
         this.ID = ID;
@@ -85,17 +86,10 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         */
 
 
-
-
-
-
-
-
-
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerHome officeManagerPage = new OfficeManagerHome(ID,username);
+                OfficeManagerHome officeManagerPage = new OfficeManagerHome(ID, username);
                 officeManagerPage.setVisible(true);
                 dispose();
 
@@ -105,7 +99,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         stockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerStock officeManagerStock = new OfficeManagerStock(ID,username);
+                OfficeManagerStock officeManagerStock = new OfficeManagerStock(ID, username);
                 officeManagerStock.setVisible(true);
                 dispose();
             }
@@ -114,7 +108,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         blanksButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks(ID,username);
+                OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks(ID, username);
                 officeManagerBlanks.setVisible(true);
                 dispose();
             }
@@ -124,7 +118,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         discountPlanButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerDiscountPlan discountPlanButton = new OfficeManagerDiscountPlan(ID,username);
+                OfficeManagerDiscountPlan discountPlanButton = new OfficeManagerDiscountPlan(ID, username);
                 discountPlanButton.setVisible(true);
                 dispose();
 
@@ -134,7 +128,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         ticketStockTurnOverButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerTicketStockTurnOverReport ticketStockTurnOverButton = new OfficeManagerTicketStockTurnOverReport(ID,username);
+                OfficeManagerTicketStockTurnOverReport ticketStockTurnOverButton = new OfficeManagerTicketStockTurnOverReport(ID, username);
                 ticketStockTurnOverButton.setVisible(true);
                 dispose();
 
@@ -144,7 +138,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         interlineSalesReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports(ID,username);
+                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports(ID, username);
                 interlineSalesReportButton.setVisible(true);
                 dispose();
 
@@ -154,7 +148,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         domesticSalesReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport(ID,username);
+                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport(ID, username);
                 domesticSalesReportButton.setVisible(true);
                 dispose();
 
@@ -189,7 +183,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                         colName[i] = rsmd.getColumnName(i + 1);
                     }
                     model.setColumnIdentifiers(colName);
-                    String blankNumber,type,IsSold,IsAssigned,employee_ID;
+                    String blankNumber, type, IsSold, IsAssigned, employee_ID;
                     while (rs.next()) {
                         blankNumber = rs.getString(1);
                         type = rs.getString(2);
@@ -197,7 +191,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                         IsAssigned = rs.getString(4);
                         employee_ID = rs.getString(5);
 
-                        String[] row = {blankNumber,type,IsSold,IsAssigned,employee_ID};
+                        String[] row = {blankNumber, type, IsSold, IsAssigned, employee_ID};
                         model.addRow(row);
                     }
                     st.close();
@@ -223,7 +217,6 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                             "LEFT JOIN Employee ON Blank.Employee_ID = Employee.Employee_ID AND Employee.role = 'advisor';";
 
 
-
                     ResultSet rs = st.executeQuery(query);
                     ResultSetMetaData rsmd = rs.getMetaData();
                     DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
@@ -234,7 +227,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                         colName[i] = rsmd.getColumnName(i + 1);
                     }
                     model.setColumnIdentifiers(colName);
-                    String blankNumber,Type,IsSold,IsAssigned,employee_ID, employee_first_name, employee_last_name;
+                    String blankNumber, Type, IsSold, IsAssigned, employee_ID, employee_first_name, employee_last_name;
                     while (rs.next()) {
                         blankNumber = rs.getString(1);
                         Type = rs.getString(2);
@@ -244,7 +237,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                         employee_first_name = rs.getString(6);
                         employee_last_name = rs.getString(7);
 
-                        String[] row = {blankNumber,Type,IsSold,IsAssigned,employee_ID,employee_first_name,employee_last_name};
+                        String[] row = {blankNumber, Type, IsSold, IsAssigned, employee_ID, employee_first_name, employee_last_name};
                         model.addRow(row);
                     }
                     st.close();
@@ -258,10 +251,27 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         });
 
 
+        viewBlankUsageReportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    File logFile = new File("/Users/aadilghani/Desktop/AirViaTicketSalesSystem/src/LogFile Report.txt");
+                    Desktop.getDesktop().open(logFile);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
 
-
-
+            }
+        });
     }
+
+
+
+
+
+
+
+
 
     public static void main(String[] args){
         OfficeManagerBlanks Blanks = new OfficeManagerBlanks(ID,username);
