@@ -29,6 +29,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
     private String dbName;
     private String dbUser;
     private String dbPassword;
+    private File backupFile;
 
     public SystemAdminHome(int ID, String username){
         this.ID = ID;
@@ -71,6 +72,28 @@ public class SystemAdminHome extends javax.swing.JFrame {
         restoreButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int result = JOptionPane.showConfirmDialog(null, "Restoring the database will overwrite any existing data. Are you sure you want to continue?", "Confirm Database Restore", JOptionPane.YES_NO_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    JFileChooser fileChooser = new JFileChooser();
+                    int result2 = fileChooser.showOpenDialog(null);
+                    if (result2 == JFileChooser.APPROVE_OPTION) {
+                        File backupFile = fileChooser.getSelectedFile();
+                        try {
+                            String[] restoreCmd = new String[]{"mysql", "--user=" + dbUser, "--password=" + dbPassword, dbName, "-e", "source " + backupFile.getAbsolutePath()};
+                            Process runtimeProcess = Runtime.getRuntime().exec(restoreCmd);
+                            int processComplete = runtimeProcess.waitFor();
+                            if (processComplete == 0) {
+                                JOptionPane.showMessageDialog(null, "Database restored from " + backupFile.getAbsolutePath());
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Error restoring database.");
+                            }
+                        } catch (IOException | InterruptedException ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(null, "Error restoring database: " + ex.getMessage());
+                        }
+                    }
+                }
+
 
             }
         });
@@ -81,7 +104,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
                 int result = fileChooser.showSaveDialog(null);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     // Get the selected file and directory
-                    File backupFile = fileChooser.getSelectedFile();
+                    backupFile = fileChooser.getSelectedFile();
                     File backupDir = backupFile.getParentFile();
 
                     // Get today's date in the format yyyy-MM-dd
