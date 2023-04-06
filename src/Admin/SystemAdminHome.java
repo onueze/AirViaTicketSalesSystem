@@ -10,10 +10,10 @@ import java.util.Date;
 
 public class SystemAdminHome extends javax.swing.JFrame {
     private JButton homeButton;
-    private JButton userDetailsButton;
+    private JButton manageUserDetailsButton;
     private JButton customerDetailsButton;
-    private JButton commissionRatesButton;
-    private JButton systemStockButton;
+    private JButton manageCommissionRatesButton;
+    private JButton manageSystemStockButton;
     private JButton restoreButton;
     private JButton backUpButton;
     private JButton createUserButton;
@@ -45,27 +45,62 @@ public class SystemAdminHome extends javax.swing.JFrame {
         dbName = "in2018g01";
 
 
-        userDetailsButton.addActionListener(new ActionListener() {
+        homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                SystemAdminHome homeButton = new SystemAdminHome(ID,username);
+                homeButton.setVisible(true);
+                dispose();
 
             }
         });
+
+        manageUserDetailsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UserDetails manageUserDetailsButton = new UserDetails(ID,username);
+                manageUserDetailsButton.setVisible(true);
+                dispose();
+
+            }
+        });
+
         customerDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                CustomerDetails manageCustomerDetailsButton = new CustomerDetails(ID,username);
+                manageCustomerDetailsButton.setVisible(true);
+                dispose();
+
 
             }
         });
-        commissionRatesButton.addActionListener(new ActionListener() {
+        manageCommissionRatesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                CommissionRates manageCommissionRatesButton = new CommissionRates(ID,username);
+                manageCommissionRatesButton.setVisible(true);
+                dispose();
+
             }
         });
-        systemStockButton.addActionListener(new ActionListener() {
+        manageSystemStockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                SystemStock manageSystemStockButton = new SystemStock(ID,username);
+                manageSystemStockButton.setVisible(true);
+                dispose();
+
+
+            }
+        });
+        createUserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CreateUser createUserButton = new CreateUser(ID,username);
+                createUserButton.setVisible(true);
+                dispose();
 
             }
         });
