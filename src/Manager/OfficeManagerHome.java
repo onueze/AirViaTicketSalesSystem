@@ -16,6 +16,7 @@ public class OfficeManagerHome extends javax.swing.JFrame {
     private JPanel logoField;
     private JLabel IDAndUserNameLabel;
     private JPanel officeManagerPage;
+    private JButton advisorIndividualReportButton;
     private static int ID;
     private static String username;
 
@@ -100,8 +101,14 @@ public class OfficeManagerHome extends javax.swing.JFrame {
         });
 
 
-
-
+        advisorIndividualReportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OfficeManagerAdvisorIndividualReport advisorIndividualReportButton = new OfficeManagerAdvisorIndividualReport(ID,username);
+                advisorIndividualReportButton.setVisible(true);
+                dispose();
+            }
+        });
     }
 
 

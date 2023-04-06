@@ -25,8 +25,6 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
     private JScrollPane blankTableScroll;
     private JButton showBlanksButton;
     private JButton viewBlankUsageReportButton;
-    private JComboBox FilterType;
-    private JPanel blankTypePanel;
 
 
     private static int ID;
@@ -43,7 +41,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         this.ID = ID;
         setContentPane(Blanks);
         setSize(1500, 1000);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
 
         /*       NEED TO SORT ADD THE FILTER SYSTEM, MAKE IT THE A METHOD SO IT CAN BE CALLAED MUILT TOMES WITHOUT REAPIGN ALL THE CODE
@@ -153,61 +151,29 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                 dispose();
 
             }
+
         });
 
 
-        submitBlankUsageReportButton.addActionListener(new ActionListener() {
+        viewBlankUsageReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-        submitBlankUsageReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try (Connection con = DBConnectivity.getConnection()) {
-                    assert con != null;
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    Statement st = con.createStatement();
-                    String query = "SELECT  Blank.BlankNumber, Blank.Type,Blank.isSold,Blank.isAssigned,Blank.Employee_ID" +
-                            "FROM Blank";
-
-                    ResultSet rs = st.executeQuery(query);
-                    ResultSetMetaData rsmd = rs.getMetaData();
-                    DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
-
-                    int cols = rsmd.getColumnCount();
-                    String[] colName = new String[cols];
-                    for (int i = 0; i < cols; i++) {
-                        colName[i] = rsmd.getColumnName(i + 1);
-                    }
-                    model.setColumnIdentifiers(colName);
-                    String blankNumber, type, IsSold, IsAssigned, employee_ID;
-                    while (rs.next()) {
-                        blankNumber = rs.getString(1);
-                        type = rs.getString(2);
-                        IsSold = rs.getString(3);
-                        IsAssigned = rs.getString(4);
-                        employee_ID = rs.getString(5);
-
-                        String[] row = {blankNumber, type, IsSold, IsAssigned, employee_ID};
-                        model.addRow(row);
-                    }
-                    st.close();
-
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
-                } catch (SQLException ex) {
+                try {
+                    File logFile = new File("/Users/aadilghani/Desktop/AirViaTicketSalesSystem/src/LogFile Report.txt");
+                    Desktop.getDesktop().open(logFile);
+                } catch (IOException ex) {
                     ex.printStackTrace();
                 }
 
-
             }
         });
+
         showBlanksButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
+                model.setRowCount(0);
+
                 try (Connection con = DBConnectivity.getConnection()) {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
@@ -219,7 +185,8 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
 
                     ResultSet rs = st.executeQuery(query);
                     ResultSetMetaData rsmd = rs.getMetaData();
-                    DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
+
+
 
                     int cols = rsmd.getColumnCount();
                     String[] colName = new String[cols];
@@ -247,29 +214,10 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
-            }
-        });
-
-
-        viewBlankUsageReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    File logFile = new File("/Users/aadilghani/Desktop/AirViaTicketSalesSystem/src/LogFile Report.txt");
-                    Desktop.getDesktop().open(logFile);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
 
             }
         });
     }
-
-
-
-
-
-
 
 
 
