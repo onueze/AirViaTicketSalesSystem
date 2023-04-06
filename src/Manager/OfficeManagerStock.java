@@ -10,6 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.sql.*;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
 
 public class OfficeManagerStock extends javax.swing.JFrame {
 
@@ -63,8 +66,18 @@ public class OfficeManagerStock extends javax.swing.JFrame {
 
         setContentPane(Stock);
         setSize(1000, 600);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
+
+        // add this to assign and reassign somehow
+
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String formattedDate = dateFormat.format(currentDate);
+
+
+
+
 
 
         homeButton.addActionListener(new ActionListener() {
@@ -90,9 +103,10 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         blanksButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                dispose();
+
                 OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks(ID, username);
                 officeManagerBlanks.setVisible(true);
-                dispose();
 
             }
         });
@@ -323,7 +337,6 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                 String assignAdvisorID = (String) assignTravelAdvisor.getSelectedItem();
                 String assignBlankNumber = (String) assignBlank.getSelectedItem();
 
-
                 try (Connection con = DBConnectivity.getConnection()) {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
@@ -343,6 +356,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(null, "Blank table updated successfully");
 
                         String message = "Assigned Blank Number: " + assignBlankNumber + ", Employee ID: " + assignAdvisorID;
+
                         appendToLogFile(message);
                     } else {
                         // Show error message
