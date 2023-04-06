@@ -94,7 +94,6 @@ public class SystemAdminHome extends javax.swing.JFrame {
                     }
                 }
 
-
             }
         });
         backUpButton.addActionListener(new ActionListener() {
