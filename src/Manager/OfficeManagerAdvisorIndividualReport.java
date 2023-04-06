@@ -1,12 +1,10 @@
 package Manager;
 
 import DB.DBConnectivity;
-import com.itextpdf.io.IOException;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.*;
 
 public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
@@ -30,49 +30,12 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
     private JButton produceAdvisorIndivudialReportButton;
     private JComboBox chooseAdvisorName;
     private JComboBox selectSaleType;
-    private JButton testPdfButton;
+    private JButton viewProducedReportButton;
     private static int ID;
     private static String username;
 
 
-    private static void createPDF(String pdfPath, ResultSet resultSet, String advisorName) throws FileNotFoundException, SQLException {
-        // Initialize the PdfWriter
-        PdfWriter pdfWriter = new PdfWriter(pdfPath);
 
-        // Initialize the PdfDocument
-        PdfDocument pdfDocument = new PdfDocument(pdfWriter);
-
-        // Initialize the Document
-        Document document = new Document(pdfDocument);
-
-        // Add title to the document
-        String title = advisorName + " Individual Report";
-        Paragraph titleParagraph = new Paragraph(title).setFontSize(18).setBold().setUnderline();
-        document.add(titleParagraph);
-
-        // Create a table and populate it with the fetched data
-        Table table = new Table(5);
-        table.addHeaderCell("Employee ID");
-        table.addHeaderCell("Blank Number");
-        table.addHeaderCell("Is Sold");
-        table.addHeaderCell("Type");
-        table.addHeaderCell("Date Assign");
-
-        // Iterate through the result set without calling resultSet.first()
-        while (resultSet.next()) {
-            table.addCell(resultSet.getString("Employee_ID"));
-            table.addCell(resultSet.getString("BlankNumber"));
-            table.addCell(resultSet.getString("IsSold"));
-            table.addCell(resultSet.getString("Type"));
-            table.addCell(resultSet.getString("Date_Assign"));
-        }
-
-        // Add the table to the document
-        document.add(table);
-
-        // Close the document
-        document.close();
-    }
 
 
 
@@ -215,11 +178,6 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
                 selectSaleType.addItem("Interline");
                 selectSaleType.addItem("Domestic");
 
-
-
-
-
-
             }
         });
 
@@ -236,51 +194,135 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     Statement st = con.createStatement();
-                    String query = "SELECT Employee.Employee_ID, Employee.First_name, Blank.BlankNumber, Blank.isSold, Blank.Type, Blank.date_assign "
-                            + "FROM Employee "
-                            + "INNER JOIN Blank ON Employee.Employee_ID = Blank.isAssigned "
-                            + "WHERE Employee.role = 'advisor' "
-                            + "AND Employee.Employee_ID = ? "
-                            + "AND Blank.isAssigned = true "
-                            + "AND Blank.Type = ?";
+
+                    String query = "SELECT " +
+                            "Sale.Employee_ID " +
+                            "SUM(Sale.Amount) AS TotalSaleAmount, " +
+                            "SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END) AS TotalCommissionAmount, " +
+                            "SUM(Sale.Amount) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END) AS NetSaleAmount " +
+                            "FROM " +
+                            "Sale " +
+                            "JOIN Commission ON Sale.Commission_ID = Commission.Commission_ID " +
+                            "JOIN Blank ON Sale.BlankNumber = Blank.BlankNumber " +
+                            "WHERE Sale.Employee_ID = ? " +
+                            "GROUP BY " +
+                            "Sale.Employee_ID;";
 
                     PreparedStatement preparedStatement = con.prepareStatement(query);
+                    preparedStatement.setString(1,advisorID);
 
-                    // Set the values for the prepared statement
-                    preparedStatement.setString(1, advisorID);
-                    preparedStatement.setString(2, saleType);
 
-                    // Execute the query and fetch the data
-                    ResultSet resultSet = preparedStatement.executeQuery();
 
-                    // Generate the PDF report
-                    String advisorName = "";
-                    if (resultSet.next()) {
-                        advisorName = resultSet.getString("First_name");
+                    Statement ast = con.createStatement();
+
+                    String additionalQuery = "SELECT SUM(NetSaleAmount) AS TotalNetSaleAmount FROM (" +
+                            "SELECT Sale.Employee_ID " +
+                            "       SUM(Sale.Amount) AS TotalSaleAmount, " +
+                            "       SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END) AS TotalCommissionAmount, " +
+                            "       SUM(Sale.Amount) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END) AS NetSaleAmount " +
+                            "FROM Sale " +
+                            "JOIN Commission ON Sale.Commission_ID = Commission.Commission_ID " +
+                            "JOIN Blank ON Sale.BlankNumber = Blank.BlankNumber " +
+                            "WHERE Sale.Employee_ID = ? " +
+                            "GROUP BY Sale.Employee_ID" +
+                            ") AS subquery;";
+
+                    PreparedStatement preparedStatementA = con.prepareStatement(additionalQuery);
+                    preparedStatementA.setString(1,advisorID);
+
+
+
+
+
+                    ResultSet rs = st.executeQuery(query);
+                    ResultSet rsAdditional = ast.executeQuery(additionalQuery);
+
+                    Document PDFdoc = new Document(PageSize.A4.rotate());
+                    PdfWriter.getInstance(PDFdoc,new FileOutputStream("Individual report.pdf"));
+                    PDFdoc.open();
+                    PdfPTable queryTable = new PdfPTable(5);
+
+
+
+                    String[] columnNames = {"Employee_ID", "Total Sale Amount", "Total Commission Amount", "Net Sale Amount","Total Net Sale Amount"};
+
+                    float[] columnWidths = {2f, 1.5f, 1.8f, 1f,1.5f};
+                    queryTable.setWidths(columnWidths);
+                    queryTable.setWidthPercentage(100);
+
+                    for (String columnName : columnNames) {
+                        PdfPCell header = new PdfPCell(new Phrase(columnName));
+                        header.setMinimumHeight(20); // Set minimum height for header cells
+                        header.setBackgroundColor(BaseColor.LIGHT_GRAY); // Set background color for header cells
+                        queryTable.addCell(header);
                     }
 
-                    String pdfPath = advisorName.replaceAll("\\s+", "") + "_IndividualReport.pdf";
-                    createPDF(pdfPath, resultSet, advisorName);
+                    PdfPCell table_cell;
 
-                    // Display the generated PDF on the screen
-                    if (Desktop.isDesktopSupported()) {
-                        try {
-                            File pdfFile = new File(pdfPath);
-                            Desktop.getDesktop().open(pdfFile);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        } catch (java.io.IOException ex) {
-                            ex.printStackTrace();
-                        }
+                    while(rs.next()){
+
+                        String Employee_ID = rs.getString("Employee_ID");
+                        table_cell=new PdfPCell(new Phrase(Employee_ID));
+                        queryTable.addCell(table_cell);
+
+                        String TotalSaleAmount = rs.getString("TotalSaleAmount");
+                        table_cell=new PdfPCell(new Phrase(TotalSaleAmount));
+                        queryTable.addCell(table_cell);
+
+                        String TotalCommissionAmount = rs.getString("TotalCommissionAmount");
+                        table_cell=new PdfPCell(new Phrase(TotalCommissionAmount));
+                        queryTable.addCell(table_cell);
+
+                        String NetSaleAmount = rs.getString("NetSaleAmount");
+                        table_cell=new PdfPCell(new Phrase(NetSaleAmount));
+                        queryTable.addCell(table_cell);
+
+
+
                     }
 
-                } catch (ClassNotFoundException | SQLException | FileNotFoundException ex) {
+                    if (rsAdditional.next()) {
+                        String TotalNetSaleAmount = rsAdditional.getString("TotalNetSaleAmount");
+                        table_cell = new PdfPCell(new Phrase(TotalNetSaleAmount));
+                        queryTable.addCell(table_cell);
+                    }
+                    rsAdditional.close();
+                    PDFdoc.add(queryTable);
+                    PDFdoc.close();
+
+                    st.close();
+
+
+
+
+
+
+
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                } catch (DocumentException ex) {
+                    ex.printStackTrace();
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+        });
+
+
+        viewProducedReportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    File PDFdoc = new File("Individual report.pdf");
+                    Desktop.getDesktop().open(PDFdoc);
+                } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
         });
-
-
     }
 
 
