@@ -1,4 +1,4 @@
-package Advisor;
+package Advisor.Sales;
 
 import DB.DBConnectivity;
 
@@ -20,6 +20,7 @@ public class SalesSelectTicket extends javax.swing.JFrame {
     private JPanel mainPanel;
     private JButton showBlanksButton;
     private JButton continueButton;
+    private JTextField textField1;
     private JPanel filterPanel;
     private JComboBox selectBlank;
     private static int ID;

@@ -1,7 +1,7 @@
 package Authentication;
 
 import Admin.SystemAdminHome;
-import Advisor.TravelAdvisorHome;
+import Advisor.Home.TravelAdvisorHome;
 import DB.DBConnectivity;
 import Manager.OfficeManagerHome;
 

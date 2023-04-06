@@ -1,5 +1,6 @@
-package Advisor;
+package Advisor.Sales;
 
+import Advisor.Home.TravelAdvisorHome;
 import DB.DBConnectivity;
 
 import javax.swing.*;
