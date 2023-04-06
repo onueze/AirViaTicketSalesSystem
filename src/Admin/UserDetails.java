@@ -15,6 +15,12 @@ public class UserDetails {
     private JButton changeAccessRoleButton;
     private JComboBox roleCombobox;
     private JTextField employeeIDText;
+    private JButton homeButton;
+    private JButton createUserButton;
+    private JButton manageSystemStockButton;
+    private JButton manageCommissionRatesButton;
+    private JButton manageCustomerDetailsButton;
+    private JButton manageUserDetailsButton;
 
     public UserDetails() {
         roleCombobox.addActionListener(new ActionListener() {
