@@ -1,5 +1,6 @@
-package Advisor;
+package Advisor.Blanks;
 
+import Advisor.Home.TravelAdvisorHome;
 import DB.DBConnectivity;
 
 import javax.swing.*;

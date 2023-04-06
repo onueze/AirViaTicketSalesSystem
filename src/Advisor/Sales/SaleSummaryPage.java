@@ -1,4 +1,4 @@
-package Advisor;
+package Advisor.Sales;
 
 import DB.DBConnectivity;
 
@@ -27,7 +27,7 @@ public class SaleSummaryPage extends javax.swing.JFrame {
     private JLabel customerIDLabel;
     private static int ID;
     private static String username;
-    static float price;
+    private static float price;
     private static int flightID;
     private static String paymentPeriod;
     private static String paymentType;
@@ -42,6 +42,7 @@ public class SaleSummaryPage extends javax.swing.JFrame {
     private String flightArrtime;
     private String airline;
     private String flightDate;
+    private int ticketID;
 
 
 
@@ -125,8 +126,57 @@ public class SaleSummaryPage extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                int dialog = JOptionPane.showConfirmDialog(mainPanel, "Do you want to continue and complete the payment?");
+                if (dialog == JOptionPane.YES_OPTION) {
+                    // User clicked the "Yes" button
+                    // Do something here
+                    try (Connection con = DBConnectivity.getConnection()) {
+                        assert con != null;
+                        Class.forName("com.mysql.cj.jdbc.Driver");
+                        Statement st = con.createStatement();
+                        String query = "INSERT INTO Ticket SELECT " +
+                                "(SELECT COALESCE(MAX(TicketID), 0) + 1 FROM Ticket), '444000002', '3'";
+                        System.out.println(query);
+                        int rowsInserted = st.executeUpdate(query);
+
+                        st.close();
+                    } catch (SQLException | ClassNotFoundException ex) {
+                        ex.printStackTrace();
+                    }
+
+
+                    try (Connection con = DBConnectivity.getConnection()) {
+                        assert con != null;
+                        Class.forName("com.mysql.cj.jdbc.Driver");
+                        Statement st = con.createStatement();
+                        String query = "SELECT Ticket_ID FROM Ticket " +
+                                "WHERE blankNumber = '"+blankNumber+"'" +
+                                "(SELECT COALESCE(MAX(TicketID), 0) + 1 FROM Ticket), '444000002', '3'";
+                        ResultSet rs = st.executeQuery(query);
+
+                        if(rs.next()){
+                            ticketID = rs.getInt("Ticket_ID");
+                        }
+
+
+                        st.close();
+                    } catch (SQLException | ClassNotFoundException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    if (paymentType.equals("card")) {
+                        dispose();
+                        SalesCardPayNow salesCardPayNow = new SalesCardPayNow(ID, username, customerID, price, blankNumber, blankType, paymentPeriod, paymentType,ticketID);
+                    } else {
+//                        SalesCashPayNow salesCashPayNow = new SalesCardPayNow(ID, username,customerID,price,blankNumber,blankType,paymentPeriod,paymentType);
+                    }
+
+                } else {
+
+                }
             }
         });
+
         voidTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -139,5 +189,6 @@ public class SaleSummaryPage extends javax.swing.JFrame {
     public static void main(String[]args){
         SaleSummaryPage saleSummaryPage = new SaleSummaryPage(ID,  username,customerID,  price,
         flightID, paymentPeriod, paymentType, blankNumber, blankType);
+        saleSummaryPage.show();
     }
 }

@@ -1,4 +1,4 @@
-package Advisor;
+package Advisor.Sales;
 
 import DB.DBConnectivity;
 

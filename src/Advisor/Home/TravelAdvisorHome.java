@@ -1,10 +1,12 @@
-package Advisor;
+package Advisor.Home;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import Advisor.Blanks.AdvisorStock;
+import Advisor.Sales.SalesSearchCustomer;
 import Authentication.Login;
 
 public class TravelAdvisorHome extends javax.swing.JFrame {
