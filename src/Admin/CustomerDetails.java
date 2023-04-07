@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class CustomerDetails extends javax.swing.JFrame{
+public class CustomerDetails extends javax.swing.JFrame {
     private JButton button1;
     private JButton createUserButton;
     private JButton homeButton;
@@ -17,23 +17,20 @@ public class CustomerDetails extends javax.swing.JFrame{
     private static String username;
 
 
+    public CustomerDetails(int ID, String username) {
 
-
-    public CustomerDetails(int ID,String username) {
-
-        this.username= username;
-        this.ID= ID;
+        this.username = username;
+        this.ID = ID;
         setContentPane(createCustomerDetails);
-        setSize(1000,600);
+        setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
-
 
 
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SystemAdminHome homeButton = new SystemAdminHome(ID,username);
+                SystemAdminHome homeButton = new SystemAdminHome(ID, username);
                 homeButton.setVisible(true);
                 dispose();
 
@@ -43,7 +40,7 @@ public class CustomerDetails extends javax.swing.JFrame{
         manageUserDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                UserDetails manageUserDetailsButton = new UserDetails(ID,username);
+                UserDetails manageUserDetailsButton = new UserDetails(ID, username);
                 manageUserDetailsButton.setVisible(true);
                 dispose();
 
@@ -53,7 +50,7 @@ public class CustomerDetails extends javax.swing.JFrame{
         manageCustomerDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CustomerDetails manageCustomerDetailsButton = new CustomerDetails(ID,username);
+                CustomerDetails manageCustomerDetailsButton = new CustomerDetails(ID, username);
                 manageCustomerDetailsButton.setVisible(true);
                 dispose();
 
@@ -64,7 +61,7 @@ public class CustomerDetails extends javax.swing.JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                CommissionRates manageCommissionRatesButton = new CommissionRates(ID,username);
+                CommissionRates manageCommissionRatesButton = new CommissionRates(ID, username);
                 manageCommissionRatesButton.setVisible(true);
                 dispose();
 
@@ -73,7 +70,7 @@ public class CustomerDetails extends javax.swing.JFrame{
         manageSystemStockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SystemStock manageSystemStockButton = new SystemStock(ID,username);
+                SystemStock manageSystemStockButton = new SystemStock(ID, username);
                 manageSystemStockButton.setVisible(true);
                 dispose();
 
@@ -83,7 +80,7 @@ public class CustomerDetails extends javax.swing.JFrame{
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CreateUser createUserButton = new CreateUser(ID,username);
+                CreateUser createUserButton = new CreateUser(ID, username);
                 createUserButton.setVisible(true);
                 dispose();
 
@@ -91,11 +88,11 @@ public class CustomerDetails extends javax.swing.JFrame{
         });
 
 
-
     }
 
+
     public static void main(String[] args) {
-        CustomerDetails customerDetails = new CustomerDetails(ID,username);
+        CustomerDetails customerDetails = new CustomerDetails(ID, username);
         customerDetails.show();
     }
 }

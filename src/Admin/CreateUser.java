@@ -58,6 +58,7 @@ public class CreateUser extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 String firstName = firstNameField.getText();
+                System.out.println(firstName);
                 String lastName = surnameField.getText();
                 String username = usernameField.getText();
                 String password = passwordField.getText();
@@ -65,13 +66,14 @@ public class CreateUser extends javax.swing.JFrame {
                 String phoneNumber = phoneNumberField.getText();
                 String email = emailAddressField.getText();
                 String address = addressField.getText();
+
                 //int Company_ID = 1;
 
                 try (Connection con = DBConnectivity.getConnection()) {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     String query = "INSERT INTO Employee SELECT "+
-                            "(SELECT COALESCE (MAX(Employee_ID),0)+1 FROM Employee),'"+firstName+","+lastName+","+username+"','"+password+"','"+role+"','"+phoneNumber+"','"+email+"','"+address+",'1''";
+                            "(SELECT COALESCE (MAX(Employee_ID),0)+1 FROM Employee),'"+firstName+"','"+lastName+"','"+username+"','"+password+"','"+role+"','"+phoneNumber+"','"+email+"','"+address+"','1' ";
                     PreparedStatement preparedStatement = con.prepareStatement(query);
 
 
