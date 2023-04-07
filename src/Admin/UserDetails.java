@@ -8,25 +8,36 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class UserDetails extends javax.swing.JFrame{
-    private JPanel userDetails;
+public class UserDetails extends javax.swing.JFrame {
+    private JPanel mainPanel;
     private JTable userTable;
     private JButton deleteUserButton;
     private JButton changeAccessRoleButton;
     private JComboBox roleCombobox;
     private JTextField employeeIDText;
+    private JButton searchUserButton;
+    private static int ID;
+    private static String username;
+    private int selectedID;
+    private DefaultTableModel model;
+
+    private JPanel userDetails;
     private JButton homeButton;
     private JButton createUserButton;
     private JButton manageSystemStockButton;
     private JButton manageCommissionRatesButton;
     private JButton manageCustomerDetailsButton;
     private JButton manageUserDetailsButton;
+    private JButton updateDetailsButton;
+    private int employee_ID;
 
-    private static int ID;
-    private static String username;
 
-
-    public UserDetails() {
+    public UserDetails(int ID, String username) {
+        setContentPane(mainPanel);
+        setSize(1500, 600);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setVisible(true);
+        model = (DefaultTableModel) userTable.getModel();
         roleCombobox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -36,16 +47,16 @@ public class UserDetails extends javax.swing.JFrame{
                 if (e.getSource() == roleCombobox) {
                     switch (selected) {
                         case "advisor" -> {
-                            displayUserTable("'Interline'");
+                            displayUserTable("'advisor'");
                         }
                         case "admin" -> {
-                            displayUserTable("'Domestic'");
+                            displayUserTable("'admin'");
                         }
                         case "officeManager" -> {
-                            displayUserTable("'MCO'");
+                            displayUserTable("'officeManager'");
                         }
-                        case "select role" -> {
-                            displayUserTable("SELECT DISTINCT Blank.Type FROM Blank");
+                        case "select all" -> {
+                            displayUserTable("SELECT DISTINCT Employee.role FROM Employee");
                         }
 
                     }
@@ -53,119 +64,240 @@ public class UserDetails extends javax.swing.JFrame{
                 }
             }
         });
+
+        searchUserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                model.setRowCount(0);
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = "SELECT Employee.Employee_ID, Employee.First_name, Employee.Last_name, Employee.username, Employee.role, Employee.PhoneNumber, " +
+                            "Employee.Email, Employee.Address, Employee.Company_ID \n" +
+                            "FROM Employee \n" +
+                            "WHERE Employee.First_name = '" + employeeIDText.getText() + "' OR Employee.Last_name = '" + employeeIDText.getText() + "' OR Employee.username = '" + employeeIDText.getText() + "'  ";
+                    System.out.println(query);
+                    ResultSet rs = st.executeQuery(query);
+                    ResultSetMetaData rsmd = rs.getMetaData();
+
+                    int cols = rsmd.getColumnCount();
+                    String[] colName = new String[cols];
+                    for (int i = 0; i < cols; i++) {
+                        colName[i] = rsmd.getColumnName(i + 1);
+                    }
+                    model.setColumnIdentifiers(colName);
+                    String employee_ID, first_name, last_name, username, role, phoneNumber, email, address, companyID;
+                    while (rs.next()) {
+                        employee_ID = rs.getString(1);
+                        first_name = rs.getString(2);
+                        last_name = rs.getString(3);
+                        username = rs.getString(4);
+                        role = rs.getString(5);
+                        phoneNumber = rs.getString(6);
+                        email = rs.getString(7);
+                        address = rs.getString(8);
+                        companyID = rs.getString(9);
+                        String[] row = {employee_ID, first_name, last_name, username, role, phoneNumber, email, address, companyID};
+                        model.addRow(row);
+                    }
+                    st.close();
+
+                } catch (ClassNotFoundException | SQLException ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+        });
+
+        deleteUserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = userTable.getSelectedRow(); // get the index of the selected row
+
+                String message = "Are you sure you want to delete this user?" +
+                        " This is a crucial operation and the user will be deleted permanently.";
+
+
+                // show a JOptionPane with YES_NO_OPTION and the warning message
+                int option = JOptionPane.showConfirmDialog(null, message, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+
+                if (selectedRow != -1) {
+                    // check if the user clicked Yes
+                    if (option == JOptionPane.YES_OPTION) {
+                        // user clicked Yes, continue with the action
+
+
+                        // get the value of the first column in the selected row
+                        Object value = userTable.getModel().getValueAt(selectedRow, 0);
+
+                        // cast the value to the appropriate type (e.g. String or Integer)
+                        String stringID = (String) value;
+
+                        selectedID = Integer.parseInt(stringID);
+
+                        try (Connection con = DBConnectivity.getConnection()) {
+                            assert con != null;
+                            Class.forName("com.mysql.cj.jdbc.Driver");
+                            Statement st = con.createStatement();
+                            String query = "DELETE FROM Employee " +
+                                    " WHERE Employee_ID = '" + selectedID + "'";
+                            ;
+                            System.out.println(query);
+                            int rs = st.executeUpdate(query);
+                        } catch (SQLException | ClassNotFoundException ex) {
+                            ex.printStackTrace();
+                        }
+                    } else {
+                        // user clicked No, cancel the action
+                        // ...
+                    }
+                }else {
+                    // no row is selected, show an error message or do nothing
+                    JOptionPane.showMessageDialog(null, "Please select a row from the table.");
+                }
+
+
+            }
+        });
+        changeAccessRoleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = userTable.getSelectedRow(); // get the index of the selected row
+
+
+
+                if (selectedRow != -1) {
+                    // get the value of the first column in the selected row
+                    Object value = userTable.getModel().getValueAt(selectedRow, 0);
+
+                    // cast the value to the appropriate type (e.g. String or Integer)
+                    String stringID = (String) value;
+
+                    selectedID = Integer.parseInt(stringID);
+
+                    Object[] options = {"Admin", "Office Manager", "Advisor"};
+                    int selection = JOptionPane.showOptionDialog(null, "Please select the role you want to specify for this user:", "Role Selection",
+                            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+
+                    switch (selection) {
+                        // User selected "Admin" option
+                        case 0 -> {
+                            updateRole("admin");
+                        }
+                        case 1 -> {
+                            // User selected "Office Manager" option
+                            updateRole("officeManager");
+                        }
+                        case 2 -> {
+                            // User selected "Advisor" option
+                            updateRole("advisor");
+                        }
+                    }
+
+                } else {
+                    // no row is selected, show an error message or do nothing
+                    JOptionPane.showMessageDialog(null, "Please select a row from the table.");
+                }
+            }
+
+        });
+        updateDetailsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = userTable.getSelectedRow(); // get the index of the selected row
+                // get the value of the first column in the selected row
+                Object value = userTable.getModel().getValueAt(selectedRow, 0);
+
+                // cast the value to the appropriate type (e.g. String or Integer)
+                String stringID = (String) value;
+
+                selectedID = Integer.parseInt(stringID);
+
+                employee_ID = selectedID;
+
+                if (selectedRow != -1) {
+                    dispose();
+                    UpdateUserDetails updateUserDetails = new UpdateUserDetails(employee_ID,ID,username);
+                    updateUserDetails.show();
+                }
+                else{
+                    // no row is selected, show an error message or do nothing
+                    JOptionPane.showMessageDialog(null, "Please select a row from the table.");
+                }
+
+            }
+        });
     }
 
-    public void displayUserTable (String blankConstraint){
-        DefaultTableModel model = (DefaultTableModel) userTable.getModel();
-        model.setRowCount(0);
-        try (Connection con = DBConnectivity.getConnection()) {
-            assert con != null;
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Statement st = con.createStatement();
-            String query = "SELECT Employee.First_name, Employee.Last_name, Blank.blankNumber, Blank.Type \n" +
-                    "FROM Employee \n" +
-                    "WHERE Employee.Employee_ID = '" + userTable + "' AND Employee.role IN (" + blankConstraint + ") ";
-            System.out.println(query);
-            ResultSet rs = st.executeQuery(query);
-            ResultSetMetaData rsmd = rs.getMetaData();
 
-            int cols = rsmd.getColumnCount();
-            String[] colName = new String[cols];
-            for (int i = 0; i < cols; i++) {
-                colName[i] = rsmd.getColumnName(i + 1);
-            }
-            model.setColumnIdentifiers(colName);
-            String first_name, last_name, blankNumber, blankType;
-            while (rs.next()) {
-                first_name = rs.getString(1);
-                last_name = rs.getString(2);
-                blankNumber = rs.getString(3);
-                blankType = rs.getString(4);
-                String[] row = {first_name, last_name, blankNumber, blankType};
-                model.addRow(row);
-            }
-            st.close();
+        public void displayUserTable (String Constraint){
+            DefaultTableModel model = (DefaultTableModel) userTable.getModel();
+            model.setRowCount(0);
+            try (Connection con = DBConnectivity.getConnection()) {
+                assert con != null;
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Statement st = con.createStatement();
+                String query = "SELECT Employee.Employee_ID, Employee.First_name, Employee.Last_name, Employee.username, Employee.role, Employee.PhoneNumber, " +
+                        "Employee.Email, Employee.Address, Employee.Company_ID \n" +
+                        "FROM Employee \n" +
+                        "WHERE Employee.Company_ID = 1 AND Employee.role IN (" + Constraint + ") ";
+                System.out.println(query);
+                ResultSet rs = st.executeQuery(query);
+                ResultSetMetaData rsmd = rs.getMetaData();
 
-        } catch (ClassNotFoundException | SQLException ex) {
-            ex.printStackTrace();
+                int cols = rsmd.getColumnCount();
+                String[] colName = new String[cols];
+                for (int i = 0; i < cols; i++) {
+                    colName[i] = rsmd.getColumnName(i + 1);
+                }
+                model.setColumnIdentifiers(colName);
+                String employee_ID, first_name, last_name, username, role, phoneNumber, email, address, companyID;
+                while (rs.next()) {
+                    employee_ID = rs.getString(1);
+                    first_name = rs.getString(2);
+                    last_name = rs.getString(3);
+                    username = rs.getString(4);
+                    role = rs.getString(5);
+                    phoneNumber = rs.getString(6);
+                    email = rs.getString(7);
+                    address = rs.getString(8);
+                    companyID = rs.getString(9);
+                    String[] row = {employee_ID, first_name, last_name, username, role, phoneNumber, email, address, companyID};
+                    model.addRow(row);
+                }
+                st.close();
+
+            } catch (ClassNotFoundException | SQLException ex) {
+                ex.printStackTrace();
+            }
+
         }
 
-    }
 
-
-    public UserDetails(int ID, String username) {
-        this.username = username;
-        this.ID = ID;
-        setContentPane(userDetails);
-        setSize(1000, 600);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setVisible(true);
-
-        homeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SystemAdminHome homeButton = new SystemAdminHome(ID,username);
-                homeButton.setVisible(true);
-                dispose();
-
+        public void updateRole (String role){
+            try (Connection con = DBConnectivity.getConnection()) {
+                assert con != null;
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Statement st = con.createStatement();
+                String query = "UPDATE Employee " +
+                        "SET role = '" + role + "' " +
+                        "WHERE Employee_ID = '" + selectedID + "' ";
+                System.out.println(query);
+                int rs = st.executeUpdate(query);
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
-        });
-
-        manageUserDetailsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                UserDetails manageUserDetailsButton = new UserDetails(ID,username);
-                manageUserDetailsButton.setVisible(true);
-                dispose();
-
-            }
-        });
-
-        manageCustomerDetailsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                CustomerDetails manageCustomerDetailsButton = new CustomerDetails(ID,username);
-                manageCustomerDetailsButton.setVisible(true);
-                dispose();
+        }
 
 
-            }
-        });
-        manageCommissionRatesButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
 
-                CommissionRates manageCommissionRatesButton = new CommissionRates(ID,username);
-                manageCommissionRatesButton.setVisible(true);
-                dispose();
-
-            }
-        });
-        manageSystemStockButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SystemStock manageSystemStockButton = new SystemStock(ID,username);
-                manageSystemStockButton.setVisible(true);
-                dispose();
-
-
-            }
-        });
-        createUserButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                CreateUser createUserButton = new CreateUser(ID,username);
-                createUserButton.setVisible(true);
-                dispose();
-
-            }
-        });
-    }
-
-    public static void main(String[] args) {
-        UserDetails userDetails = new UserDetails(ID,username);
-        userDetails.show();
-    }
+        public static void main (String[]args){
+            UserDetails userDetails = new UserDetails(ID, username);
+            userDetails.show();
+        }
 
 }
 
