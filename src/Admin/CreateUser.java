@@ -29,10 +29,9 @@ public class CreateUser extends javax.swing.JFrame {
     private JFormattedTextField emailAddressField;
     private JButton submitCreationButton;
     private JFormattedTextField addressField;
-    private JFormattedTextField passwordField;
+    private JPasswordField passwordField;
     private static int ID;
     private static String username;
-
 
 
 
@@ -45,7 +44,7 @@ public class CreateUser extends javax.swing.JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
-        JComboBox<String> roleComboBox = new JComboBox<>(new String[] {"Advisor","Office Manager","Admin" });
+
 
 
         firstNameField.addKeyListener(new KeyAdapter() {
