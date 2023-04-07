@@ -1,11 +1,16 @@
 package Admin;
 
+import DB.DBConnectivity;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.*;
 
 public class SystemStock extends javax.swing.JFrame{
-    private JButton button1;
+    private JButton logOutButton;
     private JButton createUserButton;
     private JButton homeButton;
     private JButton manageUserDetailsButton;
@@ -13,6 +18,14 @@ public class SystemStock extends javax.swing.JFrame{
     private JButton manageCommissionRatesButton;
     private JButton manageCustomerDetailsButton;
     private JPanel systemStockPage;
+
+    private JButton ShowBlanks;
+    private JTable blankTable;
+    private JScrollPane blankScrollPane;
+    private JComboBox selectOfficeManagerID;
+    private JComboBox selectBlankType;
+    private JComboBox selectFilter;
+
 
     private static int ID;
     private static String username;
@@ -22,12 +35,126 @@ public class SystemStock extends javax.swing.JFrame{
 
     public SystemStock(int ID,String username) {
 
+        blankTable.setPreferredScrollableViewportSize(new Dimension(500, 500));
+        blankScrollPane.setPreferredSize(new Dimension(500, 500));
+
         this.username= username;
         this.ID= ID;
         setContentPane(systemStockPage);
         setSize(1000,600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+
+
+
+
+
+
+
+        ShowBlanks.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultTableModel model = (DefaultTableModel) blankTable.getModel();
+                model.setRowCount(0);
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query;
+                    String selectedOption = (String) selectFilter.getSelectedItem();
+
+                    switch (selectedOption) {
+                        case "Sold Blanks":
+                            query = "SELECT Blank.BlankNumber, Blank.Type, Blank.Employee_ID " +
+                                    "FROM Blank " +
+                                    "WHERE Blank.isSold = '1';";
+                            model.setColumnIdentifiers(new String[]{"BlankNumber", "Type", "Employee_ID"});
+                            break;
+                        case "Assigned Blanks":
+                            query = "SELECT Blank.BlankNumber, Blank.Type, Blank.Employee_ID, Blank.date_assign " +
+                                    "FROM Blank " +
+                                    "WHERE Blank.isAssigned = '1';";
+                            model.setColumnIdentifiers(new String[]{"BlankNumber", "Type", "Employee_ID", "date_assign"});
+                            break;
+                        case "Unassigned Blanks":
+                            query = "SELECT Blank.BlankNumber, Blank.Type " +
+                                    "FROM Blank " +
+                                    "WHERE Blank.isAssigned = '0';";
+                            model.setColumnIdentifiers(new String[]{"BlankNumber", "Type"});
+                        case "Blank Types":
+                            query = "SELECT Blank.BlankNumber, Blank.Type " +
+                                    "FROM Blank;";
+                            model.setColumnIdentifiers(new String[]{"BlankNumber", "Type"});
+                            break;
+                        default:
+                            return;
+                    }
+
+                    ResultSet rs = st.executeQuery(query);
+
+                    while (rs.next()) {
+                        String[] row;
+                        switch (selectedOption) {
+                            case "Sold Blanks":
+                                row = new String[]{rs.getString("BlankNumber"), rs.getString("Type"), rs.getString("Employee_ID")};
+                                break;
+                            case "Assigned Blanks":
+                                row = new String[]{rs.getString("BlankNumber"), rs.getString("Type"), rs.getString("Employee_ID"), rs.getString("date_assign")};
+                                break;
+                            case "Unassigned Blanks":
+                                row = new String[]{rs.getString("BlankNumber"), rs.getString("Type")};
+                                break;
+                            case "Blank Types":
+                                row = new String[]{rs.getString("BlankNumber"), rs.getString("Type")};
+                                break;
+                            default:
+                                return;
+                        }
+                        model.addRow(row);
+                    }
+                    st.close();
+
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+
+
+
+        selectOfficeManagerID.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = "SELECT  Employee.Employee_ID FROM Employee where Employee.role = 'officeManager'";
+
+                    ResultSet rs = st.executeQuery(query);
+                    selectOfficeManagerID.removeAllItems();
+
+
+                    while (rs.next()) {
+                        String Id = rs.getString("Employee_ID");
+                        selectOfficeManagerID.addItem(Id);
+                    }
+
+                    st.close();
+
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+        });
 
 
 
@@ -90,6 +217,7 @@ public class SystemStock extends javax.swing.JFrame{
 
             }
         });
+
 
 
 
