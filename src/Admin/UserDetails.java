@@ -230,6 +230,59 @@ public class UserDetails extends javax.swing.JFrame {
 
             }
         });
+
+        manageUserDetailsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                UserDetails manageUserDetailsButton = new UserDetails(ID, username);
+                manageUserDetailsButton.setVisible(true);
+
+
+            }
+        });
+
+        manageCustomerDetailsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                CustomerDetails manageCustomerDetailsButton = new CustomerDetails(ID, username);
+                manageCustomerDetailsButton.setVisible(true);
+
+
+            }
+        });
+        manageCommissionRatesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                CommissionRates manageCommissionRatesButton = new CommissionRates(ID, username);
+                manageCommissionRatesButton.setVisible(true);
+
+
+            }
+        });
+        manageSystemStockButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                SystemStock manageSystemStockButton = new SystemStock(ID, username);
+                manageSystemStockButton.setVisible(true);
+
+
+
+            }
+        });
+        createUserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                CreateUser createUserButton = new CreateUser(ID, username);
+                createUserButton.setVisible(true);
+
+
+            }
+        });
     }
 
 
