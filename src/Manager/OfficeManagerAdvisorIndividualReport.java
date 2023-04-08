@@ -14,6 +14,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 
 public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
@@ -178,6 +181,7 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
                 selectSaleType.addItem("Interline");
                 selectSaleType.addItem("Domestic");
 
+
             }
         });
 
@@ -193,67 +197,67 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
                 try (Connection con = DBConnectivity.getConnection()) {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
-                    Statement st = con.createStatement();
 
                     String query = "SELECT " +
-                            "Sale.Employee_ID " +
-                            "SUM(Sale.Amount) AS TotalSaleAmount, " +
-                            "SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END) AS TotalCommissionAmount, " +
-                            "SUM(Sale.Amount) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END) AS NetSaleAmount " +
+                            "Sale.Employee_ID, " +
+                            "Blank.BlankNumber, " +
+                            "ROUND(SUM(Sale.Amount * Currency_Code.Exchange_Rate), 2) AS TotalSaleAmount, " +
+                            "ROUND(SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END), 2) AS TotalCommissionAmount, " +
+                            "ROUND(SUM(Sale.Amount * Currency_Code.Exchange_Rate) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END), 2) AS NetSaleAmount " +
                             "FROM " +
                             "Sale " +
                             "JOIN Commission ON Sale.Commission_ID = Commission.Commission_ID " +
                             "JOIN Blank ON Sale.BlankNumber = Blank.BlankNumber " +
-                            "WHERE Sale.Employee_ID = ? " +
+                            "JOIN Currency_Code ON Sale.Currency_Code = Currency_Code.Currency_Code " +
+                            "WHERE Sale.Employee_ID = ? AND Blank.Type = ? " +
                             "GROUP BY " +
-                            "Sale.Employee_ID;";
+                            "Sale.Employee_ID, Blank.BlankNumber;";
 
                     PreparedStatement preparedStatement = con.prepareStatement(query);
-                    preparedStatement.setString(1,advisorID);
+                    preparedStatement.setString(1, advisorID);
+                    preparedStatement.setString(2, saleType);
 
-
-
-                    Statement ast = con.createStatement();
-
-                    String additionalQuery = "SELECT SUM(NetSaleAmount) AS TotalNetSaleAmount FROM (" +
-                            "SELECT Sale.Employee_ID " +
-                            "       SUM(Sale.Amount) AS TotalSaleAmount, " +
-                            "       SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END) AS TotalCommissionAmount, " +
-                            "       SUM(Sale.Amount) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END) AS NetSaleAmount " +
+                    String additionalQuery = "SELECT ROUND(SUM(NetSaleAmount), 2) AS TotalNetSaleAmount, ROUND(SUM(TotalCommissionAmount), 2) AS TotalOverallCommissionEarned FROM (" +
+                            "SELECT Sale.Employee_ID, " +
+                            "       ROUND(SUM(Sale.Amount * Currency_Code.Exchange_Rate), 2) AS TotalSaleAmount, " +
+                            "       ROUND(SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END), 2) AS TotalCommissionAmount, " +
+                            "       ROUND(SUM(Sale.Amount * Currency_Code.Exchange_Rate) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END), 2) AS NetSaleAmount " +
                             "FROM Sale " +
                             "JOIN Commission ON Sale.Commission_ID = Commission.Commission_ID " +
                             "JOIN Blank ON Sale.BlankNumber = Blank.BlankNumber " +
-                            "WHERE Sale.Employee_ID = ? " +
+                            "JOIN Currency_Code ON Sale.Currency_Code = Currency_Code.Currency_Code " +
+                            "WHERE Sale.Employee_ID = ? AND Blank.Type = ? " +
                             "GROUP BY Sale.Employee_ID" +
                             ") AS subquery;";
 
                     PreparedStatement preparedStatementA = con.prepareStatement(additionalQuery);
-                    preparedStatementA.setString(1,advisorID);
+                    preparedStatementA.setString(1, advisorID);
+                    preparedStatementA.setString(2, saleType);
 
+                    ResultSet rs = preparedStatement.executeQuery();
+                    ResultSet rsAdditional = preparedStatementA.executeQuery();
 
+                    Path pdfPath = Paths.get("Individual report.pdf");
+                    if (Files.exists(pdfPath)) {
+                        Files.delete(pdfPath);
+                    }
 
-
-
-                    ResultSet rs = st.executeQuery(query);
-                    ResultSet rsAdditional = ast.executeQuery(additionalQuery);
 
                     Document PDFdoc = new Document(PageSize.A4.rotate());
                     PdfWriter.getInstance(PDFdoc,new FileOutputStream("Individual report.pdf"));
                     PDFdoc.open();
                     PdfPTable queryTable = new PdfPTable(5);
 
+                    String[] columnNames = {"Employee_ID", "Blank Number", "Total Sale Amount", "Total Commission Amount", "Net Sale Amount"};
 
-
-                    String[] columnNames = {"Employee_ID", "Total Sale Amount", "Total Commission Amount", "Net Sale Amount","Total Net Sale Amount"};
-
-                    float[] columnWidths = {2f, 1.5f, 1.8f, 1f,1.5f};
+                    float[] columnWidths = {2f, 2f, 1.5f, 1.8f, 1f};
                     queryTable.setWidths(columnWidths);
                     queryTable.setWidthPercentage(100);
 
                     for (String columnName : columnNames) {
                         PdfPCell header = new PdfPCell(new Phrase(columnName));
-                        header.setMinimumHeight(20); // Set minimum height for header cells
-                        header.setBackgroundColor(BaseColor.LIGHT_GRAY); // Set background color for header cells
+                        header.setMinimumHeight(20);
+                        header.setBackgroundColor(BaseColor.LIGHT_GRAY);
                         queryTable.addCell(header);
                     }
 
@@ -263,6 +267,10 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
 
                         String Employee_ID = rs.getString("Employee_ID");
                         table_cell=new PdfPCell(new Phrase(Employee_ID));
+                        queryTable.addCell(table_cell);
+
+                        String BlankNumber = rs.getString("BlankNumber");
+                        table_cell = new PdfPCell(new Phrase(BlankNumber));
                         queryTable.addCell(table_cell);
 
                         String TotalSaleAmount = rs.getString("TotalSaleAmount");
@@ -281,31 +289,61 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
 
                     }
 
+
+
+
+
+
+                    PdfPTable additionalQueryTable = new PdfPTable(2);
+
+                    String[] columnName2 = {"Total Net Sale Amount","Total Earned Commission"};
+
+                    float[] columnWidths2 = {1f,1f};
+                    additionalQueryTable.setWidths(columnWidths2);
+                    additionalQueryTable.setWidthPercentage(100);
+
+                    for (String columnName : columnName2) {
+                        PdfPCell header = new PdfPCell(new Phrase(columnName));
+                        header.setMinimumHeight(20);
+                        header.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        additionalQueryTable.addCell(header);
+                    }
+
+                    PdfPCell table2_cell;
                     if (rsAdditional.next()) {
                         String TotalNetSaleAmount = rsAdditional.getString("TotalNetSaleAmount");
-                        table_cell = new PdfPCell(new Phrase(TotalNetSaleAmount));
-                        queryTable.addCell(table_cell);
+                        table2_cell = new PdfPCell(new Phrase(TotalNetSaleAmount));
+                        additionalQueryTable.addCell(table2_cell);
+
+                        String TotalOverallCommissionEarned = rsAdditional.getString("TotalOverallCommissionEarned");
+                        table2_cell = new PdfPCell(new Phrase(TotalOverallCommissionEarned));
+                        additionalQueryTable.addCell(table2_cell);
+
+
                     }
+
+
+
                     rsAdditional.close();
                     PDFdoc.add(queryTable);
+                    PDFdoc.add(additionalQueryTable);
                     PDFdoc.close();
 
-                    st.close();
+                    preparedStatement.close();
+                    preparedStatementA.close();
 
 
 
-
-
-
-
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                } catch (DocumentException ex) {
-                    ex.printStackTrace();
-                } catch (FileNotFoundException ex) {
-                    ex.printStackTrace();
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                } catch (DocumentException exception) {
+                    exception.printStackTrace();
+                } catch (FileNotFoundException exception) {
+                    exception.printStackTrace();
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                } catch (ClassNotFoundException exception) {
+                    exception.printStackTrace();
                 }
             }
 

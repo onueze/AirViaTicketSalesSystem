@@ -44,43 +44,8 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
 
+
         /*       NEED TO SORT ADD THE FILTER SYSTEM, MAKE IT THE A METHOD SO IT CAN BE CALLAED MUILT TOMES WITHOUT REAPIGN ALL THE CODE
-        String[] options = new String[]{"All Blanks","MCO","Interline","Domestic"};
-        FilterType = new JComboBox<>(options);
-        blankTypePanel.add(FilterType);
-
-
-        FilterType.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
-                model.setRowCount(0);
-                String selected = (String) FilterType.getSelectedItem();
-                if(e.getSource() == FilterType){
-                    switch (selected) {
-                        case "Interline" -> {
-                            displayBlankTable("'Interline'");
-                        }
-                        case "Domestic" -> {
-                            displayBlankTable("'Domestic'");
-                        }
-                        case "MCO" ->{
-                            displayBlankTable("'MCO'");
-                        }
-                        case "All Blanks" ->{
-                            displayBlankTable("SELECT DISTINCT Blank.Type FROM Blank");
-                        }
-
-                    }
-
-                }
-
-            }
-
-
-
-        });
         */
 
 
