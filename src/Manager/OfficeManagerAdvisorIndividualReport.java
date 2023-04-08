@@ -201,9 +201,9 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
                     String query = "SELECT " +
                             "Sale.Employee_ID, " +
                             "Blank.BlankNumber, " +
-                            "SUM(Sale.Amount * Currency_Code.Exchange_Rate) AS TotalSaleAmount, " +
-                            "SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END) AS TotalCommissionAmount, " +
-                            "SUM(Sale.Amount * Currency_Code.Exchange_Rate) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END) AS NetSaleAmount " +
+                            "ROUND(SUM(Sale.Amount * Currency_Code.Exchange_Rate), 2) AS TotalSaleAmount, " +
+                            "ROUND(SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END), 2) AS TotalCommissionAmount, " +
+                            "ROUND(SUM(Sale.Amount * Currency_Code.Exchange_Rate) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END), 2) AS NetSaleAmount " +
                             "FROM " +
                             "Sale " +
                             "JOIN Commission ON Sale.Commission_ID = Commission.Commission_ID " +
@@ -217,11 +217,11 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
                     preparedStatement.setString(1, advisorID);
                     preparedStatement.setString(2, saleType);
 
-                    String additionalQuery = "SELECT SUM(NetSaleAmount) AS TotalNetSaleAmount, SUM(TotalCommissionAmount) AS TotalOverallCommissionEarned FROM (" +
+                    String additionalQuery = "SELECT ROUND(SUM(NetSaleAmount), 2) AS TotalNetSaleAmount, ROUND(SUM(TotalCommissionAmount), 2) AS TotalOverallCommissionEarned FROM (" +
                             "SELECT Sale.Employee_ID, " +
-                            "       SUM(Sale.Amount * Currency_Code.Exchange_Rate) AS TotalSaleAmount, " +
-                            "       SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END) AS TotalCommissionAmount, " +
-                            "       SUM(Sale.Amount * Currency_Code.Exchange_Rate) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END) AS NetSaleAmount " +
+                            "       ROUND(SUM(Sale.Amount * Currency_Code.Exchange_Rate), 2) AS TotalSaleAmount, " +
+                            "       ROUND(SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END), 2) AS TotalCommissionAmount, " +
+                            "       ROUND(SUM(Sale.Amount * Currency_Code.Exchange_Rate) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate * Currency_Code.Exchange_Rate ELSE 0 END), 2) AS NetSaleAmount " +
                             "FROM Sale " +
                             "JOIN Commission ON Sale.Commission_ID = Commission.Commission_ID " +
                             "JOIN Blank ON Sale.BlankNumber = Blank.BlankNumber " +
@@ -233,7 +233,6 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
                     PreparedStatement preparedStatementA = con.prepareStatement(additionalQuery);
                     preparedStatementA.setString(1, advisorID);
                     preparedStatementA.setString(2, saleType);
-
 
                     ResultSet rs = preparedStatement.executeQuery();
                     ResultSet rsAdditional = preparedStatementA.executeQuery();
