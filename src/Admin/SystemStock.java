@@ -23,12 +23,18 @@ public class SystemStock extends javax.swing.JFrame{
     private JTable blankTable;
     private JScrollPane blankScrollPane;
     private JComboBox selectOfficeManagerID;
-    private JComboBox selectBlankType;
     private JComboBox selectFilter;
+    private JButton SUBMITBLANKASSIGNButton;
+    private JTextField lowerRange;
+    private JTextField upperRange;
+    private JComboBox blankType;
 
 
     private static int ID;
     private static String username;
+
+
+
 
 
 
@@ -156,6 +162,54 @@ public class SystemStock extends javax.swing.JFrame{
             }
         });
 
+        //JTextField lowerRange = new JTextField(9);
+        //JTextField upperRange = new JTextField(9);
+
+
+        SUBMITBLANKASSIGNButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String lowerRangeText = lowerRange.getText();
+                String upperRangeText= upperRange.getText();
+                String typeB = (String) blankType.getSelectedItem();
+                String managerID = (String) selectOfficeManagerID.getSelectedItem();
+
+
+                try {
+
+
+                    try (Connection con = DBConnectivity.getConnection()) {
+                        assert con != null;
+                        Class.forName("com.mysql.cj.jdbc.Driver");
+                        Statement st = con.createStatement();
+                        String query = "Insert into Blank(BlankNumber,Type,Employee_ID) WHERE BlankNumber = ?,?,Type = ?,Employee_ID = ? ";
+
+                        PreparedStatement preparedStatement = con.prepareStatement(query);
+                        preparedStatement.setString(1,lowerRangeText);
+                        preparedStatement.setString(1,upperRangeText);
+                        preparedStatement.setString(3,typeB);
+                        preparedStatement.setString(4,managerID);
+
+                        preparedStatement.executeUpdate();
+
+
+                        st.close();
+
+                    } catch (ClassNotFoundException ex) {
+                        ex.printStackTrace();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+
+
 
 
         homeButton.addActionListener(new ActionListener() {
@@ -217,7 +271,6 @@ public class SystemStock extends javax.swing.JFrame{
 
             }
         });
-
 
 
 
