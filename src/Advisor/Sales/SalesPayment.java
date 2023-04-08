@@ -36,6 +36,10 @@ public class SalesPayment extends javax.swing.JFrame {
     private JComboBox paymentPeriodDropDown;
     private JLabel paymentPeriodLabel;
     private JPanel commissionFilterPanel;
+    private JButton exchangeButton;
+    private JLabel pricePercentageLabel;
+    private JLabel usdPriceLabel;
+    private JTextField enterCurrencyCodeTextField;
     private String blankType;
     private static int ID;
     private static String username;
@@ -52,9 +56,13 @@ public class SalesPayment extends javax.swing.JFrame {
     private String paymentOption;
     private String paymentPeriod;
     private String paymentType;
+    private static int date;
+    private static int currencyID;
+    private float exchangeRate;
+    private float priceInUSD;
 
 
-    public SalesPayment(int ID, String username, int customerID, int flightID, int blankNumber) {
+    public SalesPayment(int ID, String username, int customerID, int flightID, int blankNumber, int date) {
         System.out.println("This is flight ID: " + flightID);
         System.out.println("This is blank ID: " + blankNumber);
         System.out.println("This is customer ID: " + customerID);
@@ -63,6 +71,7 @@ public class SalesPayment extends javax.swing.JFrame {
         this.customerID = customerID;
         this.flightID = flightID;
         this.blankNumber = blankNumber;
+        this.date = date;
         setContentPane(mainPanel);
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -99,7 +108,7 @@ public class SalesPayment extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 float selectedCommission = Float.parseFloat(Objects.requireNonNull(commissionFilterr.getSelectedItem()).toString());
                 System.out.println("SELECTED COMMISSION IS " + selectedCommission);
-                priceAfterCommission = (price * selectedCommission) + price;
+                priceAfterCommission = (priceInUSD * selectedCommission) + priceInUSD;
                 totalPriceLabel.setText("The total price is: " +  priceAfterCommission);
 
             }
@@ -226,7 +235,9 @@ public class SalesPayment extends javax.swing.JFrame {
                     Statement st = con.createStatement();
                     String query = "SELECT Rate, blankType " +
                             "FROM Commission " +
-                            "WHERE Commission.blankType = '"+blankType+"' ";
+                            "WHERE Commission.blankType = '"+blankType+"' " +
+                            "AND Commission.Employee_ID = '"+ID+"' " +
+                            "AND '"+date+"' BETWEEN Commission.from_Date AND Commission.to_Date";
                     System.out.println(query);
                     ResultSet rs = st.executeQuery(query);
 
@@ -261,25 +272,54 @@ public class SalesPayment extends javax.swing.JFrame {
                     if (customerHasDiscount) {
                         if (accountType.equals("fixed")) {
                             dispose();
-                            SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, fixedApplied,flightID,paymentPeriod,paymentType,blankNumber,blankType);
+                            SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, fixedApplied,flightID,paymentPeriod,paymentType,blankNumber,blankType,date,currencyID);
                         } else if (accountType.equals("flexible")) {
                             dispose();
-                            SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, flexibleApplied,flightID,paymentPeriod,paymentType,blankNumber,blankType);
+                            SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, flexibleApplied,flightID,paymentPeriod,paymentType,blankNumber,blankType,date,currencyID);
                         }
 
                     } else {
                         dispose();
-                        SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, priceAfterCommission,flightID,paymentPeriod,paymentType,blankNumber,blankType);
+                        SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, priceAfterCommission,flightID,paymentPeriod,paymentType,blankNumber,blankType,date,currencyID);
                     }
                 }
 
 
             }
         });
+        exchangeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = "SELECT Currency_Code.Currency_Code ,Currency_Code.Exchange_Rate " +
+                            "FROM Currency_Code " +
+                            "WHERE Currency_Code.Currency_name = '"+enterCurrencyCodeTextField.getText()+"'  ";
+                    ResultSet rs = st.executeQuery(query);
+
+                    if(rs.next()){
+                        exchangeRate = rs.getFloat("Exchange_Rate");
+                        currencyID = rs.getInt("Currency_Code");
+                    }
+                    System.out.println(enterCurrencyCodeTextField.getText() + "CURRENCY CODE");
+                    System.out.println(exchangeRate+ "exchange rate");
+                    System.out.println(price + "price");
+
+                    priceInUSD = price * exchangeRate;
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+                System.out.println(priceInUSD);
+                usdPriceLabel.setText(String.valueOf(priceInUSD));
+                pricePercentageLabel.setText("Price to pay in local currency (exchange Rate " + exchangeRate + " applied)");
+            }
+        });
     }
 
     public static void main(String[] args){
-        SalesPayment salesPayment = new SalesPayment(ID,username,customerID,flightID,blankNumber);
+        SalesPayment salesPayment = new SalesPayment(ID,username,customerID,flightID,blankNumber, date);
         salesPayment.show();
     }
 }

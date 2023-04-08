@@ -38,6 +38,7 @@ public class UserDetails extends javax.swing.JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         model = (DefaultTableModel) userTable.getModel();
+
         roleCombobox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

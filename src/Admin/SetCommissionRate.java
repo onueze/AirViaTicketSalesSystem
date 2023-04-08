@@ -180,7 +180,7 @@ public class SetCommissionRate extends javax.swing.JFrame {
 
                 }
                 else{
-                    JOptionPane.showMessageDialog(mainPanel,"Please enter the date in dd/mm/yy format.");
+                    JOptionPane.showMessageDialog(mainPanel,"Please enter the date in yy/mm/dd format.");
                 }
             }
         });

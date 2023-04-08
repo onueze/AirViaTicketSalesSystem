@@ -182,7 +182,7 @@
               </grid>
             </constraints>
             <properties>
-              <text value="dd/mm/yy"/>
+              <text value="yy/mm/dd"/>
             </properties>
           </component>
           <component id="46c00" class="javax.swing.JTextField" binding="toText">
@@ -192,7 +192,7 @@
               </grid>
             </constraints>
             <properties>
-              <text value="dd/mm/yy"/>
+              <text value="yy/mm/dd"/>
             </properties>
           </component>
           <vspacer id="5e51e">
