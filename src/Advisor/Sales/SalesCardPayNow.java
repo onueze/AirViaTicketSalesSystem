@@ -57,7 +57,10 @@ public class SalesCardPayNow extends javax.swing.JFrame {
                 cardNumber = cardNumber.replace(" ","");
                 System.out.println(cardNumber + "CARDNUMBER");
                 cardValid = validateCreditCardNumber(cardNumber);
-                if(cardValid){
+                if((creditCardnumber.getText().equals(""))){
+                    JOptionPane.showMessageDialog(mainPanel,"Credit Card number is not valid");
+                }
+                if(cardValid ){
                     JOptionPane.showMessageDialog(mainPanel,"Credit Card number is valid");
                 }
                 else{
