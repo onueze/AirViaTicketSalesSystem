@@ -40,16 +40,6 @@ public class OfficeManagerAdvisorIndividualReport extends javax.swing.JFrame{
 
 
 
-
-
-
-
-
-
-
-
-
-
     public OfficeManagerAdvisorIndividualReport(int ID, String username)  {
         this.username= username;
         this.ID= ID;

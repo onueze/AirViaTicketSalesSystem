@@ -1,4 +1,11 @@
-package Admin;
+package Admin.Home;
+
+import Admin.Commission.CommissionRates;
+import Admin.CustomerDetails.CustomerDetails;
+import Admin.Blanks.SystemStock;
+import Admin.UserDetails.UserDetails;
+import Admin.UserDetails.CreateUser;
+import Authentication.Login;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -35,7 +42,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
         this.ID = ID;
         this.username = username;
         setContentPane(adminPage);
-        setSize(450,300);
+        setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
         dbHost = "smcse-stuproj00.city.ac.uk";
@@ -44,6 +51,15 @@ public class SystemAdminHome extends javax.swing.JFrame {
         dbPassword = "G3pm6gib";
         dbName = "in2018g01";
 
+
+        logOutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Login login = new Login();
+
+            }
+        });
 
         homeButton.addActionListener(new ActionListener() {
             @Override

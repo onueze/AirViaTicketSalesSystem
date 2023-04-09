@@ -2,13 +2,18 @@ package Advisor.Sales;
 
 import Advisor.Home.TravelAdvisorHome;
 import DB.DBConnectivity;
+import SMTP.Mail;
+import com.itextpdf.text.Document;
 
+import javax.mail.MessagingException;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -38,10 +43,12 @@ public class SalesCardPayNow extends javax.swing.JFrame {
     private static int ticketID;
     private static int date;
     private static int currencyID;
+    private static Document document;
+    private String customerEmail;
 
     public SalesCardPayNow(int ID, String username, int customerID,
                            float price, int blankNumber, String blankType,
-                           String paymentPeriod, String paymentType, int ticketID, int date, int currencyID) {
+                           String paymentPeriod, String paymentType, int ticketID, int date, int currencyID, Document document) {
         setContentPane(mainPanel);
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -57,6 +64,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
         this.ticketID = ticketID;
         this.date = date;
         this.currencyID = currencyID;
+        this.document = document;
 
         usdPriceLabel.setText(String.valueOf(price));
 
@@ -130,6 +138,41 @@ public class SalesCardPayNow extends javax.swing.JFrame {
                 dispose();
                 TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID,username);
                 advisorHome.show();
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = "SELECT CustomerAccount.Email " +
+                            "FROM CustomerAccount " +
+                            "WHERE CustomerAccount.Customer_ID = '" + customerID + "' ";
+                    System.out.println(query);
+                    ResultSet rs = st.executeQuery(query);
+
+                    if(rs.next()){
+                        customerEmail = rs.getString("Email");
+                    }
+
+                    st.close();
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+
+                Mail mail = new Mail();
+                mail.setupServerProperties();
+                try {
+                    mail.draftEmail(customerEmail,"Dear Customer for AirVia, this" +
+                            "is your receipt for your most recent flight purchase", "/Users/alexelemele/Documents/testPDF.pdf");
+                } catch (MessagingException ex) {
+                    ex.printStackTrace();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    mail.sendEmail();
+                } catch (MessagingException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 //        exchangeButton.addActionListener(new ActionListener() {
@@ -211,7 +254,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
 
     public static void main(String[]args){
         SalesCardPayNow salesCardPayNow = new SalesCardPayNow(ID,username,customerID,
-         price,blankNumber, blankType,paymentPeriod,paymentType,ticketID,date, currencyID);
+         price,blankNumber, blankType,paymentPeriod,paymentType,ticketID,date, currencyID, document);
     }
 
 }

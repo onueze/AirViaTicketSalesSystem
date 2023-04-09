@@ -130,6 +130,7 @@ public class SalesSelectTicket extends javax.swing.JFrame {
                 displayBlankTable("SELECT DISTINCT Blank.Type FROM Blank");
             }
         });
+
         continueButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

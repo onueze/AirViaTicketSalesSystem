@@ -1,5 +1,10 @@
-package Admin;
+package Admin.Blanks;
 
+import Admin.Commission.CommissionRates;
+import Admin.CustomerDetails.CustomerDetails;
+import Admin.Home.SystemAdminHome;
+import Admin.UserDetails.UserDetails;
+import Admin.UserDetails.CreateUser;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -9,7 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class SystemStock extends javax.swing.JFrame{
+public class SystemStock extends javax.swing.JFrame {
     private JButton logOutButton;
     private JButton createUserButton;
     private JButton homeButton;
@@ -37,17 +42,15 @@ public class SystemStock extends javax.swing.JFrame{
 
 
 
-
-
-    public SystemStock(int ID,String username) {
+    public SystemStock(int ID, String username) {
 
         blankTable.setPreferredScrollableViewportSize(new Dimension(500, 500));
         blankScrollPane.setPreferredSize(new Dimension(500, 500));
 
-        this.username= username;
-        this.ID= ID;
+        this.username = username;
+        this.ID = ID;
         setContentPane(systemStockPage);
-        setSize(1000,600);
+        setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
@@ -211,11 +214,10 @@ public class SystemStock extends javax.swing.JFrame{
 
 
 
-
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SystemAdminHome homeButton = new SystemAdminHome(ID,username);
+                SystemAdminHome homeButton = new SystemAdminHome(ID, username);
                 homeButton.setVisible(true);
                 dispose();
 
@@ -225,7 +227,7 @@ public class SystemStock extends javax.swing.JFrame{
         manageUserDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                UserDetails manageUserDetailsButton = new UserDetails(ID,username);
+                UserDetails manageUserDetailsButton = new UserDetails(ID, username);
                 manageUserDetailsButton.setVisible(true);
                 dispose();
 
@@ -235,7 +237,7 @@ public class SystemStock extends javax.swing.JFrame{
         manageCustomerDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CustomerDetails manageCustomerDetailsButton = new CustomerDetails(ID,username);
+                CustomerDetails manageCustomerDetailsButton = new CustomerDetails(ID, username);
                 manageCustomerDetailsButton.setVisible(true);
                 dispose();
 
@@ -246,7 +248,7 @@ public class SystemStock extends javax.swing.JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                CommissionRates manageCommissionRatesButton = new CommissionRates(ID,username);
+                CommissionRates manageCommissionRatesButton = new CommissionRates(ID, username);
                 manageCommissionRatesButton.setVisible(true);
                 dispose();
 
@@ -255,7 +257,7 @@ public class SystemStock extends javax.swing.JFrame{
         manageSystemStockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SystemStock manageSystemStockButton = new SystemStock(ID,username);
+                SystemStock manageSystemStockButton = new SystemStock(ID, username);
                 manageSystemStockButton.setVisible(true);
                 dispose();
 
@@ -265,7 +267,7 @@ public class SystemStock extends javax.swing.JFrame{
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CreateUser createUserButton = new CreateUser(ID,username);
+                CreateUser createUserButton = new CreateUser(ID, username);
                 createUserButton.setVisible(true);
                 dispose();
 
@@ -277,7 +279,7 @@ public class SystemStock extends javax.swing.JFrame{
     }
 
     public static void main(String[] args) {
-        SystemStock systemStock = new SystemStock(ID,username);
+        SystemStock systemStock = new SystemStock(ID, username);
         systemStock.show();
     }
 }

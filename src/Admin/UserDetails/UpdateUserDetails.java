@@ -1,4 +1,4 @@
-package Admin;
+package Admin.UserDetails;
 
 import DB.DBConnectivity;
 
