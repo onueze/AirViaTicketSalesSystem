@@ -1,5 +1,8 @@
-package Admin;
+package Admin.UserDetails;
 
+import Admin.Commission.CommissionRates;
+import Admin.CustomerDetails.CustomerDetails;
+import Admin.Blanks.SystemStock;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -38,6 +41,7 @@ public class UserDetails extends javax.swing.JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         model = (DefaultTableModel) userTable.getModel();
+
         roleCombobox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

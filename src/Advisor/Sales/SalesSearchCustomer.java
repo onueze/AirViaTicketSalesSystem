@@ -6,6 +6,8 @@ import DB.DBConnectivity;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.*;
 
 public class SalesSearchCustomer extends javax.swing.JFrame {
@@ -17,6 +19,7 @@ public class SalesSearchCustomer extends javax.swing.JFrame {
     private JButton homeButton;
     private JPanel mainPanel;
     private JPanel checkCustomerpanel;
+    private JTextField dateText;
     private static int ID;
     private static String username;
     private int customerID;
@@ -76,14 +79,43 @@ public class SalesSearchCustomer extends javax.swing.JFrame {
                                 // User clicked the "Yes" button
                                 // Do something here
                                 Statement newCustomer = con.createStatement();
-                                String queryCustomer = "INSERT INTO CustomerAccount VALUES/n" +
-                                        "('"+rs+"','"+firstName+"','"+lastName+"','"+email+"','"+phoneNumber+"',/n" +
-                                        "'"+""+"','regular','null','January',0)";
+                                String queryCustomer = "INSERT INTO CustomerAccount SELECT" +
+                                        " (SELECT COALESCE(MAX(Customer_ID), 0) + 1 FROM CustomerAccount), " +
+                                        " '"+firstName+"','"+lastName+"','"+email+"','"+phoneNumber+"', " +
+                                        "'"+" "+"','regular','null','January',0 ";
                                 System.out.println(query);
-                                ResultSet rsCustomer = newCustomer.executeQuery(queryCustomer);
+                                int rowsInserted = newCustomer.executeUpdate(queryCustomer);
+
+
+                                Statement stNewCustomer = con.createStatement();
+                                String queryNewCustomer = "SELECT Customer_ID " +
+                                        "FROM CustomerAccount \n" +
+                                        "WHERE Firstname = '"+firstName+"' AND Surname = '"+lastName+"'\n" +
+                                        "AND Email = '"+email+"' AND PhoneNumber = '"+phoneNumber+"'";
+                                System.out.println(query);
+                                ResultSet rsNewCustomer = stNewCustomer.executeQuery(queryNewCustomer);
+
+                                if(rsNewCustomer.next()) {
+                                    // get the value of a column by name
+                                    customerID = rsNewCustomer.getInt("Customer_ID");
+
+                                    // do something with the values
+                                    System.out.println("id of alex = " + customerID);
+                                }
+
+                                st.close();
+
+
+
+                                if(dateText.getText().isEmpty()){
+                                    JOptionPane.showMessageDialog(mainPanel,"Please enter a date in dd/mm/yy format");
+                                }
+
+                                String dateString = dateText.getText().replace("/","");
+                                int dateInt = Integer.parseInt(dateString);
 
                                 dispose();
-                                SalesSelectTicket salesSellTicket = new SalesSelectTicket(ID,username,customerID);
+                                SalesSelectTicket salesSellTicket = new SalesSelectTicket(ID,username,customerID,dateInt);
                                 salesSellTicket.show();
 
                             } else {
@@ -96,8 +128,16 @@ public class SalesSearchCustomer extends javax.swing.JFrame {
                             if (dialogResult == JOptionPane.YES_OPTION) {
                                 // User clicked the "Yes" button
                                 // Do something here
+
+                                if(dateText.getText().equals("")){
+                                    JOptionPane.showMessageDialog(mainPanel,"Please enter a date in dd/mm/yy format");
+                                }
+
+                                String dateString = dateText.getText().replace("/","");
+                                int dateInt = Integer.parseInt(dateString);
+
                                 dispose();
-                                SalesSelectTicket salesSellTicket = new SalesSelectTicket(ID,username,customerID);
+                                SalesSelectTicket salesSellTicket = new SalesSelectTicket(ID,username,customerID,dateInt);
                                 salesSellTicket.show();
 
                             } else {
@@ -125,6 +165,16 @@ public class SalesSearchCustomer extends javax.swing.JFrame {
                 TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID,username);
                 advisorHome.show();
 
+            }
+        });
+        dateText.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c) && c != '/') {
+                    e.consume();
+                }
             }
         });
     }

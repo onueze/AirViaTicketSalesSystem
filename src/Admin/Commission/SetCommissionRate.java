@@ -1,12 +1,12 @@
-package Admin;
+package Admin.Commission;
 
+import Admin.Commission.CommissionRates;
 import DB.DBConnectivity;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 
 public class SetCommissionRate extends javax.swing.JFrame {
     private JTable advisorTable;
@@ -180,7 +180,7 @@ public class SetCommissionRate extends javax.swing.JFrame {
 
                 }
                 else{
-                    JOptionPane.showMessageDialog(mainPanel,"Please enter the date in dd/mm/yy format.");
+                    JOptionPane.showMessageDialog(mainPanel,"Please enter the date in yy/mm/dd format.");
                 }
             }
         });

@@ -28,11 +28,14 @@ public class SalesSelectTicket extends javax.swing.JFrame {
     private static int customerID;
     private static int flightID;
     private static int blankNumberForSale;
+    private static int date;
 
-    public SalesSelectTicket(int ID, String username, int customerID) {
+    public SalesSelectTicket(int ID, String username, int customerID, int date) {
         SalesSelectTicket.ID = ID;
         SalesSelectTicket.username = username;
         SalesSelectTicket.customerID = customerID;
+        SalesSelectTicket.date = date;
+
         setContentPane(mainPanel);
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -127,6 +130,7 @@ public class SalesSelectTicket extends javax.swing.JFrame {
                 displayBlankTable("SELECT DISTINCT Blank.Type FROM Blank");
             }
         });
+
         continueButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -147,7 +151,7 @@ public class SalesSelectTicket extends javax.swing.JFrame {
                     // Perform your desired action here
                     // PaymentsPage
                     dispose();
-                    SalesPayment salesPayment = new SalesPayment(ID,username,customerID,flightID,blankNumberForSale);
+                    SalesPayment salesPayment = new SalesPayment(ID,username,customerID,flightID,blankNumberForSale,date);
                     salesPayment.show();
                 } else {
                     // No row has been selected
@@ -195,7 +199,7 @@ public class SalesSelectTicket extends javax.swing.JFrame {
     }
 
     public static void main (String[] args){
-        SalesSelectTicket salesSellTicket = new SalesSelectTicket(ID, username,customerID);
+        SalesSelectTicket salesSellTicket = new SalesSelectTicket(ID, username,customerID,date);
         salesSellTicket.show();
     }
 }
