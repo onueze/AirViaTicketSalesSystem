@@ -8,8 +8,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.Arrays;
+import java.util.List;
 
-public class SystemStock extends javax.swing.JFrame{
+
+public class SystemStock extends javax.swing.JFrame {
     private JButton logOutButton;
     private JButton createUserButton;
     private JButton homeButton;
@@ -27,27 +30,60 @@ public class SystemStock extends javax.swing.JFrame{
     private JButton SUBMITBLANKASSIGNButton;
     private JTextField lowerRange;
     private JTextField upperRange;
-    private JComboBox blankType;
+    private JTextField assignDate;
+    private JComboBox selectblankPrefix;
+    private JComboBox SelectblankType;
 
 
     private static int ID;
     private static String username;
 
 
+    private boolean validateInput() {
+        String lowerInput = lowerRange.getText();
+        String upperInput = upperRange.getText();
+        List<String> validPrefixes = Arrays.asList("444", "440", "420", "201", "101", "451", "452");
+
+        if (lowerInput.length() != 9 || upperInput.length() != 9) {
+            JOptionPane.showMessageDialog(null, "Blank number must be exactly 9 digits");
+            return false;
+        }
+
+        String lowerPrefix = lowerInput.substring(0, 3);
+        String upperPrefix = upperInput.substring(0, 3);
+
+        if (!validPrefixes.contains(lowerPrefix) || !validPrefixes.contains(upperPrefix)) {
+            JOptionPane.showMessageDialog(null, "Invalid blank type provided");
+            return false;
+        }
+
+        if (!lowerPrefix.equals(upperPrefix)) {
+            JOptionPane.showMessageDialog(null, "Ensure blank types are the same");
+            return false;
+        }
+
+        if (Long.parseLong(lowerInput) >= Long.parseLong(upperInput)) {
+            JOptionPane.showMessageDialog(null, "Lower batch shouldn't be higher than the upper batch");
+            return false;
+        }
+
+        JOptionPane.showMessageDialog(null, "Input is valid");
+        return true;
+    }
 
 
 
 
 
-    public SystemStock(int ID,String username) {
+    public SystemStock(int ID, String username) {
 
-        blankTable.setPreferredScrollableViewportSize(new Dimension(500, 500));
+        blankTable.setPreferredScrollableViewportSize(new Dimension(550, 500));
         blankScrollPane.setPreferredSize(new Dimension(500, 500));
 
-        this.username= username;
-        this.ID= ID;
+        this.username = username;
+        this.ID = ID;
         setContentPane(systemStockPage);
-        setSize(1000,600);
+        setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
@@ -162,51 +198,60 @@ public class SystemStock extends javax.swing.JFrame{
             }
         });
 
-        //JTextField lowerRange = new JTextField(9);
-        //JTextField upperRange = new JTextField(9);
 
 
         SUBMITBLANKASSIGNButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                validateInput();
                 String lowerRangeText = lowerRange.getText();
-                String upperRangeText= upperRange.getText();
-                String typeB = (String) blankType.getSelectedItem();
+                String upperRangeText = upperRange.getText();
                 String managerID = (String) selectOfficeManagerID.getSelectedItem();
 
+                int lowerBound = Integer.parseInt(lowerRangeText);
+                int upperBound = Integer.parseInt(upperRangeText);
+
+                String blankType = (String) SelectblankType.getSelectedItem();
+                String blankPrefix = (String) selectblankPrefix.getSelectedItem();
 
                 try {
-
+                    int assignDateBlank = Integer.parseInt(assignDate.getText().replace("/",""));
 
                     try (Connection con = DBConnectivity.getConnection()) {
                         assert con != null;
                         Class.forName("com.mysql.cj.jdbc.Driver");
-                        Statement st = con.createStatement();
-                        String query = "Insert into Blank(BlankNumber,Type,Employee_ID) WHERE BlankNumber = ?,?,Type = ?,Employee_ID = ? ";
+
+                        String query = "INSERT INTO Blank (BlankNumber, Employee_ID, date_assign, Type, blank_prefix, isSold,isAssigned) VALUES (?, ?, ?, ?, ?, ?,?)";
 
                         PreparedStatement preparedStatement = con.prepareStatement(query);
-                        preparedStatement.setString(1,lowerRangeText);
-                        preparedStatement.setString(1,upperRangeText);
-                        preparedStatement.setString(3,typeB);
-                        preparedStatement.setString(4,managerID);
+                        for (int i = lowerBound; i <= upperBound; i++) {
+                            preparedStatement.setInt(1, i);
+                            preparedStatement.setString(2, managerID);
+                            preparedStatement.setInt(3, assignDateBlank);
+                            preparedStatement.setString(4, blankType);
+                            preparedStatement.setString(5, blankPrefix);
+                            preparedStatement.setInt(6, 0);
+                            preparedStatement.setInt(7,1);
+                            preparedStatement.executeUpdate();
 
-                        preparedStatement.executeUpdate();
 
-
-                        st.close();
+                            //preparedStatement.addBatch();
+                        }
+                        //preparedStatement.executeBatch();
 
                     } catch (ClassNotFoundException ex) {
                         ex.printStackTrace();
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
-
-
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
+
         });
+
+
 
 
 
@@ -273,7 +318,25 @@ public class SystemStock extends javax.swing.JFrame{
         });
 
 
-
+        SelectblankType.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SelectblankType.addItem("Interline");
+                SelectblankType.addItem("Domestic");
+            }
+        });
+        selectblankPrefix.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectblankPrefix.addItem("444");
+                selectblankPrefix.addItem("440");
+                selectblankPrefix.addItem("420");
+                selectblankPrefix.addItem("201");
+                selectblankPrefix.addItem("101");
+                selectblankPrefix.addItem("101");
+                selectblankPrefix.addItem("101");
+            }
+        });
     }
 
     public static void main(String[] args) {
