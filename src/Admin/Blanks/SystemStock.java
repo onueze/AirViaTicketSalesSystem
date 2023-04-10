@@ -91,6 +91,7 @@ public class SystemStock extends javax.swing.JFrame {
         setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+        // testing the git push
 
 
 
