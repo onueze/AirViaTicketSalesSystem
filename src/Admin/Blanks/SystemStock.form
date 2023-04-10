@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="Admin.Blanks.SystemStock">
-  <grid id="27dc6" binding="systemStockPage" layout-manager="GridLayoutManager" row-count="16" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="Admin.SystemStock">
+  <grid id="27dc6" binding="systemStockPage" layout-manager="GridLayoutManager" row-count="15" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="712" height="609"/>
+      <xy x="20" y="20" width="885" height="609"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -34,7 +34,9 @@
       </component>
       <component id="fd3d4" class="javax.swing.JButton" binding="manageSystemStockButton" default-binding="true">
         <constraints>
-          <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="191" height="17"/>
+          </grid>
         </constraints>
         <properties>
           <text value="Manage System Stock"/>
@@ -95,40 +97,6 @@
           <text value="Assign Blanks"/>
         </properties>
       </component>
-      <component id="15bd7" class="javax.swing.JLabel">
-        <constraints>
-          <grid row="10" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Office Manager: "/>
-        </properties>
-      </component>
-      <component id="9da62" class="javax.swing.JLabel">
-        <constraints>
-          <grid row="11" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Blank range"/>
-        </properties>
-      </component>
-      <component id="da73d" class="javax.swing.JComboBox" binding="selectOfficeManagerID">
-        <constraints>
-          <grid row="10" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <model>
-            <item value="View Office Manager IDs"/>
-          </model>
-        </properties>
-      </component>
-      <component id="8df7c" class="javax.swing.JButton" binding="logOutButton" default-binding="true">
-        <constraints>
-          <grid row="15" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Log out"/>
-        </properties>
-      </component>
       <component id="d7778" class="javax.swing.JComboBox" binding="selectFilter">
         <constraints>
           <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
@@ -151,6 +119,14 @@
           <text value="Show Blank Stock"/>
         </properties>
       </component>
+      <component id="8df7c" class="javax.swing.JButton" binding="logOutButton" default-binding="true">
+        <constraints>
+          <grid row="13" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Log out"/>
+        </properties>
+      </component>
       <component id="56dd9" class="javax.swing.JButton" binding="SUBMITBLANKASSIGNButton" default-binding="true">
         <constraints>
           <grid row="14" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -159,9 +135,17 @@
           <text value="SUBMIT BLANK ASSIGN"/>
         </properties>
       </component>
+      <component id="9da62" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="13" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Blank range"/>
+        </properties>
+      </component>
       <component id="7e579" class="javax.swing.JTextField" binding="lowerRange">
         <constraints>
-          <grid row="11" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="13" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
@@ -169,22 +153,82 @@
       </component>
       <component id="dce58" class="javax.swing.JTextField" binding="upperRange">
         <constraints>
-          <grid row="12" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="13" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
         <properties/>
       </component>
-      <component id="b20ea" class="javax.swing.JComboBox" binding="blankType">
+      <component id="da73d" class="javax.swing.JComboBox" binding="selectOfficeManagerID">
         <constraints>
-          <grid row="13" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="9" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <model>
-            <item value="Blank Type"/>
+            <item value="View Office Manager IDs"/>
+          </model>
+        </properties>
+      </component>
+      <component id="15bd7" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="9" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Office Manager: "/>
+        </properties>
+      </component>
+      <component id="d2baa" class="javax.swing.JTextField" binding="assignDate">
+        <constraints>
+          <grid row="10" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="274d4" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="10" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Enter Date"/>
+        </properties>
+      </component>
+      <component id="f0384" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="11" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Enter Blank Type"/>
+        </properties>
+      </component>
+      <component id="b99e4" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Select Blank Prefix"/>
+        </properties>
+      </component>
+      <component id="63cd8" class="javax.swing.JComboBox" binding="SelectblankType">
+        <constraints>
+          <grid row="11" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Select Blank Type"/>
             <item value=""/>
             <item value="Interline"/>
             <item value="Domestic"/>
+          </model>
+        </properties>
+      </component>
+      <component id="6a35a" class="javax.swing.JComboBox" binding="selectblankPrefix">
+        <constraints>
+          <grid row="12" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Select Blank Prefix"/>
           </model>
         </properties>
       </component>
