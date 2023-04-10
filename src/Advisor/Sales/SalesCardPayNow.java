@@ -107,7 +107,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
                                 "(SELECT COALESCE(MAX(Sale_ID), 0) + 1 FROM Sale), '"+priceInUSD+"','"+paymentPeriod+"'," +
                                 " null,'"+date+"'," +
                                 "'"+paymentType+"', '"+ID+"','"+ SalesCardPayNow.currencyID +"'," +
-                                "'"+customerID+"',1,'"+ticketID+"','"+blankNumber+"'";
+                                "'"+customerID+"',1,'"+ticketID+"','"+blankNumber+"', null ";
                         System.out.println(query);
                         int insert = st.executeUpdate(query);
 
@@ -158,6 +158,20 @@ public class SalesCardPayNow extends javax.swing.JFrame {
                     ex.printStackTrace();
                 }
 
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = " INSERT INTO Card_Details SELECT" +
+                            "(SELECT COALESCE(MAX(Card_Number), 0) + 1 FROM Card_Details), '"+customerID+"'";
+                    System.out.println(query);
+                    int insert = st.executeUpdate(query);
+                    st.close();
+
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+
                 Mail mail = new Mail();
                 mail.setupServerProperties();
                 try {
@@ -173,6 +187,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
                 } catch (MessagingException ex) {
                     ex.printStackTrace();
                 }
+
             }
         });
 //        exchangeButton.addActionListener(new ActionListener() {

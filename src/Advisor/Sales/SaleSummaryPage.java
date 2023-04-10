@@ -1,10 +1,14 @@
 package Advisor.Sales;
 
 import DB.DBConnectivity;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.sql.*;
 
 public class SaleSummaryPage extends javax.swing.JFrame {
@@ -43,11 +47,14 @@ public class SaleSummaryPage extends javax.swing.JFrame {
     private String airline;
     private String flightDate;
     private int ticketID;
+    private static int date;
+    private static int currencyID;
+    private static Document document;
 
 
 
     public SaleSummaryPage(int ID, String username, int customerID, float price,
-                           int flightID,String paymentPeriod,String paymentType,int blankNumber,String blankType){
+                           int flightID, String paymentPeriod, String paymentType, int blankNumber, String blankType, int date, int currencyID){
         this.ID = ID;
         this.username = username;
         this.price = price;
@@ -57,6 +64,7 @@ public class SaleSummaryPage extends javax.swing.JFrame {
         this.blankNumber = blankNumber;
         this.blankType = blankType;
         this.customerID = customerID;
+        this.date = date;
         setContentPane(mainPanel);
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -135,7 +143,7 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                         Class.forName("com.mysql.cj.jdbc.Driver");
                         Statement st = con.createStatement();
                         String query = "INSERT INTO Ticket SELECT " +
-                                "(SELECT COALESCE(MAX(TicketID), 0) + 1 FROM Ticket), '444000002', '3'";
+                                "(SELECT COALESCE(MAX(TicketID), 0) + 1 FROM Ticket), '"+blankNumber+"', '"+flightID+"'";
                         System.out.println(query);
                         int rowsInserted = st.executeUpdate(query);
 
@@ -149,13 +157,13 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                         assert con != null;
                         Class.forName("com.mysql.cj.jdbc.Driver");
                         Statement st = con.createStatement();
-                        String query = "SELECT Ticket_ID FROM Ticket " +
-                                "WHERE blankNumber = '"+blankNumber+"'" +
-                                "(SELECT COALESCE(MAX(TicketID), 0) + 1 FROM Ticket), '444000002', '3'";
+                        String query = "SELECT TicketID FROM Ticket " +
+                                "WHERE blankNumber = '"+blankNumber+"'";
                         ResultSet rs = st.executeQuery(query);
 
                         if(rs.next()){
-                            ticketID = rs.getInt("Ticket_ID");
+                            ticketID = rs.getInt("TicketID");
+                            System.out.println("ticketID is: " + ticketID);
                         }
 
 
@@ -164,14 +172,77 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                         ex.printStackTrace();
                     }
 
+                    try{
+                        document = new Document();
+                        PdfWriter.getInstance(document, new FileOutputStream("/Users/alexelemele/Documents/testPDF.pdf"));
+
+                        document.open();
+
+// Create a header with "AirVia Ltd" in bold font
+                        Paragraph header = new Paragraph("AirVia Ltd", FontFactory.getFont(FontFactory.HELVETICA_BOLD));
+                        header.setAlignment(Element.ALIGN_CENTER);
+                        document.add(header);
+
+                        Paragraph message = new Paragraph("Dear " + firstName + " " + surname + "," +
+                                " this is your receipt for flight number " + flightID + " from " + flightDeparture + " to " + flightArrival + ".");
+                        message.setAlignment(Element.ALIGN_CENTER);
+                        message.add(new Phrase(Chunk.NEWLINE));
+                        document.add(message);
+
+                        Paragraph customerInfo = new Paragraph();
+                        customerInfo.setAlignment(Element.ALIGN_CENTER);
+                        customerInfo.add(new Phrase("Customer ID:          " + customerID + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("First and Last name:          " + firstName + " " + surname + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("blankNumber:          " + blankNumber + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("blankType:          " + blankType + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("flightNumber:          " + flightID + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("Airline:          " + airline + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("departure Airport:          " + flightDeparture + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("arrival Airport:          " + flightArrival + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("Date of departure:          " + flightDate + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("Departure time:          " + flightDepTime + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("Arrival time:          " + flightArrtime + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("payment Period:          " + paymentPeriod + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("payment Method:         " + paymentType + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("total price:          " + price + "\n"));
+                        document.add(customerInfo);
+
+                        document.close();
+
+
+
+                    } catch (DocumentException | FileNotFoundException ex) {
+                        ex.printStackTrace();
+                    }
+
+
+
                     if (paymentType.equals("card")) {
                         dispose();
-                        SalesCardPayNow salesCardPayNow = new SalesCardPayNow(ID, username, customerID, price, blankNumber, blankType, paymentPeriod, paymentType,ticketID);
-                    } else {
-//                        SalesCashPayNow salesCashPayNow = new SalesCardPayNow(ID, username,customerID,price,blankNumber,blankType,paymentPeriod,paymentType);
+                        SalesCardPayNow salesCardPayNow = new SalesCardPayNow(ID, username, customerID, price, blankNumber,
+                                blankType, paymentPeriod, paymentType,ticketID,date,currencyID,document);
+                    }
+                    else if(paymentType.equals("cash")) {
+                        dispose();
+                        SalesCashPayNow salesCashPayNow = new SalesCashPayNow(ID, username,customerID,price,blankNumber,
+                                blankType,paymentPeriod,paymentType,ticketID,date,currencyID,document);
                     }
 
                 } else {
+
 
                 }
             }
@@ -188,7 +259,7 @@ public class SaleSummaryPage extends javax.swing.JFrame {
 
     public static void main(String[]args){
         SaleSummaryPage saleSummaryPage = new SaleSummaryPage(ID,  username,customerID,  price,
-        flightID, paymentPeriod, paymentType, blankNumber, blankType);
+        flightID, paymentPeriod, paymentType, blankNumber, blankType,date, currencyID);
         saleSummaryPage.show();
     }
 }

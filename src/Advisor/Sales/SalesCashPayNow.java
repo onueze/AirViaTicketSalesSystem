@@ -73,7 +73,7 @@ public class SalesCashPayNow extends javax.swing.JFrame {
                             "(SELECT COALESCE(MAX(Sale_ID), 0) + 1 FROM Sale), '"+price+"','"+paymentPeriod+"'," +
                             " null,'"+date+"'," +
                             "'"+paymentType+"', '"+ID+"','"+currencyID+"'," +
-                            "'"+customerID+"',1,'"+ticketID+"','"+blankNumber+"'";
+                            "'"+customerID+"',1,'"+ticketID+"','"+blankNumber+"', null ";
                     System.out.println(query);
                     int insert = st.executeUpdate(query);
 
