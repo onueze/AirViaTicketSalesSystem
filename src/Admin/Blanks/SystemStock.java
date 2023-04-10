@@ -1,5 +1,10 @@
-package Admin;
+package Admin.Blanks;
 
+import Admin.Commission.CommissionRates;
+import Admin.CustomerDetails.CustomerDetails;
+import Admin.Home.SystemAdminHome;
+import Admin.UserDetails.CreateUser;
+import Admin.UserDetails.UserDetails;
 import DB.DBConnectivity;
 
 import javax.swing.*;
