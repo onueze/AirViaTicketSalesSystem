@@ -7,12 +7,15 @@ import Admin.Home.SystemAdminHome;
 
 import Authentication.EnterDate;
 import DB.DBConnectivity;
+import SMTP.Mail;
 
+import javax.mail.MessagingException;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -165,11 +168,30 @@ public class CreateUser extends javax.swing.JFrame {
 
 
                     String query = "INSERT INTO Employee SELECT "+
-                            "(SELECT COALESCE (MAX(Employee_ID),0)+1 FROM Employee),'"+firstName+"','"+lastName+"','"+username+"','"+password+"','"+role+"','"+phoneNumber+"','"+email+"','"+address+"','1' ";
+                            "(SELECT COALESCE (MAX(Employee_ID),0)+1 FROM Employee),'"+firstName+"','"+lastName+"','"+username+"','"+password+"','"+role+"','"+phoneNumber+"','"+email+"','"+address+"','1', 1 ";
                     PreparedStatement preparedStatement = con.prepareStatement(query);
 
 
                     preparedStatement.executeUpdate();
+
+
+
+                    Mail mail = new Mail();
+                    mail.setupServerProperties();
+
+                    try {
+                        mail.draftEmail(email,"Dear User, please use the following username and password code to log into the AirVia system:" +
+                                " you will then get prompted to change the password in order to access the system. username: " + username + " password: " + password );
+                    } catch (MessagingException | IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    try {
+                        mail.sendEmail();
+                    } catch (MessagingException ex) {
+                        ex.printStackTrace();
+                    }
+
+
 
                 } catch (SQLException | ClassNotFoundException ex) {
                     ex.printStackTrace();

@@ -14,6 +14,7 @@ import java.util.List;
 import Advisor.Blanks.AdvisorStock;
 import Advisor.IndividualReport.IndividualReport;
 import Advisor.Refunds.Refunds;
+import Advisor.Sales.OutstandingPayment;
 import Advisor.Sales.SalesSearchCustomer;
 import Authentication.Login;
 import DB.DBConnectivity;
@@ -101,7 +102,7 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
         outstandingPaymentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                OutstandingPayment outstandingPayment = new OutstandingPayment(ID,username);
+                OutstandingPayment outstandingPayment = new OutstandingPayment(ID,username);
             }
         });
     }

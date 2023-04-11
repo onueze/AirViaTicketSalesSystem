@@ -89,7 +89,7 @@ public class AdvisorStock extends javax.swing.JFrame {
             String query = "SELECT Employee.First_name, Employee.Last_name, Blank.blankNumber, Blank.Type \n" +
                     "FROM Blank \n" +
                     "INNER JOIN Employee \n" +
-                    "ON Blank.Employee_ID = Employee.Employee_ID\n" +
+                    "ON Blank.Employee_ID = Employee.Employee_ID " +
                     "WHERE Employee.Employee_ID = '"+ID+"' AND Blank.Type IN ("+blankConstraint+") ";
             System.out.println(query);
             ResultSet rs = st.executeQuery(query);

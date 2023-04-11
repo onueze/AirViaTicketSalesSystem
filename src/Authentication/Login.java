@@ -24,12 +24,13 @@ public class Login extends javax.swing.JFrame {
     private String username;
     private String password;
     private int ID;
+    private int is_new;
 
 
     public Login() {
         // MAKES THE PAGE VISIBLEu
         setContentPane(loginBackground);
-        setSize(1000,600);
+        setSize(600,600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
@@ -42,7 +43,7 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
-        // ACTION ON LOGINBUTTON
+        // ACTION ON LOGIN BUTTON
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -54,13 +55,17 @@ public class Login extends javax.swing.JFrame {
                 // TRY TO CONNECT TO DATABASE
                 try(Connection con = DBConnectivity.getConnection()) {
                     assert con != null;
-                    PreparedStatement stm = con.prepareStatement("Select Employee_ID, role from Employee where password = ? and username = ?");
+                    PreparedStatement stm = con.prepareStatement("Select Employee_ID, role , is_new from Employee where pass_word = ? and username = ? ");
                     stm.setString(1, password);
                     stm.setString(2, username);
+                    System.out.println(username);
+                    System.out.println(password);
+                    System.out.println(is_new);
                     ResultSet rs = stm.executeQuery();
                     if (rs.next()) {
                         role = rs.getString("role");
                         ID = rs.getInt("Employee_ID");
+                        is_new = rs.getInt("is_new");
 //                        switch (role) {
 //                            case "officeManager" -> {
 //                                dispose();
@@ -81,9 +86,18 @@ public class Login extends javax.swing.JFrame {
 //                                enterDate.show();
 //                            }
 //                        }
-                        dispose();
-                        TwoStepVerification twoStepVerification = new TwoStepVerification(ID,username);
-                        twoStepVerification.show();
+
+                        if(is_new == 0) {
+                            dispose();
+                            TwoStepVerification twoStepVerification = new TwoStepVerification(ID, username);
+                            twoStepVerification.show();
+                        }
+
+                        else if (is_new == 1){
+                            dispose();
+                            ChangePassword changePassword = new ChangePassword(ID,username);
+                            changePassword.show();
+                        }
                     }
                     else{
                         JOptionPane.showMessageDialog(loginBackground,"Invalid password or username");
