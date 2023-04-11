@@ -72,7 +72,7 @@
         <properties>
           <font name="Courier" size="18" style="1"/>
           <foreground color="-16777216"/>
-          <text value="Airvia 2-Step Verification"/>
+          <text value="Airvia Authentication"/>
         </properties>
       </component>
     </children>

@@ -67,9 +67,7 @@ public class TwoStepVerification  extends javax.swing.JFrame  {
         try {
             mail.draftEmail(employeeEmail,"Dear User, please use the following verification code to log into the AirVia system:" +
                     " " + sixDigitCode);
-        } catch (MessagingException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
+        } catch (MessagingException | IOException ex) {
             ex.printStackTrace();
         }
         try {
@@ -123,9 +121,7 @@ public class TwoStepVerification  extends javax.swing.JFrame  {
                 try {
                     mail.draftEmail(employeeEmail,"Dear User, please use the following verification code to log into the AirVia system:" +
                             " " + sixDigitCode);
-                } catch (MessagingException ex) {
-                    ex.printStackTrace();
-                } catch (IOException ex) {
+                } catch (MessagingException | IOException ex) {
                     ex.printStackTrace();
                 }
                 try {
