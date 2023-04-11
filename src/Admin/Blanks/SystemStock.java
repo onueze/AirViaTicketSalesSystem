@@ -1,5 +1,10 @@
-package Admin;
-
+package Admin.Blanks;
+import Admin.Commission.CommissionRates;
+import Admin.CustomerDetails.CustomerDetails;
+import Admin.Home.SystemAdminHome;
+import Admin.UserDetails.CreateUser;
+import Admin.UserDetails.UserDetails;
+import Authentication.EnterDate;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -260,7 +265,7 @@ public class SystemStock extends javax.swing.JFrame {
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SystemAdminHome homeButton = new SystemAdminHome(ID,username);
+                SystemAdminHome homeButton = new SystemAdminHome(ID,username, EnterDate.getDateToday());
                 homeButton.setVisible(true);
                 dispose();
 

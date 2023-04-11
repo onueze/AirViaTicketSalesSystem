@@ -1,19 +1,28 @@
 package Admin.Home;
 
+import Admin.Blanks.SystemStock;
 import Admin.Commission.CommissionRates;
 import Admin.CustomerDetails.CustomerDetails;
-import Admin.Blanks.SystemStock;
+
 import Admin.UserDetails.UserDetails;
 import Admin.UserDetails.CreateUser;
 import Authentication.Login;
+import DB.DBConnectivity;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class SystemAdminHome extends javax.swing.JFrame {
     private JButton homeButton;
@@ -26,6 +35,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
     private JButton createUserButton;
     private JButton logOutButton;
     private JPanel adminPage;
+    private JButton showAlertsButton;
     private static int ID;
     private static String username;
     String location = null;
@@ -37,10 +47,12 @@ public class SystemAdminHome extends javax.swing.JFrame {
     private String dbUser;
     private String dbPassword;
     private File backupFile;
+    private static int dateToday;
 
-    public SystemAdminHome(int ID, String username){
+    public SystemAdminHome(int ID, String username, int dateToday){
         this.ID = ID;
         this.username = username;
+        this.dateToday = dateToday;
         setContentPane(adminPage);
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -50,6 +62,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
         dbUser = "in2018g01_a";
         dbPassword = "G3pm6gib";
         dbName = "in2018g01";
+
 
 
         logOutButton.addActionListener(new ActionListener() {
@@ -64,7 +77,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SystemAdminHome homeButton = new SystemAdminHome(ID,username);
+                SystemAdminHome homeButton = new SystemAdminHome(ID,username, dateToday);
                 homeButton.setVisible(true);
                 dispose();
 
@@ -189,13 +202,99 @@ public class SystemAdminHome extends javax.swing.JFrame {
             }
 
         });
+        showAlertsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showPopup();
+            }
+        });
+    }
+
+    private List<Integer> payLaterMessage() {
+        List<Integer> customerIDs = new ArrayList<>();
+
+        try (Connection con = DBConnectivity.getConnection()) {
+            assert con != null;
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Statement st = con.createStatement();
+            String query = "SELECT Sale.Customer_ID FROM Sale WHERE Sale.paylater = 'pay later'" +
+                    "AND Sale.Expiry_Date < '"+dateToday+"' ";
+            ResultSet rs = st.executeQuery(query);
+            System.out.println(query);
+
+            while (rs.next()) {
+                int customerID = rs.getInt("Customer_ID");
+                customerIDs.add(customerID);
+            }
+
+        } catch (ClassNotFoundException | SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return customerIDs;
+    }
+
+
+    private JPanel createRefundApprovalPanel(int customerID) {
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel label = new JLabel("CustomerID: " + customerID + " has to pay");
+        panel.add(label, BorderLayout.NORTH);
+
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton alertButton = new JButton("Alert Customer");
+
+        // Add action listeners for approve and reject buttons
+        alertButton.addActionListener(e -> {
+            // Approve refund logic
+        });
+
+        buttonsPanel.add(alertButton);
+        panel.add(buttonsPanel, BorderLayout.SOUTH);
+
+        return panel;
+
+    }
+
+
+    private void showPopup() {
+        JComponent glassPane = new JPanel();
+        glassPane.setLayout(null);
+        glassPane.setOpaque(false);
+
+        JPanel popup = new JPanel();
+        popup.setBounds(getWidth() - 200, 0, 200, 400);
+        popup.setBackground(Color.LIGHT_GRAY);
+        popup.setLayout(new BoxLayout(popup, BoxLayout.Y_AXIS));
+
+        List<Integer> customerIDs = payLaterMessage();
+        for (int customerID : customerIDs) {
+            popup.add(createRefundApprovalPanel(customerID));
+            System.out.println("added");
+        }
+
+        JScrollPane scrollPane = new JScrollPane(popup);
+        scrollPane.setBounds(getWidth() - 200, 0, 200, 400);
+        glassPane.add(scrollPane);
+
+        JButton closePopupButton = new JButton("Close");
+        closePopupButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                glassPane.setVisible(false);
+            }
+        });
+        closePopupButton.setBounds(getWidth() - 200, 400, 200, 30);
+        glassPane.add(closePopupButton);
+
+        setGlassPane(glassPane);
+        glassPane.setVisible(true);
     }
 
 
 
 
     public static void main(String[] args){
-        SystemAdminHome adminHome = new  SystemAdminHome(ID, username);
+        SystemAdminHome adminHome = new  SystemAdminHome(ID, username, dateToday);
         adminHome.show();
     }
 }

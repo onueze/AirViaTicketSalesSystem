@@ -1,29 +1,33 @@
 package Advisor.Refunds;
 
+import Advisor.Home.TravelAdvisorHome;
 import DB.DBConnectivity;
+import SMTP.Mail;
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfStamper;
-import com.itextpdf.text.pdf.PdfWriter;
+import SMTP.Log;
 
+
+import javax.mail.MessagingException;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 
 public class RefundsPayBack extends javax.swing.JFrame {
     private JPanel mainPanel;
     private JButton processRefundButton;
     private JLabel cardNumberText;
     private JButton checkButton;
+    private JButton cancelButton;
+    private JLabel customerIDText;
+    private JLabel amountReturnText;
     private int cardNumber;
-    private static Document document;
+    private static Document logfile;
     private int saleID;
     private int commissionID;
     private int ID;
@@ -34,6 +38,7 @@ public class RefundsPayBack extends javax.swing.JFrame {
     private static int blankNumber;
     private static int ticketID;
     private static float price;
+    private String customerEmail;
 
     public RefundsPayBack(int ID, String username, int customerID, int currentDate,
                           String paymentType, int blankNumber, int ticketID, int saleID, int commissionID, float price) {
@@ -46,11 +51,15 @@ public class RefundsPayBack extends javax.swing.JFrame {
         this.ticketID = ticketID;
         this.saleID = saleID;
         this.commissionID = commissionID;
+        this.price = price;
 
         setContentPane(mainPanel);
         setSize(1000, 600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
+
+        customerIDText.setText(String.valueOf(customerID));
+        amountReturnText.setText(String.valueOf(price));
 
         try (Connection con = DBConnectivity.getConnection()) {
             assert con != null;
@@ -86,10 +95,13 @@ public class RefundsPayBack extends javax.swing.JFrame {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     Statement st = con.createStatement();
-                    String query = "INSERT INTO Refund SELECT" +
+                    String query = "BEGIN;" +
+                            "SELECT * FROM Refund WHERE Refund_ID = (SELECT COALESCE(MAX(Refund_ID), 0) FROM Refund) FOR UPDATE;" +
+                            "INSERT INTO Refund SELECT" +
                             "(SELECT COALESCE(MAX(Refund_ID), 0) + 1 FROM Refund), '"+currentDate+"','"+customerID+"'," +
                             "'"+saleID+"'," +
-                            "'"+ID+"', '"+commissionID+"', 1,";
+                            "'"+ID+"', '"+commissionID+"', 1;" +
+                            "COMMIT;";
                     System.out.println(query);
                     int insert = st.executeUpdate(query);
 
@@ -99,72 +111,90 @@ public class RefundsPayBack extends javax.swing.JFrame {
                 }
 
 
-                try{
-//                    document = new Document();
-//                    PdfWriter.getInstance(document, new FileOutputStream("/Users/alexelemele/Documents/testPDF.pdf"));
-//
-//                    document.open();
-//
-//// Create a header with "AirVia Ltd" in bold font
-//                    Paragraph header = new Paragraph("AirVia Ltd", FontFactory.getFont(FontFactory.HELVETICA_BOLD));
-//                    header.setAlignment(Element.ALIGN_CENTER);
-//                    document.add(header);
-//
-//                    Paragraph message = new Paragraph("Dear Customer, your Ticket with blank number ");
-//                    message.setAlignment(Element.ALIGN_CENTER);
-//                    message.add(new Phrase(Chunk.NEWLINE));
-//                    document.add(message);
-//
-//                    Paragraph customerInfo = new Paragraph();
-//                    customerInfo.setAlignment(Element.ALIGN_CENTER);
-//                    customerInfo.add(new Phrase("Customer ID:          " + customerID + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("First and Last name:          " + firstName + " " + surname + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("blankNumber:          " + blankNumber + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("blankType:          " + blankType + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("flightNumber:          " + flightID + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("Airline:          " + airline + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("departure Airport:          " + flightDeparture + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("arrival Airport:          " + flightArrival + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("Date of departure:          " + flightDate + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("Departure time:          " + flightDepTime + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("Arrival time:          " + flightArrtime + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("payment Period:          " + paymentPeriod + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("payment Method:         " + paymentType + "\n"));
-//                    customerInfo.add(new Phrase(Chunk.NEWLINE));
-//                    customerInfo.add(new Phrase("total price:          " + price + "\n"));
-//                    document.add(customerInfo);
-//
-//                    document.close();
-
-
-                    PdfReader reader = new PdfReader("logfile.pdf");
-                    PdfStamper stamper = new PdfStamper(reader, new FileOutputStream("logfile.pdf"));
-                    Document document = new Document();
-                    stamper.getOverContent(1).beginText();
-                    stamper.getOverContent(1).showTextAligned(com.itextpdf.text.Element.ALIGN_LEFT,
-                            "Refund of blankNumber: " + blankNumber + " to Customer " + customerID + " on date " +
-                                    " " + currentDate, 36, 788, 0);
-                    stamper.getOverContent(1).endText();
-                    stamper.close();
-                    reader.close();
-
-
-
-                } catch (DocumentException | IOException ex) {
+                try {
+                    Log log = new Log("/Users/alexelemele/Documents/logfile.txt");
+                    log.logger.info("Refund of blankNumber: " + blankNumber + " to Customer: " + customerID + " on date:" +
+                            " " + currentDate);
+                } catch (IOException ex) {
                     ex.printStackTrace();
                 }
+
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = "BEGIN; " +
+                            "SELECT * FROM Sale WHERE Sale.BlanlNumber = '"+blankNumber+"' FOR UPDATE; " +
+                            "UPDATE Sale " +
+                            "SET Sale.Refund_ID = 1 " +
+                            "WHERE Sale.BlankNumber = '"+blankNumber+"';" +
+                            "COMMIT; ";
+                    System.out.println(query);
+                    int rs = st.executeUpdate(query);
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+
+                JOptionPane.showMessageDialog(mainPanel,"Refund successfull");
+
+
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = "SELECT CustomerAccount.Email " +
+                            "FROM CustomerAccount " +
+                            "WHERE CustomerAccount.Customer_ID = '" + customerID + "' ";
+                    System.out.println(query);
+                    ResultSet rs = st.executeQuery(query);
+
+                    if(rs.next()){
+                        customerEmail = rs.getString("Email");
+                    }
+
+                    st.close();
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+
+                Mail mail = new Mail();
+                mail.setupServerProperties();
+                try {
+                    mail.draftEmail(customerEmail,"Dear Customer " + customerID + ", this is to confirm that" +
+                            "your refund for blankNumber: " + blankNumber + " was successfull and a amount of " + price);
+                } catch (MessagingException ex) {
+                    ex.printStackTrace();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    mail.sendEmail();
+                } catch (MessagingException ex) {
+                    ex.printStackTrace();
+                }
+
+                dispose();
+                TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID,username);
+                advisorHome.show();
+
+            }
+
+
+        });
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int dialog = JOptionPane.showConfirmDialog(mainPanel,"Are you sure you want to cancel the refund?");
+
+                if(dialog == -1){
+                    dispose();
+                    TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID,username);
+                    advisorHome.show();
+                }
+
+
             }
         });
     }

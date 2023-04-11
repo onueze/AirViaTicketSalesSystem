@@ -110,14 +110,18 @@ public class UpdateUserDetails extends javax.swing.JFrame {
                         assert con != null;
                         Class.forName("com.mysql.cj.jdbc.Driver");
                         Statement st = con.createStatement();
-                        String query = "UPDATE Employee " +
+
+                        String query = "BEGIN;" +
+                                "SELECT * FROM Employee WHERE Employee_ID = '"+employee_id+"' FOR UPDATE;" +
+                                "UPDATE Employee " +
                                 "SET First_name = '" + firstNameText.getText() + "', " +
                                 "Last_name = '" + lastNameText.getText() + "', " +
                                 "username = '" + usernameText.getText() + "', " +
                                 "PhoneNumber = '" + phoneNumberText.getText() + "', " +
                                 "Email = '" + emailText.getText() + "', " +
                                 "Address = '" + addressText.getText() + "' " +
-                                "WHERE Employee_ID = '" + employee_id + "'";
+                                "WHERE Employee_ID = '" + employee_id + "'; " +
+                                "COMMIT; ";
                         System.out.println(query);
                         int rs = st.executeUpdate(query);
                     } catch (SQLException | ClassNotFoundException ex) {
