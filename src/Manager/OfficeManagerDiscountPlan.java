@@ -3,7 +3,6 @@ package Manager;
 import DB.DBConnectivity;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,17 +18,17 @@ public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
     private JButton interlineSalesReportButton;
     private JButton ticketStockTurnOverButton;
     private JTable DiscountPlanTable;
-    private JComboBox comboBox1;
-    private JButton verifyCustomerSalesForButton;
-    private JTextField autoFilledByVerifyTextField;
-    private JFormattedTextField formattedTextField1;
-    private JFormattedTextField discountRatetextFormattedTextField;
-    private JButton submitCustomerDiscountPlanButton;
     private JPanel DiscountPlan;
-    private JButton ViewDetails;
     private JScrollPane DiscountPlanScroll;
-    private JComboBox CustomerIDDropdown;
-    private JButton viewCustomerIDButton;
+    private JTextField setDiscountRate;
+    private JTextField lowerRange;
+    private JTextField midRange;
+    private JButton submitFixedDiscountRateButton;
+    private JButton submitFlexableDiscountRatesButton;
+    private JTextField UpperRange;
+    private JTextField lowerRangeRate;
+    private JTextField midRangeRate;
+    private JTextField upperRangeRate;
     private static int ID;
     private static String username;
 
@@ -51,9 +50,10 @@ public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
 
 
 
-
+/*
         ViewDetails.addActionListener(new ActionListener() {
             @Override
+            // add to check the total sales not just one tocket sale
             public void actionPerformed(ActionEvent e) {
 
                 try (Connection con = DBConnectivity.getConnection()) {
@@ -106,6 +106,8 @@ public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
             }
         });
 
+ */
+/*
         viewCustomerIDButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -134,6 +136,8 @@ public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
 
             }
         });
+
+ */
 
 
 
@@ -192,9 +196,102 @@ public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
         });
 
 
+        submitFixedDiscountRateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int fixedRate = Integer.parseInt(setDiscountRate.getText());
+
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    //Statement st = con.createStatement();
+                    String query = "\"WITH MonthlySales AS (\n" +
+                            "SELECT Customer_ID, SUM(amount) AS sales_total\n" +
+                            "FROM Sale\n" +
+                            "WHERE EXTRACT(MONTH FROM Current_month) = EXTRACT(MONTH FROM CURRENT_DATE)\n" +
+                            "AND EXTRACT(YEAR FROM Current_month) = EXTRACT(YEAR FROM CURRENT_DATE)\n" +
+                            "GROUP BY Customer_ID\n" +
+                            "UPDATE FixedDiscount"+
+                            "SET Rate = (SELECT fixedRate FROM DiscountType WHERE DiscountType = 'Fixed')"+
+                            "FROM FixedDiscount fd"+
+                            "JOIN CustomerAccount CurrentAccount ON FixedDiscount.CustomerID = CustomerAccount.Customer_ID"+
+                            "JOIN MonthlySales MonthlySales ON CurrentAccount.Customer_ID = MonthlySales.Customer_ID"+
+                            "WHERE ms.sales_total < 3";
+
+                    PreparedStatement pstmt = con.prepareStatement(query);
+                    pstmt.setInt(1, fixedRate);
+                    pstmt.executeQuery();
+
+                } catch (ClassNotFoundException ex) {ex.printStackTrace();
+
+
+            } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        submitFlexableDiscountRatesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int lowerRate = Integer.parseInt(lowerRangeRate.getText());
+                int midRate = Integer.parseInt(midRangeRate.getText());
+                int upperRate = Integer.parseInt(upperRangeRate.getText());
+
+                int lowRange = Integer.parseInt(lowerRange.getText());
+                int MidRange = Integer.parseInt(midRange.getText());
+                int upperRange = Integer.parseInt(UpperRange.getText());
 
 
 
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    //Statement st = con.createStatement();
+
+                    String query = "WITH MonthlySales AS (" +
+                            "  SELECT Customer_ID, SUM(amount) AS sales_total" +
+                            "  FROM Sale" +
+                            "  WHERE EXTRACT(MONTH FROM Current_month) = EXTRACT(MONTH FROM CURRENT_DATE)" +
+                            "  AND EXTRACT(YEAR FROM Current_month) = EXTRACT(YEAR FROM CURRENT_DATE)" +
+                            "  GROUP BY Customer_ID" +
+                            ")," +
+                            "UPDATE FlexibleDiscountPlan" +
+                            " SET Rate = CASE" +
+                            "             WHEN ms.sales_total BETWEEN 1 AND " + lowRange + " THEN " + lowerRate +
+                            "             WHEN ms.sales_total BETWEEN " + (lowRange + 1) + " AND " + midRange + " THEN " + midRate +
+                            "             ELSE " + upperRate +
+                            "           END" +
+                            " FROM FlexibleDiscountPlan fdp" +
+                            " JOIN CustomerAccount ca ON fdp.CustomerID = ca.Customer_ID" +
+                            " JOIN MonthlySales ms ON ca.Customer_ID = ms.Customer_ID" +
+                            " WHERE ms.sales_total > 3;";
+
+                    PreparedStatement pstmt = con.prepareStatement(query);
+                    pstmt.setInt(1,lowerRate );
+                    pstmt.setInt(2,midRate );
+                    pstmt.setInt(3,upperRate );
+
+                    pstmt.setInt(4,lowRange );
+                    pstmt.setInt(5,MidRange );
+                    pstmt.setInt(6,upperRange );
+                    pstmt.executeQuery();
+
+
+                } catch (ClassNotFoundException ex) {ex.printStackTrace();
+
+
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+
+
+
+
+            }
+        });
     }
 
     public static void main(String[] args){

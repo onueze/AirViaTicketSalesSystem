@@ -32,7 +32,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
     private JComboBox assignBlank;
     private JButton submitAssignBlanks;
     private JButton submitReassignBlanksButton;
-    private JComboBox blankType;
+    private JComboBox blankTypeTable;
     private JButton showStockButton;
     private JScrollPane stockTableScroll;
     private JComboBox ReassignAdvisor;
@@ -444,6 +444,12 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         });
 
 
+        blankTypeTable.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               // blankTypeTable.addItem();
+            }
+        });
     }
 
     public static void main(String[] args){

@@ -5,6 +5,7 @@ import Admin.CustomerDetails.CustomerDetails;
 import Admin.Home.SystemAdminHome;
 import Admin.UserDetails.CreateUser;
 import Admin.UserDetails.UserDetails;
+import Authentication.EnterDate;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -42,6 +43,8 @@ public class SystemStock extends javax.swing.JFrame {
 
     private static int ID;
     private static String username;
+    private static int dateToday;
+
 
 
     private boolean validateInput() {
@@ -92,6 +95,7 @@ public class SystemStock extends javax.swing.JFrame {
 
         this.username = username;
         this.ID = ID;
+        this.dateToday = dateToday;
         setContentPane(systemStockPage);
         setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -285,7 +289,7 @@ public class SystemStock extends javax.swing.JFrame {
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SystemAdminHome homeButton = new SystemAdminHome(ID,username);
+                SystemAdminHome homeButton = new SystemAdminHome(ID,username, EnterDate.getDateToday());
                 homeButton.setVisible(true);
                 dispose();
 
