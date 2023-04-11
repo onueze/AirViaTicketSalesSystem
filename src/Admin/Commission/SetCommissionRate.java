@@ -178,6 +178,12 @@ public class SetCommissionRate extends javax.swing.JFrame {
                         ex.printStackTrace();
                     }
 
+                    JOptionPane.showMessageDialog(mainPanel,"Commission successfully set to advisor: " + ID);
+
+                    dispose();
+                    CommissionRates commissionRates = new CommissionRates(ID,username);
+                    commissionRates.show();
+
                 }
                 else{
                     JOptionPane.showMessageDialog(mainPanel,"Please enter the date in yy/mm/dd format.");

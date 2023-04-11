@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,6 +46,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
     private static int currencyID;
     private static Document document;
     private String customerEmail;
+    private String cardNumber;
 
     public SalesCardPayNow(int ID, String username, int customerID,
                            float price, int blankNumber, String blankType,
@@ -73,7 +75,8 @@ public class SalesCardPayNow extends javax.swing.JFrame {
         checkCardDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String cardNumber = creditCardnumber.getText();
+
+                cardNumber = creditCardnumber.getText();
                 cardNumber = cardNumber.replace(" ","");
                 System.out.println(cardNumber + "CARDNUMBER");
                 cardValid = validateCreditCardNumber(cardNumber);
@@ -107,7 +110,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
                                 "(SELECT COALESCE(MAX(Sale_ID), 0) + 1 FROM Sale), '"+priceInUSD+"','"+paymentPeriod+"'," +
                                 " null,'"+date+"'," +
                                 "'"+paymentType+"', '"+ID+"','"+ SalesCardPayNow.currencyID +"'," +
-                                "'"+customerID+"',1,'"+ticketID+"','"+blankNumber+"', null ";
+                                "'"+customerID+"',1,'"+ticketID+"','"+blankNumber+"', null, 1";
                         System.out.println(query);
                         int insert = st.executeUpdate(query);
 
@@ -158,12 +161,16 @@ public class SalesCardPayNow extends javax.swing.JFrame {
                     ex.printStackTrace();
                 }
 
+
+
+                BigInteger bigNum = new BigInteger(cardNumber);
+
                 try (Connection con = DBConnectivity.getConnection()) {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     Statement st = con.createStatement();
-                    String query = " INSERT INTO Card_Details SELECT" +
-                            "(SELECT COALESCE(MAX(Card_Number), 0) + 1 FROM Card_Details), '"+customerID+"'";
+                    String query = " INSERT INTO Card_Details VALUES" +
+                            "('"+ bigNum +"', '"+customerID+"')";
                     System.out.println(query);
                     int insert = st.executeUpdate(query);
                     st.close();

@@ -1,14 +1,17 @@
 package Advisor.Sales;
 
 import DB.DBConnectivity;
+import SMTP.Mail;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import javax.mail.MessagingException;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.*;
 
 public class SaleSummaryPage extends javax.swing.JFrame {
@@ -50,6 +53,7 @@ public class SaleSummaryPage extends javax.swing.JFrame {
     private static int date;
     private static int currencyID;
     private static Document document;
+    private static String customerEmail;
 
 
 
@@ -134,16 +138,130 @@ public class SaleSummaryPage extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                int dialog = JOptionPane.showConfirmDialog(mainPanel, "Do you want to continue and complete the payment?");
-                if (dialog == JOptionPane.YES_OPTION) {
-                    // User clicked the "Yes" button
-                    // Do something here
+                if(paymentPeriod.equals("pay now")) {
+
+                    int dialog = JOptionPane.showConfirmDialog(mainPanel, "Do you want to continue and complete the payment?");
+                    if (dialog == JOptionPane.YES_OPTION) {
+                        // User clicked the "Yes" button
+                        // Do something here
+                        try (Connection con = DBConnectivity.getConnection()) {
+                            assert con != null;
+                            Class.forName("com.mysql.cj.jdbc.Driver");
+                            Statement st = con.createStatement();
+                            String query = "INSERT INTO Ticket SELECT " +
+                                    "(SELECT COALESCE(MAX(TicketID), 0) + 1 FROM Ticket), '" + blankNumber + "', '" + flightID + "'";
+                            System.out.println(query);
+                            int rowsInserted = st.executeUpdate(query);
+
+                            st.close();
+                        } catch (SQLException | ClassNotFoundException ex) {
+                            ex.printStackTrace();
+                        }
+
+
+                        try (Connection con = DBConnectivity.getConnection()) {
+                            assert con != null;
+                            Class.forName("com.mysql.cj.jdbc.Driver");
+                            Statement st = con.createStatement();
+                            String query = "SELECT TicketID FROM Ticket " +
+                                    "WHERE blankNumber = '" + blankNumber + "'";
+                            ResultSet rs = st.executeQuery(query);
+
+                            if (rs.next()) {
+                                ticketID = rs.getInt("TicketID");
+                                System.out.println("ticketID is: " + ticketID);
+                            }
+
+
+                            st.close();
+                        } catch (SQLException | ClassNotFoundException ex) {
+                            ex.printStackTrace();
+                        }
+
+                        try {
+                            document = new Document();
+                            PdfWriter.getInstance(document, new FileOutputStream("/Users/alexelemele/Documents/testPDF.pdf"));
+
+                            document.open();
+
+                            // Create a header with "AirVia Ltd" in bold font
+                            Paragraph header = new Paragraph("AirVia Ltd", FontFactory.getFont(FontFactory.HELVETICA_BOLD));
+                            header.setAlignment(Element.ALIGN_CENTER);
+                            document.add(header);
+
+                            Paragraph message = new Paragraph("Dear " + firstName + " " + surname + "," +
+                                    " this is your receipt for flight number " + flightID + " from " + flightDeparture + " to " + flightArrival + ".");
+                            message.setAlignment(Element.ALIGN_CENTER);
+                            message.add(new Phrase(Chunk.NEWLINE));
+                            document.add(message);
+
+                            Paragraph customerInfo = new Paragraph();
+                            customerInfo.setAlignment(Element.ALIGN_CENTER);
+                            customerInfo.add(new Phrase("Customer ID:          " + customerID + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("First and Last name:          " + firstName + " " + surname + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("blankNumber:          " + blankNumber + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("blankType:          " + blankType + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("flightNumber:          " + flightID + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("date of sale:          " + date + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("Airline:          " + airline + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("departure Airport:          " + flightDeparture + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("arrival Airport:          " + flightArrival + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("Date of departure:          " + flightDate + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("Departure time:          " + flightDepTime + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("Arrival time:          " + flightArrtime + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("payment Period:          " + paymentPeriod + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("payment Method:         " + paymentType + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("total price:          " + price + "\n"));
+                            document.add(customerInfo);
+
+                            document.close();
+
+
+                        } catch (DocumentException | FileNotFoundException ex) {
+                            ex.printStackTrace();
+                        }
+
+
+                        if (paymentType.equals("card")) {
+                            dispose();
+                            SalesCardPayNow salesCardPayNow = new SalesCardPayNow(ID, username, customerID, price, blankNumber,
+                                    blankType, paymentPeriod, paymentType, ticketID, date, currencyID, document);
+                        } else if (paymentType.equals("cash")) {
+                            dispose();
+                            SalesCashPayNow salesCashPayNow = new SalesCashPayNow(ID, username, customerID, price, blankNumber,
+                                    blankType, paymentPeriod, paymentType, ticketID, date, currencyID, document);
+                        }
+
+                    } else {
+
+
+                    }
+                }
+
+                else if(paymentPeriod.equals("pay later")){
+                    int dateDue = calculatePayLaterDate(date);
+
+
                     try (Connection con = DBConnectivity.getConnection()) {
                         assert con != null;
                         Class.forName("com.mysql.cj.jdbc.Driver");
                         Statement st = con.createStatement();
                         String query = "INSERT INTO Ticket SELECT " +
-                                "(SELECT COALESCE(MAX(TicketID), 0) + 1 FROM Ticket), '"+blankNumber+"', '"+flightID+"'";
+                                "(SELECT COALESCE(MAX(TicketID), 0) + 1 FROM Ticket), '" + blankNumber + "', '" + flightID + "'";
                         System.out.println(query);
                         int rowsInserted = st.executeUpdate(query);
 
@@ -158,10 +276,10 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                         Class.forName("com.mysql.cj.jdbc.Driver");
                         Statement st = con.createStatement();
                         String query = "SELECT TicketID FROM Ticket " +
-                                "WHERE blankNumber = '"+blankNumber+"'";
+                                "WHERE blankNumber = '" + blankNumber + "'";
                         ResultSet rs = st.executeQuery(query);
 
-                        if(rs.next()){
+                        if (rs.next()) {
                             ticketID = rs.getInt("TicketID");
                             System.out.println("ticketID is: " + ticketID);
                         }
@@ -172,19 +290,20 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                         ex.printStackTrace();
                     }
 
-                    try{
+                    try {
                         document = new Document();
                         PdfWriter.getInstance(document, new FileOutputStream("/Users/alexelemele/Documents/testPDF.pdf"));
 
                         document.open();
 
-// Create a header with "AirVia Ltd" in bold font
+                        // Create a header with "AirVia Ltd" in bold font
                         Paragraph header = new Paragraph("AirVia Ltd", FontFactory.getFont(FontFactory.HELVETICA_BOLD));
                         header.setAlignment(Element.ALIGN_CENTER);
                         document.add(header);
 
                         Paragraph message = new Paragraph("Dear " + firstName + " " + surname + "," +
-                                " this is your receipt for flight number " + flightID + " from " + flightDeparture + " to " + flightArrival + ".");
+                                " these are the details for flight " + flightID + " from " + flightDeparture + " to " + flightArrival + "." +
+                                " Please ensure that you pay the mentioned amount within the 30 day period");
                         message.setAlignment(Element.ALIGN_CENTER);
                         message.add(new Phrase(Chunk.NEWLINE));
                         document.add(message);
@@ -198,6 +317,8 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                         customerInfo.add(new Phrase("blankNumber:          " + blankNumber + "\n"));
                         customerInfo.add(new Phrase(Chunk.NEWLINE));
                         customerInfo.add(new Phrase("blankType:          " + blankType + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("date of pay later sale:          " + date + "\n"));
                         customerInfo.add(new Phrase(Chunk.NEWLINE));
                         customerInfo.add(new Phrase("flightNumber:          " + flightID + "\n"));
                         customerInfo.add(new Phrase(Chunk.NEWLINE));
@@ -223,29 +344,70 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                         document.close();
 
 
-
                     } catch (DocumentException | FileNotFoundException ex) {
                         ex.printStackTrace();
                     }
 
+                    try (Connection con = DBConnectivity.getConnection()) {
+                        assert con != null;
+                        Class.forName("com.mysql.cj.jdbc.Driver");
+                        Statement st = con.createStatement();
+                        String query = " INSERT INTO Sale SELECT" +
+                                "(SELECT COALESCE(MAX(Sale_ID), 0) + 1 FROM Sale), '"+price+"','"+paymentPeriod+"'," +
+                                " '"+dateDue+"','"+date+"'," +
+                                "'"+paymentType+"', '"+ID+"','"+currencyID+"'," +
+                                "'"+customerID+"',1,'"+ticketID+"','"+blankNumber+"', null, 0 ";
+                        System.out.println(query);
+                        int insert = st.executeUpdate(query);
 
-
-                    if (paymentType.equals("card")) {
-                        dispose();
-                        SalesCardPayNow salesCardPayNow = new SalesCardPayNow(ID, username, customerID, price, blankNumber,
-                                blankType, paymentPeriod, paymentType,ticketID,date,currencyID,document);
+                        st.close();
+                    } catch (SQLException | ClassNotFoundException ex) {
+                        ex.printStackTrace();
                     }
-                    else if(paymentType.equals("cash")) {
-                        dispose();
-                        SalesCashPayNow salesCashPayNow = new SalesCashPayNow(ID, username,customerID,price,blankNumber,
-                                blankType,paymentPeriod,paymentType,ticketID,date,currencyID,document);
+
+
+                    try (Connection con = DBConnectivity.getConnection()) {
+                        assert con != null;
+                        Class.forName("com.mysql.cj.jdbc.Driver");
+                        Statement st = con.createStatement();
+                        String query = "SELECT CustomerAccount.Email " +
+                                "FROM CustomerAccount " +
+                                "WHERE CustomerAccount.Customer_ID = '" + customerID + "' ";
+                        System.out.println(query);
+                        ResultSet rs = st.executeQuery(query);
+
+                        if(rs.next()){
+                            customerEmail = rs.getString("Email");
+                        }
+
+                        st.close();
+                    } catch (SQLException | ClassNotFoundException ex) {
+                        ex.printStackTrace();
                     }
 
-                } else {
+                    Mail mail = new Mail();
+                    mail.setupServerProperties();
+
+                    try {
+                        mail.draftEmail(customerEmail,"Dear Customer for AirVia, these " +
+                                "are the details for your outstanding payment. Please execute the payment before :" +
+                                " " + dateDue, "/Users/alexelemele/Documents/testPDF.pdf");
+                    } catch (MessagingException | IOException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    try {
+                        mail.sendEmail();
+                    } catch (MessagingException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    JOptionPane.showMessageDialog(mainPanel,"Customer has been emailed on late payment details");
+                }
 
 
                 }
-            }
+
         });
 
         voidTicketButton.addActionListener(new ActionListener() {
@@ -257,9 +419,29 @@ public class SaleSummaryPage extends javax.swing.JFrame {
     }
 
 
+    public static int calculatePayLaterDate(int dateSaleMade){
+        //231201
+        String str = String.valueOf(dateSaleMade);
+        int dateDue = 0;
+        if (str.substring(2, 4).equals("12")) {
+            System.out.println(true);
+            str = str.replace(str.substring(2,4),"01");
+            dateDue = Integer.parseInt(str) + 10000 - 2;
+        }
+        else {
+            dateDue = dateSaleMade + 100 - 2;
+        }
+
+
+        return dateDue;
+
+    }
+
+
     public static void main(String[]args){
         SaleSummaryPage saleSummaryPage = new SaleSummaryPage(ID,  username,customerID,  price,
         flightID, paymentPeriod, paymentType, blankNumber, blankType,date, currencyID);
         saleSummaryPage.show();
+
     }
 }

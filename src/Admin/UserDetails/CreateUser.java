@@ -4,6 +4,8 @@ import Admin.Blanks.SystemStock;
 import Admin.Commission.CommissionRates;
 import Admin.CustomerDetails.CustomerDetails;
 import Admin.Home.SystemAdminHome;
+
+import Authentication.EnterDate;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -36,6 +38,7 @@ public class CreateUser extends javax.swing.JFrame {
     private JPasswordField passwordField;
     private static int ID;
     private static String username;
+    private EnterDate enterDate;
 
 
 
@@ -179,7 +182,7 @@ public class CreateUser extends javax.swing.JFrame {
                     homeButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            SystemAdminHome homeButton = new SystemAdminHome(ID, username);
+                            SystemAdminHome homeButton = new SystemAdminHome(ID, username,EnterDate.getDateToday() );
                             homeButton.setVisible(true);
                             dispose();
 

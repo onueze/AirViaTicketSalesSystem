@@ -4,31 +4,42 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import Advisor.Blanks.AdvisorStock;
+import Advisor.IndividualReport.IndividualReport;
+import Advisor.Refunds.Refunds;
 import Advisor.Sales.SalesSearchCustomer;
 import Authentication.Login;
+import DB.DBConnectivity;
 
 public class TravelAdvisorHome extends javax.swing.JFrame {
     private JButton homeButton;
     private JButton stockButton;
     private JButton ticketSalesButton;
     private JButton refundsButton;
-    private JButton earnedCommissionButton;
     private JButton logOutButton;
     private JPanel travelAdvisorPage;
     private JPanel logoPanel;
     private JButton individualReportButton;
     private JLabel usernameLabel;
+    private JButton outstandingPaymentButton;
     private ImageIcon logoImage;
     private JLabel logoLabel;
     private static int ID;
+    private static int dateToday;
     private static String username;
 
 
     public TravelAdvisorHome(int ID, String username){
         this.username = username;
         this.ID = ID;
+        this.dateToday = dateToday;
         usernameLabel.setText("advisor: "+ username);
         logoImage = new ImageIcon("data/AirViaLogo.png");
         logoLabel = new JLabel(logoImage);
@@ -40,11 +51,15 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
+
+
+
         logOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 Login login = new Login();
+                login.show();
 
             }
         });
@@ -53,6 +68,7 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 AdvisorStock stock = new AdvisorStock(ID,username);
+                stock.show();
             }
         });
 
@@ -61,11 +77,37 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 SalesSearchCustomer advisorSales = new SalesSearchCustomer(ID,username);
+                advisorSales.show();
 
             }
         });
 
+        refundsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Refunds refunds = new Refunds(ID,username);
+                refunds.show();
+            }
+        });
+        individualReportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                IndividualReport individualReport = new IndividualReport(ID,username);
+                individualReport.show();
+            }
+        });
+        outstandingPaymentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                OutstandingPayment outstandingPayment = new OutstandingPayment(ID,username);
+            }
+        });
     }
+
+
+
 
     public static void main(String[] args){
         TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID, username);

@@ -1,10 +1,13 @@
 package Admin.CustomerDetails;
 
+import Admin.Blanks.SystemStock;
 import Admin.Commission.CommissionRates;
 import Admin.Home.SystemAdminHome;
-import Admin.Blanks.SystemStock;
+
+
 import Admin.UserDetails.UserDetails;
 import Admin.UserDetails.CreateUser;
+import Authentication.EnterDate;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -45,7 +48,7 @@ public class CustomerDetails extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                SystemAdminHome homeButton = new SystemAdminHome(ID, username);
+                SystemAdminHome homeButton = new SystemAdminHome(ID, username, EnterDate.getDateToday());
                 homeButton.setVisible(true);
 
 
@@ -218,6 +221,8 @@ public class CustomerDetails extends javax.swing.JFrame {
                             ;
                             System.out.println(query);
                             int rs = st.executeUpdate(query);
+
+                            st.close();
                         } catch (SQLException | ClassNotFoundException ex) {
                             ex.printStackTrace();
                         }

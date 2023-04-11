@@ -1,6 +1,6 @@
 package Authentication;
 
-import Admin.SystemAdminHome;
+import Admin.Home.SystemAdminHome;
 import Advisor.Home.TravelAdvisorHome;
 import DB.DBConnectivity;
 import Manager.OfficeManagerHome;
@@ -61,25 +61,29 @@ public class Login extends javax.swing.JFrame {
                     if (rs.next()) {
                         role = rs.getString("role");
                         ID = rs.getInt("Employee_ID");
-                        switch (role) {
-                            case "officeManager" -> {
-                                dispose();
-                                OfficeManagerHome officeHome = new OfficeManagerHome(ID, username);
-                                officeHome.setVisible(true);
-                                officeHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-                            }
-                            case "advisor" -> {
-                                dispose();
-                                TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID, username);
-                                advisorHome.setVisible(true);
-                                advisorHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-                            }
-                            case "admin" -> {
-                                dispose();
-                                SystemAdminHome adminHome = new SystemAdminHome(ID, username);
-                                adminHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-                            }
-                        }
+//                        switch (role) {
+//                            case "officeManager" -> {
+//                                dispose();
+//                                OfficeManagerHome officeHome = new OfficeManagerHome(ID, username);
+//                                officeHome.setVisible(true);
+//                                officeHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+//                            }
+//                            case "advisor" -> {
+//                                dispose();
+//                                TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID, username);
+//                                advisorHome.setVisible(true);
+//                                advisorHome.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+//                            }
+//                            case "admin" -> {
+//                                dispose();
+//                                EnterDate enterDate = new EnterDate(ID,username);
+//                                enterDate.setVisible(true);
+//                                enterDate.show();
+//                            }
+//                        }
+                        dispose();
+                        TwoStepVerification twoStepVerification = new TwoStepVerification(ID,username);
+                        twoStepVerification.show();
                     }
                     else{
                         JOptionPane.showMessageDialog(loginBackground,"Invalid password or username");

@@ -269,18 +269,27 @@ public class SalesPayment extends javax.swing.JFrame {
                     // User clicked the "Yes" button
                     // Do something here
 
-                    if (customerHasDiscount) {
-                        if (accountType.equals("fixed")) {
-                            dispose();
-                            SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, fixedApplied,flightID,paymentPeriod,paymentType,blankNumber,blankType,date,currencyID);
-                        } else if (accountType.equals("flexible")) {
-                            dispose();
-                            SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, flexibleApplied,flightID,paymentPeriod,paymentType,blankNumber,blankType,date,currencyID);
-                        }
+                    if(paymentPeriodDropDown.getSelectedItem().toString().equals("pay now")) {
+                        System.out.println("false");
 
-                    } else {
+                        if (customerHasDiscount) {
+                            if (accountType.equals("fixed")) {
+                                dispose();
+                                SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, fixedApplied, flightID, paymentPeriod, paymentType, blankNumber, blankType, date, currencyID);
+                            } else if (accountType.equals("flexible")) {
+                                dispose();
+                                SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, flexibleApplied, flightID, paymentPeriod, paymentType, blankNumber, blankType, date, currencyID);
+                            }
+
+                        } else {
+                            dispose();
+                            SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, priceAfterCommission, flightID, paymentPeriod, paymentType, blankNumber, blankType, date, currencyID);
+                        }
+                    }
+                    else if(paymentPeriodDropDown.getSelectedItem().toString().equals("pay later")){
+                        System.out.println("true");
                         dispose();
-                        SaleSummaryPage salesCashPayNow = new SaleSummaryPage(ID, username, customerID, priceAfterCommission,flightID,paymentPeriod,paymentType,blankNumber,blankType,date,currencyID);
+                        SaleSummaryPage salesPayLater = new SaleSummaryPage(ID, username, customerID, priceAfterCommission, flightID, paymentPeriod, paymentType, blankNumber, blankType, date, currencyID);
                     }
                 }
 
