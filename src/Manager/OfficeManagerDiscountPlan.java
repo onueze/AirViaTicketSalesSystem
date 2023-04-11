@@ -7,11 +7,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.sql.*;
-import java.text.NumberFormat;
-import java.util.Locale;
 
 public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
     private JButton logOutButton;
@@ -195,25 +191,7 @@ public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
             }
         });
 
-        interlineSalesReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports(ID, username);
-                interlineSalesReportButton.setVisible(true);
-                dispose();
 
-            }
-        });
-
-        domesticSalesReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport(ID, username);
-                domesticSalesReportButton.setVisible(true);
-                dispose();
-
-            }
-        });
 
 
 

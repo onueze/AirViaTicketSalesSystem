@@ -32,7 +32,7 @@ public class SystemStock extends javax.swing.JFrame {
     private JScrollPane blankScrollPane;
     private JComboBox selectOfficeManagerID;
     private JComboBox selectFilter;
-    private JButton SUBMITBLANKASSIGNButton;
+    private JButton submitAssignBlank;
     private JTextField lowerRange;
     private JTextField upperRange;
     private JTextField assignDate;
@@ -80,6 +80,11 @@ public class SystemStock extends javax.swing.JFrame {
 
 
 
+
+
+
+
+
     public SystemStock(int ID, String username) {
 
         blankTable.setPreferredScrollableViewportSize(new Dimension(550, 500));
@@ -92,6 +97,11 @@ public class SystemStock extends javax.swing.JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         // testing the git push
+
+
+
+
+
 
 
 
@@ -206,9 +216,10 @@ public class SystemStock extends javax.swing.JFrame {
 
 
 
-        SUBMITBLANKASSIGNButton.addActionListener(new ActionListener() {
+        submitAssignBlank.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 validateInput();
                 String lowerRangeText = lowerRange.getText();
                 String upperRangeText = upperRange.getText();
@@ -227,7 +238,16 @@ public class SystemStock extends javax.swing.JFrame {
                         assert con != null;
                         Class.forName("com.mysql.cj.jdbc.Driver");
 
-                        String query = "INSERT INTO Blank (BlankNumber, Employee_ID, date_assign, Type, blank_prefix, isSold,isAssigned) VALUES (?, ?, ?, ?, ?, ?,?)";
+                        String getMaxBatchIdQuery = "SELECT MAX(batch_id) as max_batch_id FROM Blank";
+                        Statement getMaxBatchIdStatement = con.createStatement();
+                        ResultSet resultSet = getMaxBatchIdStatement.executeQuery(getMaxBatchIdQuery);
+                        int newBatchId = 1;
+                        if (resultSet.next()) {
+                            newBatchId = resultSet.getInt("max_batch_id") + 1;
+                        }
+
+                        String query = "INSERT INTO Blank (BlankNumber, Manager_ID, date_assign, Type, blank_prefix, isSold, isAssigned, batch_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
 
                         PreparedStatement preparedStatement = con.prepareStatement(query);
                         for (int i = lowerBound; i <= upperBound; i++) {
@@ -237,13 +257,10 @@ public class SystemStock extends javax.swing.JFrame {
                             preparedStatement.setString(4, blankType);
                             preparedStatement.setString(5, blankPrefix);
                             preparedStatement.setInt(6, 0);
-                            preparedStatement.setInt(7,1);
+                            preparedStatement.setInt(7, 1);
+                            preparedStatement.setInt(8, newBatchId);
                             preparedStatement.executeUpdate();
-
-
-                            //preparedStatement.addBatch();
                         }
-                        //preparedStatement.executeBatch();
 
                     } catch (ClassNotFoundException ex) {
                         ex.printStackTrace();
@@ -253,9 +270,11 @@ public class SystemStock extends javax.swing.JFrame {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-            }
 
+
+            }
         });
+
 
 
 
@@ -339,8 +358,7 @@ public class SystemStock extends javax.swing.JFrame {
                 selectblankPrefix.addItem("420");
                 selectblankPrefix.addItem("201");
                 selectblankPrefix.addItem("101");
-                selectblankPrefix.addItem("101");
-                selectblankPrefix.addItem("101");
+
             }
         });
     }

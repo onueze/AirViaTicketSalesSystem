@@ -1,7 +1,6 @@
 package Manager;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -79,27 +78,6 @@ public class OfficeManagerTicketStockTurnOverReport extends javax.swing.JFrame {
 
             }
         });
-
-        interlineSalesReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports(ID,username);
-                interlineSalesReportButton.setVisible(true);
-                dispose();
-
-            }
-        });
-
-        domesticSalesReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport(ID,username);
-                domesticSalesReportButton.setVisible(true);
-                dispose();
-
-            }
-        });
-
 
 
     }

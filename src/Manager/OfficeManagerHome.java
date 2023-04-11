@@ -80,31 +80,13 @@ public class OfficeManagerHome extends javax.swing.JFrame {
             }
         });
 
-        interlineSalesReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports(ID,username);
-                interlineSalesReportButton.setVisible(true);
-                dispose();
 
-            }
-        });
-
-        domesticSalesReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport(ID,username);
-                domesticSalesReportButton.setVisible(true);
-                dispose();
-
-            }
-        });
 
 
         advisorIndividualReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerAdvisorIndividualReport advisorIndividualReportButton = new OfficeManagerAdvisorIndividualReport(ID,username);
+                OfficeReports advisorIndividualReportButton = new OfficeReports(ID,username);
                 advisorIndividualReportButton.setVisible(true);
                 dispose();
             }
