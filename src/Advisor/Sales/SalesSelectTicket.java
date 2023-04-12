@@ -1,5 +1,6 @@
 package Advisor.Sales;
 
+import Advisor.Home.TravelAdvisorHome;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -21,6 +22,7 @@ public class SalesSelectTicket extends javax.swing.JFrame {
     private JButton showBlanksButton;
     private JButton continueButton;
     private JTextField textField1;
+    private JButton homeButton;
     private JPanel filterPanel;
     private JComboBox selectBlank;
     private static int ID;
@@ -159,6 +161,13 @@ public class SalesSelectTicket extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(mainPanel,"Please select both Flight and desired Blank. If there are no available /n" +
                             "Flights please let the customer know");
                 }
+            }
+        });
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                TravelAdvisorHome travelAdvisorHome = new TravelAdvisorHome(ID,username);
             }
         });
     }

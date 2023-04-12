@@ -6,6 +6,10 @@ import java.sql.SQLException;
 
 public class DBConnectivity {
 
+    /**
+     This method returns a Connection object for the database with the given URL, username and password.
+     @return Connection object representing the database connection
+     */
     // TRIES CONNECTION WITH DATABASE
     public static Connection getConnection() {
         try {

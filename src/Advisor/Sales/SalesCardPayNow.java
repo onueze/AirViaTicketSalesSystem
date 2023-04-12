@@ -197,36 +197,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
 
             }
         });
-//        exchangeButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//
-//                try (Connection con = DBConnectivity.getConnection()) {
-//                    assert con != null;
-//                    Class.forName("com.mysql.cj.jdbc.Driver");
-//                    Statement st = con.createStatement();
-//                    String query = "SELECT Currency_Code.Currency_Code ,Currency_Code.Exchange_Rate " +
-//                            "FROM Currency_Code " +
-//                            "WHERE Currency_Code.Currency_name = '"+enterCurrencyCodeTextField.getText()+"'  ";
-//                    ResultSet rs = st.executeQuery(query);
-//
-//                    if(rs.next()){
-//                        exchangeRate = rs.getFloat("Exchange_Rate");
-//                        currencyID = rs.getInt("Currency_Code");
-//                    }
-//                    System.out.println(enterCurrencyCodeTextField.getText() + "CURRENCY CODE");
-//                    System.out.println(exchangeRate+ "exchange rate");
-//                    System.out.println(price + "price");
-//
-//                    priceInUSD = price / exchangeRate;
-//                } catch (SQLException | ClassNotFoundException ex) {
-//                    ex.printStackTrace();
-//                }
-//                System.out.println(priceInUSD);
-//                usdPriceLabel.setText(String.valueOf(priceInUSD));
-//                pricePercentageLabel.setText("Price to pay in USD (exchange Rate " + exchangeRate + " applied)");
-//            }
-//        });
+
         creditCardnumber.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -235,6 +206,22 @@ public class SalesCardPayNow extends javax.swing.JFrame {
                 if (!Character.isDigit(c)) {
                     e.consume();
                 }
+            }
+        });
+        cancelPaymentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel?", "Cancel Confirmation", JOptionPane.YES_NO_OPTION);
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    // User clicked "Yes"
+                    // Perform cancellation action
+                    dispose();
+                    TravelAdvisorHome travelAdvisorHome = new TravelAdvisorHome(ID,username);
+                } else {
+                    // User clicked "No"
+                    // Do nothing or perform alternative action
+                }
+
             }
         });
     }

@@ -22,6 +22,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
+
+/**
+
+ The IndividualReport class represents the GUI for the individual report page, which includes buttons and fields
+ for producing different types of reports for advisors and sales.
+ */
 public class IndividualReport extends javax.swing.JFrame {
     private JButton logOutButton;
     private JButton domesticSalesReportButton;
@@ -45,32 +52,15 @@ public class IndividualReport extends javax.swing.JFrame {
     private static int ID;
     private static String username;
     private String saleType;
-    /*
-    private void startRefundNotificationWatcher() {
-        Thread refundWatcherThread = new Thread(() -> {
-            while (true) {
-                String message = refundMessage();
-                if (!message.isEmpty()) {
-                    SwingUtilities.invokeLater(() -> {
-                        refundMessage();
-                    });
-                }
-                try {
-                    // Check for new records every minute (60000 ms)
-                    Thread.sleep(60000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        refundWatcherThread.setDaemon(true);
-        refundWatcherThread.start();
-    }
- */
 
 
 
 
+    /**
+     Constructs a new IndividualReport object with the specified user ID and username.
+     @param ID the user ID for the current user
+     @param username the username for the current user
+     */
     public IndividualReport(int ID, String username) {
 
 
@@ -104,18 +94,22 @@ public class IndividualReport extends javax.swing.JFrame {
         });
 
 
+        //Adding action listener for the button to produce advisor individual report
         produceAdvisorIndivudialReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 saleType = (String) selectSaleType.getSelectedItem();
 
+                //Try with resources block for establishing database connection
                 try (Connection con = DBConnectivity.getConnection()) {
+                    //Parse the entered dates from the JTextField and remove any slashes (if any)
                     int dateForReportInitail = Integer.parseInt(dateForReport.getText().replace("/",""));
                     int dateForReportTo = Integer.parseInt(dateToReport.getText().replace("/",""));
 
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
 
+                    //MySQL query to retrieve data
                     String query = "SELECT " +
                             "  Sale.Employee_ID, " +
                             "  Blank.BlankNumber, " +
@@ -142,6 +136,7 @@ public class IndividualReport extends javax.swing.JFrame {
                     System.out.println(dateForReportInitail);
                     System.out.println(dateForReportTo);
 
+                    //Creating PreparedStatement object for the MySQL query
                     PreparedStatement preparedStatement = con.prepareStatement(query);
                     preparedStatement.setString(1, String.valueOf(ID));
                     preparedStatement.setString(2, saleType);
@@ -150,6 +145,7 @@ public class IndividualReport extends javax.swing.JFrame {
 
 
 
+                    //MySQL query to retrieve additional data
                     String additionalQuery = "SELECT ROUND(SUM(NetSaleAmount), 2) AS TotalNetSaleAmount, ROUND(SUM(TotalCommissionAmount), 2) AS TotalOverallCommissionEarned FROM (" +
                             "SELECT Sale.Employee_ID, " +
                             "       ROUND(SUM(Sale.Amount * Currency_Code.Exchange_Rate), 2) AS TotalSaleAmount, " +
@@ -171,26 +167,37 @@ public class IndividualReport extends javax.swing.JFrame {
                     preparedStatementA.setInt(4, dateForReportTo);
 
 
+                    // Execute the first query and store the results in a ResultSet object
                     ResultSet rs = preparedStatement.executeQuery();
                     ResultSet rsAdditional = preparedStatementA.executeQuery();
 
+                    // Specify the path to the PDF file and delete it if it already exists
                     Path pdfPath = Paths.get("/Users/alexelemele/Downloads/AirViaTicketSalesSystem/data/RefundEmail.pdf");
                     if (Files.exists(pdfPath)) {
                         Files.delete(pdfPath);
                     }
 
 
+                    // Create a new PDF document and open it
                     Document PDFdoc = new Document(PageSize.A4.rotate());
                     PdfWriter.getInstance(PDFdoc, new FileOutputStream("/Users/alexelemele/Downloads/AirViaTicketSalesSystem/data/RefundEmail.pdf"));
                     PDFdoc.open();
+
+                    // Add a header to the PDF document
                     PDFdoc.addHeader("AirVia Ltd",saleType + " Sales Report");
+
+                    // Create a new table with 6 columns to hold the query results
                     PdfPTable queryTable = new PdfPTable(6);
+
+                    // Specify the column names for the table
                     String[] columnNames = {"Employee_ID", "Blank Number", "Payment Date", "Total Sale Amount", "Total Commission Amount", "Net Sale Amount"};
 
+                    // Specify the width of each column in the table
                     float[] columnWidths = {2f, 2f, 1f,1.5f, 1.8f, 1f};
                     queryTable.setWidths(columnWidths);
                     queryTable.setWidthPercentage(100);
 
+                    // Add the column headers to the table
                     for (String columnName : columnNames) {
                         PdfPCell header = new PdfPCell(new Phrase(columnName));
                         header.setMinimumHeight(20);
@@ -200,6 +207,8 @@ public class IndividualReport extends javax.swing.JFrame {
 
                     PdfPCell table_cell;
 
+                    // Retrieve the values for each column in the row
+                    // Add each value to a cell and add the cell to the table
                     while (rs.next()) {
 
                         String Employee_ID = rs.getString("Employee_ID");
@@ -230,27 +239,34 @@ public class IndividualReport extends javax.swing.JFrame {
                     }
 
 
-                    PdfPTable additionalQueryTable = new PdfPTable(2);
+                    PdfPTable additionalQueryTable = new PdfPTable(2); // create a new PDF table with 2 columns
 
-                    String[] columnName2 = {"Total Net Sale Amount", "Total Earned Commission"};
 
-                    float[] columnWidths2 = {0.5f, 0.5f};
-                    additionalQueryTable.setWidths(columnWidths2);
-                    additionalQueryTable.setWidthPercentage(50);
+                    String[] columnName2 = {"Total Net Sale Amount", "Total Earned Commission"}; // define column names as an array
 
+
+                    float[] columnWidths2 = {0.5f, 0.5f}; // define the column widths
+                    additionalQueryTable.setWidths(columnWidths2); // set the column widths for the table
+                    additionalQueryTable.setWidthPercentage(50); // set the table's width to be 50% of the page
+
+                    // loop through the column names and add each as a header cell to the table
                     for (String columnName : columnName2) {
-                        PdfPCell header = new PdfPCell(new Phrase(columnName));
-                        header.setMinimumHeight(20);
-                        header.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                        additionalQueryTable.addCell(header);
+                        PdfPCell header = new PdfPCell(new Phrase(columnName)); // create a new PDF cell with the column name as a Phrase
+                        header.setMinimumHeight(20); // set a minimum height for the header cell
+                        header.setBackgroundColor(BaseColor.LIGHT_GRAY); // set the background color of the header cell to light gray
+                        additionalQueryTable.addCell(header); // add the header cell to the table
                     }
 
                     PdfPCell table2_cell;
                     if (rsAdditional.next()) {
+
+                        // check if there are any additional results in the result set
                         String TotalNetSaleAmount = rsAdditional.getString("TotalNetSaleAmount");
+
                         table2_cell = new PdfPCell(new Phrase(TotalNetSaleAmount));
                         additionalQueryTable.addCell(table2_cell);
 
+                        // get the "TotalOverallCommissionEarned" value from the result set and add it as a cell to the table
                         String TotalOverallCommissionEarned = rsAdditional.getString("TotalOverallCommissionEarned");
                         table2_cell = new PdfPCell(new Phrase(TotalOverallCommissionEarned));
                         additionalQueryTable.addCell(table2_cell);
@@ -259,13 +275,13 @@ public class IndividualReport extends javax.swing.JFrame {
                     }
 
 
-                    rsAdditional.close();
-                    PDFdoc.add(queryTable);
-                    PDFdoc.add(additionalQueryTable);
-                    PDFdoc.close();
+                    rsAdditional.close(); // close the result set
+                    PDFdoc.add(queryTable); // add the first table (queryTable) to the PDF document
+                    PDFdoc.add(additionalQueryTable); // add the second table (additionalQueryTable) to the PDF document
+                    PDFdoc.close(); // close the PDF document
 
-                    preparedStatement.close();
-                    preparedStatementA.close();
+                    preparedStatement.close(); // close the prepared statement for the first query
+                    preparedStatementA.close(); // close the prepared statement for the second query
 
 
                 } catch (SQLException | DocumentException | IOException | ClassNotFoundException exception) {

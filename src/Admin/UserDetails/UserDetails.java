@@ -13,6 +13,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
+
+/**
+
+ A class that displays and manages user details.
+ */
 public class UserDetails extends javax.swing.JFrame {
     private JPanel mainPanel;
     private JTable userTable;
@@ -37,6 +42,11 @@ public class UserDetails extends javax.swing.JFrame {
     private int employee_ID;
 
 
+    /**
+     * Constructs a UserDetails object with specified ID and username.
+     * @param ID the ID of the user
+     * @param username the username of the user
+     */
     public UserDetails(int ID, String username) {
         setContentPane(mainPanel);
         setSize(1500, 600);
@@ -292,6 +302,13 @@ public class UserDetails extends javax.swing.JFrame {
     }
 
 
+
+
+        /**
+         * This method displays the user table with the specified constraint
+         * @param Constraint a String that represents the constraint for the query to fetch user data
+         */
+
         public void displayUserTable (String Constraint){
             DefaultTableModel model = (DefaultTableModel) userTable.getModel();
             model.setRowCount(0);
@@ -314,6 +331,7 @@ public class UserDetails extends javax.swing.JFrame {
                 }
                 model.setColumnIdentifiers(colName);
                 String employee_ID, first_name, last_name, username, role, phoneNumber, email, address, companyID;
+                // iterate over the result set and add the data to the table model
                 while (rs.next()) {
                     employee_ID = rs.getString(1);
                     first_name = rs.getString(2);
@@ -336,6 +354,11 @@ public class UserDetails extends javax.swing.JFrame {
         }
 
 
+    /**
+
+     Updates the role of the employee with the given selected ID in the database
+     @param role the new role to update to
+     */
         public void updateRole (String role){
             try (Connection con = DBConnectivity.getConnection()) {
                 assert con != null;

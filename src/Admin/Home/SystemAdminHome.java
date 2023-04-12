@@ -8,7 +8,9 @@ import Admin.UserDetails.UserDetails;
 import Admin.UserDetails.CreateUser;
 import Authentication.Login;
 import DB.DBConnectivity;
+import SMTP.Mail;
 
+import javax.mail.MessagingException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -48,6 +50,11 @@ public class SystemAdminHome extends javax.swing.JFrame {
     private String dbPassword;
     private File backupFile;
     private static int dateToday;
+    private String email;
+    private String firstname;
+    private String surname;
+
+
 
     public SystemAdminHome(int ID, String username, int dateToday){
         this.ID = ID;
@@ -62,6 +69,14 @@ public class SystemAdminHome extends javax.swing.JFrame {
         dbUser = "in2018g01_a";
         dbPassword = "G3pm6gib";
         dbName = "in2018g01";
+
+        List<Integer> possibleAlerts = payLaterMessage();
+        if (possibleAlerts.isEmpty()){
+            // do nothing
+        }
+        else{
+            showPopup();
+        }
 
 
 
@@ -226,6 +241,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
                 int customerID = rs.getInt("Customer_ID");
                 customerIDs.add(customerID);
             }
+            st.close();
 
         } catch (ClassNotFoundException | SQLException ex) {
             ex.printStackTrace();
@@ -243,9 +259,54 @@ public class SystemAdminHome extends javax.swing.JFrame {
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton alertButton = new JButton("Alert Customer");
 
+        try (Connection con = DBConnectivity.getConnection()) {
+            assert con != null;
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Statement st = con.createStatement();
+            String query = "SELECT Email, Firstname , Surname FROM CustomerAccount WHERE Customer_ID  = '"+customerID+"'";
+            ResultSet rs = st.executeQuery(query);
+            System.out.println(query);
+
+            while (rs.next()) {
+                email = rs.getString("Email");
+                firstname =  rs.getString("Firstname");
+                surname =  rs.getString("Firstname");
+            }
+            st.close();
+
+        } catch (ClassNotFoundException | SQLException ex) {
+            ex.printStackTrace();
+        }
+
         // Add action listeners for approve and reject buttons
         alertButton.addActionListener(e -> {
-            // Approve refund logic
+            // Send alert logic
+            Mail mail = new Mail();
+            mail.setupServerProperties();
+
+            try {
+                mail.draftEmail(email,"Dear " + firstname + " " + surname + "," +
+                        "\n" +
+                        "I hope this email finds you well. I am writing to remind you that the payment for your account with us is currently past due. We would like to kindly request that you settle the outstanding balance as soon as possible.\n" +
+                        "\n" +
+                        "We understand that unforeseen circumstances can arise, which may cause delays in payment. However, it is important to keep your account current to avoid any disruption in the services that we provide.\n" +
+                        "\n" +
+                        "Please refer to your latest invoice for the amount due and the payment options available to you. If you have any questions or concerns, please do not hesitate to contact us under +447713956305.\n" +
+                        "\n" +
+                        "We value your business and look forward to continuing our relationship. Thank you for your prompt attention to this matter.\n" +
+                        "\n" +
+                        "Best regards,\n" +
+                        "\n" +
+                        "AirVia Ltd");
+            } catch (MessagingException | IOException ex) {
+                ex.printStackTrace();
+            }
+            try {
+                mail.sendEmail();
+            } catch (MessagingException ex) {
+                ex.printStackTrace();
+            }
+            JOptionPane.showMessageDialog(adminPage, " the customer has been successfully emailed");
         });
 
         buttonsPanel.add(alertButton);

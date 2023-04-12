@@ -19,6 +19,16 @@ import Advisor.Sales.SalesSearchCustomer;
 import Authentication.Login;
 import DB.DBConnectivity;
 
+
+
+/**
+
+ This class represents the home page for the travel advisor, which displays various options for them to select from.
+
+ It contains buttons for navigating to the stock page, ticket sales page, refunds page, individual report page, and outstanding payment page.
+
+ The advisor's username is also displayed on the page.
+ */
 public class TravelAdvisorHome extends javax.swing.JFrame {
     private JButton homeButton;
     private JButton stockButton;
@@ -37,6 +47,15 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
     private static String username;
 
 
+
+    /**
+
+     Constructs a TravelAdvisorHome object with the specified advisor ID and username.
+     Sets the advisor's username on the page, and adds the AirVia logo to the logo panel.
+     Sets the size, content pane, and visibility of the frame.
+     @param ID the advisor's ID
+     @param username the advisor's username
+     */
     public TravelAdvisorHome(int ID, String username){
         this.username = username;
         this.ID = ID;
@@ -47,7 +66,6 @@ public class TravelAdvisorHome extends javax.swing.JFrame {
         logoImage.getImage().getScaledInstance(500,500,Image.SCALE_DEFAULT);
         travelAdvisorPage.setPreferredSize(new Dimension(500,500));
         logoPanel.add(logoLabel);
-//        logoPanel.add(new InsertImage("data/AirViaLogo.png"));
         setContentPane(travelAdvisorPage);
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);

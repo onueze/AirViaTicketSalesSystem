@@ -432,7 +432,6 @@ public class SaleSummaryPage extends javax.swing.JFrame {
             dateDue = dateSaleMade + 100 - 2;
         }
 
-
         return dateDue;
 
     }

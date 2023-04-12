@@ -1,5 +1,6 @@
 package Advisor.Refunds;
 
+import Advisor.Home.TravelAdvisorHome;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -36,24 +37,35 @@ public class Refunds extends javax.swing.JFrame {
     private int currentDate;
     private float amount;
 
+
+    /**
+     Represents a GUI for processing refunds for a specific sale based on the blank number
+     @param ID the ID of the sale
+     @param username the username of the user processing the refund
+     */
     public Refunds(int ID, String username) {
         setContentPane(mainPanel);
         setSize(1000, 600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
 
+        // ActionListener for the "Check Validity" button
         checkValidityButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                // Get the input values from the text fields
                 String blankString = blankNumberText.getText();
                 blankString = blankString.replace(" ","");
                 String currentDateString = dateText.getText();
 
 
+                // Check if any of the text fields are empty
                 if(blankString.isEmpty() || currentDateString.isEmpty()){
                     JOptionPane.showMessageDialog(mainPanel,"Blank text field and date text field both require text");
                 }
 
+                // Try to connect to the database and execute the query
                 try (Connection con = DBConnectivity.getConnection()) {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
@@ -67,11 +79,13 @@ public class Refunds extends javax.swing.JFrame {
                     ResultSet rs = st.executeQuery(query);
 
 
+                    // Check if the query returned any results
                     if(!rs.next()){
                         blankFound = false;
                         JOptionPane.showMessageDialog(mainPanel,"blank number not found");
                     }
                     else{
+                        // Get the values from the query result
                         saleID = rs.getInt("Sale_ID");
                         amount = rs.getFloat("Amount");
                         paymentDate = rs.getInt("Payment_Date");
@@ -98,15 +112,17 @@ public class Refunds extends javax.swing.JFrame {
                 currentDateString = currentDateString.replace("/","");
                 currentDate = Integer.parseInt(currentDateString);
 
+                // Format the payment and refund request dates to dd/MM/yy format
                 String formattedBought = formatDate(paymentDate);
-                System.out.println(paymentDate);
                 String formattedRequest = formatDate(currentDate);
 
 
+                // Check if the sale has already been refunded
                 if(refundID > 0){
                     JOptionPane.showMessageDialog(mainPanel,"This sale has already been refunded");
                 }
 
+                // Check if the refund request date is valid
                 else if(!validateDate(paymentDate, currentDate) && blankFound){
 
                     JOptionPane.showMessageDialog(mainPanel,"The date of the refund request " + formattedRequest + " has" +
@@ -123,6 +139,7 @@ public class Refunds extends javax.swing.JFrame {
             });
 
 
+        // Adding a KeyListener to the dateText field to allow only digits and slashes to be entered
         dateText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -135,6 +152,7 @@ public class Refunds extends javax.swing.JFrame {
         });
 
 
+        // Adding a KeyListener to the blankNumberText field to allow only digits to be entered
         blankNumberText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -145,6 +163,8 @@ public class Refunds extends javax.swing.JFrame {
                 }
             }
         });
+
+        // Adding an ActionListener to the nextButton to proceed to the next step if the refund is eligible
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -158,8 +178,29 @@ public class Refunds extends javax.swing.JFrame {
                 }
             }
         });
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel?", "Cancel Confirmation", JOptionPane.YES_NO_OPTION);
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    // User clicked "Yes"
+                    // Perform cancellation action
+                    dispose();
+                    TravelAdvisorHome travelAdvisorHome = new TravelAdvisorHome(ID,username);
+                } else {
+                    // User clicked "No"
+                    // Do nothing or perform alternative action
+                }
+            }
+        });
     }
 
+
+    /**
+     * Formats a payment date from an integer into a string in the format "dd/MM/yy".
+     * @param paymentDate the payment date as an integer (in the format "yyMMdd")
+     * @return the formatted payment date as a string (in the format "dd/MM/yy")
+     */
     public static String formatDate(int paymentDate) {
         String dateStr = String.valueOf(paymentDate);
         String year = dateStr.substring(0, 2);
@@ -170,6 +211,12 @@ public class Refunds extends javax.swing.JFrame {
 
 
 
+    /**
+     * Validates that a refund request date is later than the date the item was bought.
+     * @param dateBought the date the item was bought as an integer (in the format "yyMMdd")
+     * @param dateRefundRequest the date the refund was requested as an integer (in the format "yyMMdd")
+     * @return true if the refund request date is valid, false otherwise
+     */
     public boolean validateDate(int dateBought, int dateRefundRequest){
 
         if(String.valueOf(dateBought).length() == String.valueOf(dateRefundRequest).length()){
@@ -182,6 +229,11 @@ public class Refunds extends javax.swing.JFrame {
         return false;
     }
 
+    /**
+     * Checks if a string is a valid date in the format "yy/MM/dd".
+     * @param inputString the string to check
+     * @return true if the string is a valid date, false otherwise
+     */
     public static boolean isDateString(String inputString) {
         try {
             String[] parts = inputString.split("/");
@@ -202,6 +254,10 @@ public class Refunds extends javax.swing.JFrame {
     }
 
 
+    /**
+     * Main method for running the Refunds class and displaying the refund interface.
+     * @param args the command line arguments (not used)
+     */
     public static void main(String[] args){
         Refunds refunds = new Refunds(ID,username);
         refunds.show();

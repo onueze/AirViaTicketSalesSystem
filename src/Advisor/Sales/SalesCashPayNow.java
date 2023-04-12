@@ -157,6 +157,13 @@ public class SalesCashPayNow extends javax.swing.JFrame {
 
             }
         });
+        voidTicketButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                TravelAdvisorHome travelAdvisorHome = new TravelAdvisorHome(ID,username);
+            }
+        });
     }
 
 

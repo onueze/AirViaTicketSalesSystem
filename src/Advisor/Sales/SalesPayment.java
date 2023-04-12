@@ -60,6 +60,7 @@ public class SalesPayment extends javax.swing.JFrame {
     private static int currencyID;
     private float exchangeRate;
     private float priceInUSD;
+    private int commission_ID;
 
 
     public SalesPayment(int ID, String username, int customerID, int flightID, int blankNumber, int date) {
@@ -233,7 +234,7 @@ public class SalesPayment extends javax.swing.JFrame {
 
 
                     Statement st = con.createStatement();
-                    String query = "SELECT Rate, blankType " +
+                    String query = "SELECT Rate, blankType, Commission_ID " +
                             "FROM Commission " +
                             "WHERE Commission.blankType = '"+blankType+"' " +
                             "AND Commission.Employee_ID = '"+ID+"' " +
@@ -246,6 +247,7 @@ public class SalesPayment extends javax.swing.JFrame {
 
                     while(rs.next()){
                         String option = rs.getString("Rate");
+                        commission_ID = rs.getInt("Commission_ID");
                         rateSet.add(option); // Add the value to the Set
                     }
                     for (String option : rateSet) { // Loop through the Set and add unique values to the combo box
@@ -323,6 +325,13 @@ public class SalesPayment extends javax.swing.JFrame {
                 System.out.println(priceInUSD);
                 usdPriceLabel.setText(String.valueOf(priceInUSD));
                 pricePercentageLabel.setText("Price to pay in local currency (exchange Rate " + exchangeRate + " applied)");
+            }
+        });
+        voidTicketButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                TravelAdvisorHome travelAdvisorHome = new TravelAdvisorHome(ID,username);
             }
         });
     }
