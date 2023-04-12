@@ -1,5 +1,6 @@
 package Manager;
 
+import Authentication.Login;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -21,13 +22,11 @@ public class OfficeManagerStock extends javax.swing.JFrame {
     private JPanel Stock;
     private JButton logOutButton;
     private JTable stockTable;
-    private JButton domesticSalesReportButton;
     private JButton homeButton;
     private JButton discountPlanButton;
     private JButton blanksButton;
     private JButton stockButton;
     private JButton ticketStockTurnOverButton;
-    private JButton interlineSalesReportButton;
     private JComboBox assignTravelAdvisor;
     private JComboBox assignBlank;
     private JButton submitAssignBlanks;
@@ -47,6 +46,8 @@ public class OfficeManagerStock extends javax.swing.JFrame {
     private JComboBox SelectReassignBlankPrefix;
     private JTextField lowerRangeReassign;
     private JTextField upperRangeReassign;
+    private JLabel usernameLabel;
+    private JButton saleReportsButton;
     private JButton openBlankReportButton;
     private static int ID;
     private static String username;
@@ -106,6 +107,8 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         stockTableScroll.setPreferredSize(new Dimension(500, 500));
         this.username = username;
         this.ID = ID;
+        usernameLabel.setText("Manager: "+ username);
+
 
         setContentPane(Stock);
         setSize(1000, 600);
@@ -448,6 +451,22 @@ public class OfficeManagerStock extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                // blankTypeTable.addItem();
+            }
+        });
+        saleReportsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OfficeSaleReports saleReportsButton = new OfficeSaleReports(ID, username);
+                saleReportsButton.setVisible(true);
+                dispose();
+            }
+        });
+        logOutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Login login = new Login();
+                login.show();
             }
         });
     }

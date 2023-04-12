@@ -39,6 +39,7 @@ public class CustomerDetails extends javax.swing.JFrame {
     public CustomerDetails(int ID, String username){
         this.ID = ID;
         this.username = username;
+
         setContentPane(mainPanel);
         setSize(1500, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

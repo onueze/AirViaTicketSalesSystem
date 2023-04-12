@@ -1,19 +1,21 @@
 package Manager;
 
+import Authentication.Login;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class OfficeManagerTicketStockTurnOverReport extends javax.swing.JFrame {
     private JButton logOutButton;
-    private JButton domesticSalesReportButton;
     private JButton homeButton;
     private JButton stockButton;
-    private JButton interlineSalesReportButton;
     private JButton ticketStockTurnOverButton;
     private JButton blanksButton;
     private JButton discountPlanButton;
     private JPanel TurnOverReport;
+    private JButton saleReportsButton;
+    private JLabel usernameLabel;
     private static int ID;
     private static String username;
 
@@ -21,6 +23,10 @@ public class OfficeManagerTicketStockTurnOverReport extends javax.swing.JFrame {
 
 
     public OfficeManagerTicketStockTurnOverReport(int ID, String username){
+        this.ID = ID;
+        this.username = username;
+        usernameLabel.setText("Manager: "+ username);
+
 
         setContentPane(TurnOverReport);
         setSize(1000,600);
@@ -80,6 +86,22 @@ public class OfficeManagerTicketStockTurnOverReport extends javax.swing.JFrame {
         });
 
 
+        logOutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Login login = new Login();
+                login.show();
+            }
+        });
+        saleReportsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OfficeSaleReports saleReportsButton = new OfficeSaleReports(ID, username);
+                saleReportsButton.setVisible(true);
+                dispose();
+            }
+        });
     }
 
 

@@ -1,5 +1,7 @@
 package Manager;
 
+import Authentication.Login;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,29 +12,28 @@ public class OfficeManagerHome extends javax.swing.JFrame {
     private JButton blanksButton;
     private JButton discountPlanButton;
     private JButton ticketStockTurnoverReportButton;
-    private JButton interlineSalesReportButton;
-    private JButton domesticSalesReportButton;
     private JButton logOutButton;
-    private JPanel logoField;
-    private JLabel IDAndUserNameLabel;
+    private JLabel usernameLabel;
     private JPanel officeManagerPage;
+    private JButton saleReportsButton;
     private JButton advisorIndividualReportButton;
     private static int ID;
     private static String username;
 
 
-    public OfficeManagerHome(int ID, String username){
-        this.username= username;
-        this.ID= ID;
+    public OfficeManagerHome(int ID, String username) {
+        this.username = username;
+        this.ID = ID;
+        usernameLabel.setText("Manager: "+ username);
         setContentPane(officeManagerPage);
-        setSize(1000,600);
+        setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerHome officeManagerPage = new OfficeManagerHome(ID,username);
+                OfficeManagerHome officeManagerPage = new OfficeManagerHome(ID, username);
                 officeManagerPage.setVisible(true);
                 dispose();
 
@@ -42,7 +43,7 @@ public class OfficeManagerHome extends javax.swing.JFrame {
         stockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerStock officeManagerStock = new OfficeManagerStock(ID,username);
+                OfficeManagerStock officeManagerStock = new OfficeManagerStock(ID, username);
                 officeManagerStock.setVisible(true);
                 dispose();
 
@@ -52,7 +53,7 @@ public class OfficeManagerHome extends javax.swing.JFrame {
         blanksButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks(ID,username);
+                OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks(ID, username);
                 officeManagerBlanks.setVisible(true);
                 dispose();
 
@@ -63,7 +64,7 @@ public class OfficeManagerHome extends javax.swing.JFrame {
         discountPlanButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerDiscountPlan discountPlanButton = new OfficeManagerDiscountPlan(ID,username);
+                OfficeManagerDiscountPlan discountPlanButton = new OfficeManagerDiscountPlan(ID, username);
                 discountPlanButton.setVisible(true);
                 dispose();
 
@@ -73,7 +74,7 @@ public class OfficeManagerHome extends javax.swing.JFrame {
         ticketStockTurnoverReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeManagerTicketStockTurnOverReport ticketStockTurnoverReportButton = new OfficeManagerTicketStockTurnOverReport(ID,username);
+                OfficeManagerTicketStockTurnOverReport ticketStockTurnoverReportButton = new OfficeManagerTicketStockTurnOverReport(ID, username);
                 ticketStockTurnoverReportButton.setVisible(true);
                 dispose();
 
@@ -81,17 +82,26 @@ public class OfficeManagerHome extends javax.swing.JFrame {
         });
 
 
-
-
-        advisorIndividualReportButton.addActionListener(new ActionListener() {
+        saleReportsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OfficeReports advisorIndividualReportButton = new OfficeReports(ID,username);
-                advisorIndividualReportButton.setVisible(true);
+                OfficeSaleReports saleReportsButton = new OfficeSaleReports(ID, username);
+                saleReportsButton.setVisible(true);
                 dispose();
             }
+
         });
+        logOutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Login login = new Login();
+                login.show();
+            }
+        });
+
     }
+
 
 
 

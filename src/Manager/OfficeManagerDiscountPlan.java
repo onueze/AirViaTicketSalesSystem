@@ -1,21 +1,21 @@
 package Manager;
 
+import Authentication.Login;
 import DB.DBConnectivity;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
     private JButton logOutButton;
     private JButton homeButton;
-    private JButton domesticSalesReportButton;
     private JButton discountPlanButton;
     private JButton blanksButton;
     private JButton stockButton;
-    private JButton interlineSalesReportButton;
     private JButton ticketStockTurnOverButton;
     private JTable DiscountPlanTable;
     private JPanel DiscountPlan;
@@ -29,119 +29,25 @@ public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
     private JTextField lowerRangeRate;
     private JTextField midRangeRate;
     private JTextField upperRangeRate;
+    private JButton saleReportButton;
+    private JLabel usernameLabel;
+    private JTextField enterCustomerIDFixed;
+    private JButton setButton;
     private static int ID;
     private static String username;
+    private boolean hasDiscount;
 
 
     public OfficeManagerDiscountPlan(int ID, String username) {
-        DiscountPlanTable.setPreferredScrollableViewportSize(new Dimension(500, 500));
-        DiscountPlanScroll.setPreferredSize(new Dimension(500, 500));
-
 
         this.username = username;
         this.ID = ID;
+        usernameLabel.setText("Manager: "+ username);
+
         setContentPane(DiscountPlan);
         setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
-
-
-
-
-
-
-/*
-        ViewDetails.addActionListener(new ActionListener() {
-            @Override
-            // add to check the total sales not just one tocket sale
-            public void actionPerformed(ActionEvent e) {
-
-                try (Connection con = DBConnectivity.getConnection()) {
-                    assert con != null;
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    Statement st = con.createStatement();
-                    String query = "SELECT CustomerAccount.Customer_ID, " +
-                            "       CASE WHEN CustomerAccount.sales_this_month > 5 " +
-                            "            THEN 'FlexibleDiscount' " +
-                            "            ELSE 'FixedDiscount' " +
-                            "       END AS DiscountPlan, " +
-                            "       CASE WHEN CustomerAccount.sales_this_month > 5 " +
-                            "            THEN FlexibleDiscount.Rate " +
-                            "            ELSE FixedDiscount.Rate " +
-                            "       END AS DiscountRate " +
-                            "FROM CustomerAccount " +
-                            "LEFT JOIN FixedDiscount ON CustomerAccount.Customer_ID = FixedDiscount.CustomerID " +
-                            "LEFT JOIN FlexibleDiscount ON CustomerAccount.Customer_ID = FlexibleDiscount.CustomerID;";
-
-                    ResultSet rs = st.executeQuery(query);
-                    ResultSetMetaData rsmd = rs.getMetaData();
-                    DefaultTableModel model = (DefaultTableModel) DiscountPlanTable.getModel();
-
-                    int cols = rsmd.getColumnCount();
-                    String[] colName = new String[cols];
-                    for (int i = 0; i < cols; i++) {
-                        colName[i] = rsmd.getColumnName(i + 1);
-                    }
-                    model.setColumnIdentifiers(colName);
-                    String customer_ID, discountPlan, discountRate;
-
-
-                    while (rs.next()) {
-                        customer_ID = rs.getString(1);
-                        discountPlan = rs.getString(2);
-                        discountRate = rs.getString(3);
-
-
-                        String[] row = {customer_ID, discountPlan, discountRate};
-                        model.addRow(row);
-                    }
-                    st.close();
-
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-
-            }
-        });
-
- */
-/*
-        viewCustomerIDButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-
-                try (Connection con = DBConnectivity.getConnection()) {
-                    assert con != null;
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    Statement st = con.createStatement();
-                    String query = "SELECT CustomerAccount.Customer_ID from CustomerAccount;";
-
-                    ResultSet rs = st.executeQuery(query);
-
-                    while (rs.next()) {
-                        CustomerIDDropdown.addItem(rs.getString("CustomerAccount.Customer_ID"));
-
-                    }
-                    st.close();
-
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-
-
-            }
-        });
-
- */
-
-
-
-
 
         homeButton.addActionListener(new ActionListener() {
             @Override
@@ -200,34 +106,61 @@ public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                int fixedRate = Integer.parseInt(setDiscountRate.getText());
+                String fixedRateText = setDiscountRate.getText();
+                int customerID = Integer.parseInt(enterCustomerIDFixed.getText());
+                // Check if the fixedRateText is a valid decimal number
+                if (!fixedRateText.matches("-?\\d+(\\.\\d+)?")) {
+                    JOptionPane.showMessageDialog(null, "Invalid rate, rate should be set as a decimal", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
+                double fixedRate = Double.parseDouble(fixedRateText);
 
                 try (Connection con = DBConnectivity.getConnection()) {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
-                    //Statement st = con.createStatement();
-                    String query = "\"WITH MonthlySales AS (\n" +
-                            "SELECT Customer_ID, SUM(amount) AS sales_total\n" +
-                            "FROM Sale\n" +
-                            "WHERE EXTRACT(MONTH FROM Current_month) = EXTRACT(MONTH FROM CURRENT_DATE)\n" +
-                            "AND EXTRACT(YEAR FROM Current_month) = EXTRACT(YEAR FROM CURRENT_DATE)\n" +
-                            "GROUP BY Customer_ID\n" +
-                            "UPDATE FixedDiscount"+
-                            "SET Rate = (SELECT fixedRate FROM DiscountType WHERE DiscountType = 'Fixed')"+
-                            "FROM FixedDiscount fd"+
-                            "JOIN CustomerAccount CurrentAccount ON FixedDiscount.CustomerID = CustomerAccount.Customer_ID"+
-                            "JOIN MonthlySales MonthlySales ON CurrentAccount.Customer_ID = MonthlySales.Customer_ID"+
-                            "WHERE ms.sales_total < 3";
+                    // fixed for this need ot be based on the sales_this_month shoudl be grater than >3 and 5<
 
-                    PreparedStatement pstmt = con.prepareStatement(query);
-                    pstmt.setInt(1, fixedRate);
-                    pstmt.executeQuery();
+                    String insert = "UPDATE FixedDiscount " +
+                            "SET Rate = ? " +
+                            "WHERE CustomerID = ? " +
+                            "AND CustomerID IN ( " +
+                            "SELECT Customer_ID " +
+                            "FROM CustomerAccount " +
+                            "WHERE sales_this_month > 3 AND sales_this_month < 5" +
+                            ");";
 
-                } catch (ClassNotFoundException ex) {ex.printStackTrace();
+                    //crate astin query that takes the enetred CustomerID and and enerted fixeddisscsountrate, and looks in the CustomerAccoutn table, and look at the macthing Customer_ID Coulmn and chek if and if tbhe sales_this_month > 3 AND sales_this_month < 5, and then enetrs the enerted fixedRate  and the enerted CustomerID, inot the FixedDiscount Tabble
+                    //fields in the fixedDiscount are, rate_ID,CustomerID,rate
+
+                    PreparedStatement pstm = con.prepareStatement(insert);
+                    pstm.setDouble(1,fixedRate);
+                    pstm.setInt(2, customerID);
+                    int rowsAffect = pstm.executeUpdate();
+
+                    if(rowsAffect == 0){
+                        String query = "INSERT INTO FixedDiscount SELECT "+
+                                "(SELECT COALESCE (MAX(Fixed_ID),0) + 1 FROM FixedDiscount),'"+customerID+"','"+fixedRate+"'";
+                        PreparedStatement preparedStatement = con.prepareStatement(query);
+                        preparedStatement.executeUpdate();
+
+                        String valued = "UPDATE CustomerAccount " +
+                                "SET AccountType = 'valued'," +
+                                "DiscountType = 'fixed' " +
+                                "WHERE Customer_ID = "+customerID+" " +
+                                ";";
+                        //crate astin query that takes the enetred CustomerID and and enerted fixeddisscsountrate, and looks in the CustomerAccoutn table, and look at the macthing Customer_ID Coulmn and chek if and if tbhe sales_this_month > 3 AND sales_this_month < 5, and then enetrs the enerted fixedRate  and the enerted CustomerID, inot the FixedDiscount Tabble
+                        //fields in the fixedDiscount are, rate_ID,CustomerID,rate
+                        PreparedStatement pst = con.prepareStatement(valued);
+                        int rowsAffected = pst.executeUpdate();
+                    }
 
 
-            } catch (SQLException ex) {
+                    pstm.close();
+
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
             }
@@ -290,6 +223,22 @@ public class OfficeManagerDiscountPlan extends javax.swing.JFrame {
 
 
 
+            }
+        });
+        saleReportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OfficeSaleReports saleReportsButton = new OfficeSaleReports(ID, username);
+                saleReportsButton.setVisible(true);
+                dispose();
+            }
+        });
+        logOutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Login login = new Login();
+                login.show();
             }
         });
     }
