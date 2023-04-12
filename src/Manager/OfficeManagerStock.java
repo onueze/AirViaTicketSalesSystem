@@ -1,17 +1,19 @@
 package Manager;
 
+import Authentication.Login;
 import DB.DBConnectivity;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.sql.*;
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 
 public class OfficeManagerStock extends javax.swing.JFrame {
@@ -20,26 +22,68 @@ public class OfficeManagerStock extends javax.swing.JFrame {
     private JPanel Stock;
     private JButton logOutButton;
     private JTable stockTable;
-    private JButton domesticSalesReportButton;
     private JButton homeButton;
     private JButton discountPlanButton;
     private JButton blanksButton;
     private JButton stockButton;
     private JButton ticketStockTurnOverButton;
-    private JButton interlineSalesReportButton;
     private JComboBox assignTravelAdvisor;
     private JComboBox assignBlank;
-    private JButton submitAssignBlanksButton;
+    private JButton submitAssignBlanks;
     private JButton submitReassignBlanksButton;
-    private JComboBox blankType;
+    private JComboBox blankTypeTable;
     private JButton showStockButton;
     private JScrollPane stockTableScroll;
     private JComboBox ReassignAdvisor;
     private JComboBox reasssignBlank;
+    private JTextField lowerRange;
+    private JTextField upperRange;
+    private JTextField assignDate;
+    private JComboBox SelectBlankType;
+    private JComboBox SelectBlankPrefix;
+    private JTextField EnterReassignDate;
+    private JComboBox SelectReassignBlankType;
+    private JComboBox SelectReassignBlankPrefix;
+    private JTextField lowerRangeReassign;
+    private JTextField upperRangeReassign;
+    private JLabel usernameLabel;
+    private JButton saleReportsButton;
     private JButton openBlankReportButton;
     private static int ID;
     private static String username;
 
+
+    private boolean validateInput() {
+        String lowerInput = lowerRange.getText();
+        String upperInput = upperRange.getText();
+        List<String> validPrefixes = Arrays.asList("444", "440", "420", "201", "101", "451", "452");
+
+        if (lowerInput.length() != 9 || upperInput.length() != 9) {
+            JOptionPane.showMessageDialog(null, "Blank number must be exactly 9 digits");
+            return false;
+        }
+
+        String lowerPrefix = lowerInput.substring(0, 3);
+        String upperPrefix = upperInput.substring(0, 3);
+
+        if (!validPrefixes.contains(lowerPrefix) || !validPrefixes.contains(upperPrefix)) {
+            JOptionPane.showMessageDialog(null, "Invalid blank type provided");
+            return false;
+        }
+
+        if (!lowerPrefix.equals(upperPrefix)) {
+            JOptionPane.showMessageDialog(null, "Ensure blank types are the same");
+            return false;
+        }
+
+        if (Long.parseLong(lowerInput) >= Long.parseLong(upperInput)) {
+            JOptionPane.showMessageDialog(null, "Lower batch shouldn't be higher than the upper batch");
+            return false;
+        }
+
+        JOptionPane.showMessageDialog(null, "Input is valid");
+        return true;
+    }
 
 
 
@@ -63,10 +107,12 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         stockTableScroll.setPreferredSize(new Dimension(500, 500));
         this.username = username;
         this.ID = ID;
+        usernameLabel.setText("Manager: "+ username);
+
 
         setContentPane(Stock);
         setSize(1000, 600);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
         // add this to assign and reassign somehow
@@ -103,10 +149,11 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         blanksButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose();
+
 
                 OfficeManagerBlanks officeManagerBlanks = new OfficeManagerBlanks(ID, username);
                 officeManagerBlanks.setVisible(true);
+                dispose();
 
             }
         });
@@ -132,25 +179,6 @@ public class OfficeManagerStock extends javax.swing.JFrame {
             }
         });
 
-        interlineSalesReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports(ID, username);
-                interlineSalesReportButton.setVisible(true);
-                dispose();
-
-            }
-        });
-
-        domesticSalesReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport(ID, username);
-                domesticSalesReportButton.setVisible(true);
-                dispose();
-
-            }
-        });
 
 
         showStockButton.addActionListener(new ActionListener() {
@@ -206,8 +234,6 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                     String query = "SELECT  Employee.Employee_ID FROM Employee where Employee.role = 'advisor'";
 
                     ResultSet rs = st.executeQuery(query);
-                    assignTravelAdvisor.removeAllItems();
-
 
                     while (rs.next()) {
                         String Id = rs.getString("Employee_ID");
@@ -225,37 +251,6 @@ public class OfficeManagerStock extends javax.swing.JFrame {
         });
 
 
-        assignBlank.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-
-                try (Connection con = DBConnectivity.getConnection()) {
-                    assert con != null;
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    Statement st = con.createStatement();
-                    String query = "SELECT  Blank.BlankNumber FROM Blank WHERE isAssigned = false";
-
-
-                    ResultSet rs = st.executeQuery(query);
-                    assignBlank.removeAllItems();
-
-                    while (rs.next()) {
-                        //assignTravelAdvisor.addItem(rs.getString("BlankNumber"));
-                        String number2 = rs.getString("BlankNumber");
-                        assignBlank.addItem(number2);
-                    }
-
-                    st.close();
-
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-
 
         ReassignAdvisor.addActionListener(new ActionListener() {
             @Override
@@ -269,8 +264,6 @@ public class OfficeManagerStock extends javax.swing.JFrame {
 
 
                     ResultSet rs = st.executeQuery(query);
-                    ReassignAdvisor.removeAllItems();
-
 
                     while (rs.next()) {
                         //assignTravelAdvisor.addItem(rs.getString("BlankNumber"));
@@ -290,124 +283,68 @@ public class OfficeManagerStock extends javax.swing.JFrame {
             }
         });
 
-        reasssignBlank.addActionListener(new ActionListener() {
+
+
+
+
+
+        submitAssignBlanks.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                String reassignAdvisorID = (String) ReassignAdvisor.getSelectedItem();
-
-
-                try (Connection con = DBConnectivity.getConnection()) {
-                    assert con != null;
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    Statement st = con.createStatement();
-                    String query = "SELECT BlankNumber FROM Blank WHERE Employee_ID != ? AND isAssigned = true";
-                    PreparedStatement preparedStatement = con.prepareStatement(query);
-
-                    // Set the value for the advisor_ID placeholder
-                    preparedStatement.setString(1, reassignAdvisorID);
-
-
-                    ResultSet rs = st.executeQuery(query);
-                    reasssignBlank.removeAllItems();
-
-
-                    while (rs.next()) {
-                        //assignTravelAdvisor.addItem(rs.getString("BlankNumber"));
-                        String number = rs.getString("BlankNumber");
-                        reasssignBlank.addItem(number);
-                    }
-
-                    st.close();
-
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-
-
-            }
-        });
-
-
-        submitAssignBlanksButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+                validateInput();
+                String lowerRangeText = lowerRange.getText();
+                String upperRangeText = upperRange.getText();
                 String assignAdvisorID = (String) assignTravelAdvisor.getSelectedItem();
-                String assignBlankNumber = (String) assignBlank.getSelectedItem();
 
-                try (Connection con = DBConnectivity.getConnection()) {
-                    assert con != null;
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    Statement st = con.createStatement();
-                    String query = "UPDATE Blank SET Employee_ID = ?, isAssigned = true WHERE BlankNumber = ?";
-                    PreparedStatement preparedStatement = con.prepareStatement(query);
+                int lowerBound = Integer.parseInt(lowerRangeText);
+                int upperBound = Integer.parseInt(upperRangeText);
 
-                    // Set the values for the prepared statement
-                    preparedStatement.setString(1, assignAdvisorID);
-                    preparedStatement.setString(2, assignBlankNumber);
+                String blankType = (String) SelectBlankType.getSelectedItem();
+                String blankPrefix = (String) SelectBlankPrefix.getSelectedItem();
 
-
-                    int result2 = preparedStatement.executeUpdate();
-
-                    if (result2 > 0) {
-                        // Show success message
-                        JOptionPane.showMessageDialog(null, "Blank table updated successfully");
-
-                        String message = "Assigned Blank Number: " + assignBlankNumber + ", Employee ID: " + assignAdvisorID;
-
-                        appendToLogFile(message);
-                    } else {
-                        // Show error message
-                        JOptionPane.showMessageDialog(null, "Failed to update Blank table");
-                    }
-                    // Maybe delte one okf the jOption pane, or leave both if not really afectign runnign
-
-                } catch (ClassNotFoundException ex) {
-                    JOptionPane.showMessageDialog(null, "Database driver not found");
-                    ex.printStackTrace();
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error updating the blank table");
-                    ex.printStackTrace();
-                }
-
-            }
-
-        });
-        submitReassignBlanksButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-
-                {
-                    String reAssignAdvisorID = (String) ReassignAdvisor.getSelectedItem();
-                    String reAssignBlankNumber = (String) reasssignBlank.getSelectedItem();
-
+                try {
+                    int assignDateBlank = Integer.parseInt(assignDate.getText().replace("/", ""));
 
                     try (Connection con = DBConnectivity.getConnection()) {
                         assert con != null;
                         Class.forName("com.mysql.cj.jdbc.Driver");
-                        Statement st = con.createStatement();
-                        String query = "UPDATE Blank SET Employee_ID = ?, isAssigned = true WHERE BlankNumber = ?";
-                        PreparedStatement preparedStatement = con.prepareStatement(query);
 
-                        // Set the values for the prepared statement
-                        preparedStatement.setString(1, reAssignAdvisorID);
-                        preparedStatement.setString(2, reAssignBlankNumber);
+                        // Check if the blanks are initially assigned to the manager
+                        String checkManagerQuery = "SELECT * FROM Blank WHERE BlankNumber BETWEEN ? AND ? AND Manager_ID = ?";
+                        PreparedStatement checkManagerStatement = con.prepareStatement(checkManagerQuery);
+                        checkManagerStatement.setInt(1, lowerBound);
+                        checkManagerStatement.setInt(2, upperBound);
+                        checkManagerStatement.setString(3, String.valueOf(ID));
+                        ResultSet resultSet = checkManagerStatement.executeQuery();
 
+                        int validBlanksCount = 0;
+                        while (resultSet.next()) {
+                            validBlanksCount++;
+                        }
 
-                        int result = preparedStatement.executeUpdate();
+                        if (validBlanksCount == (upperBound - lowerBound + 1)) {
+                            // Proceed with the assignment
+                            String query = "UPDATE Blank SET Employee_ID = ?, date_assign = ?, Type = ?, blank_prefix = ?, isAssigned = ? WHERE BlankNumber BETWEEN ? AND ? AND Manager_ID = ?";
+                            PreparedStatement preparedStatement = con.prepareStatement(query);
+                            preparedStatement.setString(1, assignAdvisorID);
+                            preparedStatement.setInt(2, assignDateBlank);
+                            preparedStatement.setString(3, blankType);
+                            preparedStatement.setString(4, blankPrefix);
+                            preparedStatement.setInt(5, 1);
+                            preparedStatement.setInt(6, lowerBound);
+                            preparedStatement.setInt(7, upperBound);
+                            preparedStatement.setString(8, String.valueOf(ID));
+                            int affectedRows = preparedStatement.executeUpdate();
 
-                        if (result > 0) {
-                            // Show success message
-                            JOptionPane.showMessageDialog(null, "Blank table updated successfully");
-
-                            String message = "Reassigned Blank Number: " + reAssignBlankNumber + ", Employee ID: " + reAssignAdvisorID;
-                            appendToLogFile(message);
+                            if (affectedRows > 0) {
+                                JOptionPane.showMessageDialog(null, "Database has been affected.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            } else {
+                                JOptionPane.showMessageDialog(null, "No rows were affected.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                            }
                         } else {
-                            // Show error message
-                            JOptionPane.showMessageDialog(null, "Failed to update Blank table");
+                            // Show an error message when not all blanks belong to the manager
+                            JOptionPane.showMessageDialog(null, "These blanks are not assigned to you.", "Error", JOptionPane.ERROR_MESSAGE);
                         }
 
                     } catch (ClassNotFoundException ex) {
@@ -415,13 +352,123 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
+        submitReassignBlanksButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
+                validateInput();
+                String lowerRangeReassignTextText = lowerRangeReassign.getText();
+                String upperRangeReassignTextText = upperRangeReassign.getText();
+                String ReassignAdvisorid = (String) ReassignAdvisor.getSelectedItem();
+
+                int lowerBoundReassign = Integer.parseInt(lowerRangeReassignTextText);
+                int upperBoundReassign = Integer.parseInt(upperRangeReassignTextText);
+
+                String blankType = (String) SelectReassignBlankType.getSelectedItem();
+                String blankPrefix = (String) SelectReassignBlankPrefix.getSelectedItem();
+
+                try {
+                    int reassignDateBlank = Integer.parseInt(EnterReassignDate.getText().replace("/", ""));
+
+                    try (Connection con = DBConnectivity.getConnection()) {
+                        assert con != null;
+                        Class.forName("com.mysql.cj.jdbc.Driver");
+
+                        // Check if the blanks are initially assigned to an advisor, not sold, and not assigned to the same advisor
+                        String checkAssignedQuery = "SELECT * FROM Blank WHERE BlankNumber BETWEEN ? AND ? AND Employee_ID IS NOT NULL AND Employee_ID != ? AND isSold = 0";
+                        PreparedStatement checkAssignedStatement = con.prepareStatement(checkAssignedQuery);
+                        checkAssignedStatement.setInt(1, lowerBoundReassign);
+                        checkAssignedStatement.setInt(2, upperBoundReassign);
+                        checkAssignedStatement.setString(3, ReassignAdvisorid);
+                        ResultSet resultSet = checkAssignedStatement.executeQuery();
+
+                        int validBlanksCount = 0;
+                        while (resultSet.next()) {
+                            validBlanksCount++;
+                        }
+
+                        if (validBlanksCount == (upperBoundReassign - lowerBoundReassign + 1)) {
+                            // Proceed with the reassignment
+                            String query = "UPDATE Blank SET Employee_ID = ?, date_assign = ?, Type = ?, blank_prefix = ? WHERE BlankNumber BETWEEN ? AND ? AND isSold = 0";
+                            PreparedStatement preparedStatement = con.prepareStatement(query);
+                            preparedStatement.setString(1, ReassignAdvisorid);
+                            preparedStatement.setInt(2, reassignDateBlank);
+                            preparedStatement.setString(3, blankType);
+                            preparedStatement.setString(4, blankPrefix);
+                            preparedStatement.setInt(5, lowerBoundReassign);
+                            preparedStatement.setInt(6, upperBoundReassign);
+                            int affectedRows = preparedStatement.executeUpdate();
+
+                            if (affectedRows > 0) {
+                                JOptionPane.showMessageDialog(null, "Database has been affected.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            } else {
+                                JOptionPane.showMessageDialog(null, "No rows were affected.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        } else {
+                            // Show an error message when not all blanks meet the conditions
+                            JOptionPane.showMessageDialog(null, "These blanks have not been assigned to an advisor, have been sold, or are already assigned to the same advisor.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+
+                    } catch (ClassNotFoundException ex) {
+                        ex.printStackTrace();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         });
 
 
+        SelectBlankType.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SelectBlankType.addItem("Interline");
+                SelectBlankType.addItem("Domestic");
+            }
+        });
+        SelectBlankPrefix.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SelectBlankPrefix.addItem("444");
+                SelectBlankPrefix.addItem("440");
+                SelectBlankPrefix.addItem("420");
+                SelectBlankPrefix.addItem("201");
+                SelectBlankPrefix.addItem("101");
+
+            }
+        });
+
+
+        blankTypeTable.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               // blankTypeTable.addItem();
+            }
+        });
+        saleReportsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OfficeSaleReports saleReportsButton = new OfficeSaleReports(ID, username);
+                saleReportsButton.setVisible(true);
+                dispose();
+            }
+        });
+        logOutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Login login = new Login();
+                login.show();
+            }
+        });
     }
 
     public static void main(String[] args){

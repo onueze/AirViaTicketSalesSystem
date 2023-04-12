@@ -1,10 +1,12 @@
 package Admin.Blanks;
+
 import Admin.Commission.CommissionRates;
 import Admin.CustomerDetails.CustomerDetails;
 import Admin.Home.SystemAdminHome;
 import Admin.UserDetails.CreateUser;
 import Admin.UserDetails.UserDetails;
 import Authentication.EnterDate;
+import Authentication.Login;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -32,16 +34,23 @@ public class SystemStock extends javax.swing.JFrame {
     private JScrollPane blankScrollPane;
     private JComboBox selectOfficeManagerID;
     private JComboBox selectFilter;
-    private JButton SUBMITBLANKASSIGNButton;
+    private JButton submitAssignBlank;
     private JTextField lowerRange;
     private JTextField upperRange;
     private JTextField assignDate;
     private JComboBox selectblankPrefix;
     private JComboBox SelectblankType;
+    private JLabel usernameLabel;
+    private JTextField newLowBlankRange;
+    private JTextField newUpperBlankRange;
+    private JButton submitBlankAdditionButton;
+    private JComboBox comboBox1;
 
 
     private static int ID;
     private static String username;
+    private static int dateToday;
+
 
 
     private boolean validateInput() {
@@ -49,7 +58,7 @@ public class SystemStock extends javax.swing.JFrame {
         String upperInput = upperRange.getText();
         List<String> validPrefixes = Arrays.asList("444", "440", "420", "201", "101", "451", "452");
 
-        if (lowerInput.length() != 9 || upperInput.length() != 9) {
+        if (lowerInput.length() != 9 && upperInput.length() != 9) {
             JOptionPane.showMessageDialog(null, "Blank number must be exactly 9 digits");
             return false;
         }
@@ -80,6 +89,11 @@ public class SystemStock extends javax.swing.JFrame {
 
 
 
+
+
+
+
+
     public SystemStock(int ID, String username) {
 
         blankTable.setPreferredScrollableViewportSize(new Dimension(550, 500));
@@ -87,15 +101,32 @@ public class SystemStock extends javax.swing.JFrame {
 
         this.username = username;
         this.ID = ID;
+        this.dateToday = dateToday;
+        usernameLabel.setText("Manager: " + username);
         setContentPane(systemStockPage);
         setSize(1000, 600);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+        // testing the git push
 
+        SelectblankType.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SelectblankType.addItem("Interline");
+                SelectblankType.addItem("Domestic");
+            }
+        });
+        selectblankPrefix.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectblankPrefix.addItem("444");
+                selectblankPrefix.addItem("440");
+                selectblankPrefix.addItem("420");
+                selectblankPrefix.addItem("201");
+                selectblankPrefix.addItem("101");
 
-
-
-
+            }
+        });
 
 
         ShowBlanks.addActionListener(new ActionListener() {
@@ -171,8 +202,6 @@ public class SystemStock extends javax.swing.JFrame {
         });
 
 
-
-
         selectOfficeManagerID.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -204,14 +233,14 @@ public class SystemStock extends javax.swing.JFrame {
         });
 
 
-
-        SUBMITBLANKASSIGNButton.addActionListener(new ActionListener() {
+        submitAssignBlank.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 validateInput();
                 String lowerRangeText = lowerRange.getText();
                 String upperRangeText = upperRange.getText();
-                String managerID = (String) selectOfficeManagerID.getSelectedItem();
+                int managerID = (int) selectOfficeManagerID.getSelectedItem();
 
                 int lowerBound = Integer.parseInt(lowerRangeText);
                 int upperBound = Integer.parseInt(upperRangeText);
@@ -220,29 +249,37 @@ public class SystemStock extends javax.swing.JFrame {
                 String blankPrefix = (String) selectblankPrefix.getSelectedItem();
 
                 try {
-                    int assignDateBlank = Integer.parseInt(assignDate.getText().replace("/",""));
+                    int assignDateBlank = Integer.parseInt(assignDate.getText().replace("/", ""));
 
                     try (Connection con = DBConnectivity.getConnection()) {
                         assert con != null;
                         Class.forName("com.mysql.cj.jdbc.Driver");
 
-                        String query = "INSERT INTO Blank (BlankNumber, Employee_ID, date_assign, Type, blank_prefix, isSold,isAssigned) VALUES (?, ?, ?, ?, ?, ?,?)";
+                        String getMaxBatchIdQuery = "SELECT MAX(batch_id) as max_batch_id FROM Blank";
+                        Statement getMaxBatchIdStatement = con.createStatement();
+                        ResultSet resultSet = getMaxBatchIdStatement.executeQuery(getMaxBatchIdQuery);
+                        int newBatchId = 1;
+                        if (resultSet.next()) {
+                            newBatchId = resultSet.getInt("max_batch_id") + 1;
+                        }
+
+
+
+                        String query = "INSERT INTO Blank (BlankNumber, Manager_ID, date_assign, Type, blank_prefix, isSold, isAssigned, batch_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
 
                         PreparedStatement preparedStatement = con.prepareStatement(query);
                         for (int i = lowerBound; i <= upperBound; i++) {
                             preparedStatement.setInt(1, i);
-                            preparedStatement.setString(2, managerID);
+                            preparedStatement.setInt(2, managerID);
                             preparedStatement.setInt(3, assignDateBlank);
                             preparedStatement.setString(4, blankType);
                             preparedStatement.setString(5, blankPrefix);
                             preparedStatement.setInt(6, 0);
-                            preparedStatement.setInt(7,1);
+                            preparedStatement.setInt(7, 1);
+                            preparedStatement.setInt(8, newBatchId);
                             preparedStatement.executeUpdate();
-
-
-                            //preparedStatement.addBatch();
                         }
-                        //preparedStatement.executeBatch();
 
                     } catch (ClassNotFoundException ex) {
                         ex.printStackTrace();
@@ -252,20 +289,16 @@ public class SystemStock extends javax.swing.JFrame {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+
+
             }
-
         });
-
-
-
-
-
 
 
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SystemAdminHome homeButton = new SystemAdminHome(ID,username, EnterDate.getDateToday());
+                SystemAdminHome homeButton = new SystemAdminHome(ID, username, EnterDate.getDateToday());
                 homeButton.setVisible(true);
                 dispose();
 
@@ -275,7 +308,7 @@ public class SystemStock extends javax.swing.JFrame {
         manageUserDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                UserDetails manageUserDetailsButton = new UserDetails(ID,username);
+                UserDetails manageUserDetailsButton = new UserDetails(ID, username);
                 manageUserDetailsButton.setVisible(true);
                 dispose();
 
@@ -285,7 +318,7 @@ public class SystemStock extends javax.swing.JFrame {
         manageCustomerDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CustomerDetails manageCustomerDetailsButton = new CustomerDetails(ID,username);
+                CustomerDetails manageCustomerDetailsButton = new CustomerDetails(ID, username);
                 manageCustomerDetailsButton.setVisible(true);
                 dispose();
 
@@ -296,7 +329,7 @@ public class SystemStock extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                CommissionRates manageCommissionRatesButton = new CommissionRates(ID,username);
+                CommissionRates manageCommissionRatesButton = new CommissionRates(ID, username);
                 manageCommissionRatesButton.setVisible(true);
                 dispose();
 
@@ -305,7 +338,7 @@ public class SystemStock extends javax.swing.JFrame {
         manageSystemStockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SystemStock manageSystemStockButton = new SystemStock(ID,username);
+                SystemStock manageSystemStockButton = new SystemStock(ID, username);
                 manageSystemStockButton.setVisible(true);
                 dispose();
 
@@ -315,7 +348,7 @@ public class SystemStock extends javax.swing.JFrame {
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CreateUser createUserButton = new CreateUser(ID,username);
+                CreateUser createUserButton = new CreateUser(ID, username);
                 createUserButton.setVisible(true);
                 dispose();
 
@@ -323,26 +356,54 @@ public class SystemStock extends javax.swing.JFrame {
         });
 
 
-        SelectblankType.addActionListener(new ActionListener() {
+
+        logOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SelectblankType.addItem("Interline");
-                SelectblankType.addItem("Domestic");
+                dispose();
+                Login login = new Login();
+                login.show();
             }
         });
-        selectblankPrefix.addActionListener(new ActionListener() {
+        submitBlankAdditionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectblankPrefix.addItem("444");
-                selectblankPrefix.addItem("440");
-                selectblankPrefix.addItem("420");
-                selectblankPrefix.addItem("201");
-                selectblankPrefix.addItem("101");
-                selectblankPrefix.addItem("101");
-                selectblankPrefix.addItem("101");
+                validateInput();
+
+                int lowerRangeNew = Integer.parseInt(newLowBlankRange.getText());
+                int upperRangeNew = Integer.parseInt(newUpperBlankRange.getText());
+                String blankType = (String) SelectblankType.getSelectedItem();
+                String blankPrefix = (String) selectblankPrefix.getSelectedItem();
+
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+
+                    String query = "INSERT INTO Blank(BlankNumber,Blank.Type,isSold,isAssigned,blank_prefix)" +
+                            "VALUES (?,?,?,?,?)";
+
+                    PreparedStatement preparedStatement = con.prepareStatement(query);
+                    for (int i = lowerRangeNew; i <= upperRangeNew; i++) {
+                        preparedStatement.setInt(1, i);
+                        preparedStatement.setString(2, blankType);
+                        preparedStatement.setInt(3, 0);
+                        preparedStatement.setInt(4, 0);
+                        preparedStatement.setString(5,blankPrefix);
+
+                        preparedStatement.executeUpdate();
+                    }
+
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
+
         });
     }
+
 
     public static void main(String[] args) {
         SystemStock systemStock = new SystemStock(ID,username);

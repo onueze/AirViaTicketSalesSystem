@@ -16,8 +16,6 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
     private JButton homeButton;
     private JButton stockButton;
     private JButton blanksButton;
-    private JButton domesticSalesReportButton;
-    private JButton interlineSalesReportButton;
     private JButton discountPlanButton;
     private JButton ticketStockTurnOverButton;
     private JButton submitBlankUsageReportButton;
@@ -25,6 +23,8 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
     private JScrollPane blankTableScroll;
     private JButton showBlanksButton;
     private JButton viewBlankUsageReportButton;
+    private JButton saleReportsButton;
+    private JLabel usernameLabel;
 
 
     private static int ID;
@@ -39,6 +39,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
 
         this.username = username;
         this.ID = ID;
+        usernameLabel.setText("Manager: "+ username);
         setContentPane(Blanks);
         setSize(1500, 1000);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -98,26 +99,6 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
             }
         });
 
-        interlineSalesReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OfficeManagerInterlineSalesReports interlineSalesReportButton = new OfficeManagerInterlineSalesReports(ID, username);
-                interlineSalesReportButton.setVisible(true);
-                dispose();
-
-            }
-        });
-
-        domesticSalesReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OfficeManagerDomesticSalesReport domesticSalesReportButton = new OfficeManagerDomesticSalesReport(ID, username);
-                domesticSalesReportButton.setVisible(true);
-                dispose();
-
-            }
-
-        });
 
 
         viewBlankUsageReportButton.addActionListener(new ActionListener() {
@@ -180,6 +161,14 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                     ex.printStackTrace();
                 }
 
+            }
+        });
+        saleReportsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OfficeSaleReports saleReportsButton = new OfficeSaleReports(ID, username);
+                saleReportsButton.setVisible(true);
+                dispose();
             }
         });
     }
