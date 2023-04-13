@@ -17,6 +17,7 @@ public class AdvisorStock extends javax.swing.JFrame {
     private JButton showBlanksButton;
     private JScrollPane stockTableScroll;
     private JPanel blankTypePanel;
+    private JButton voidBlankButton;
     private static int ID;
     private static String username;
     private JComboBox blankType;
@@ -89,6 +90,12 @@ public class AdvisorStock extends javax.swing.JFrame {
                     }
 
                 }
+
+            }
+        });
+        voidBlankButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
             }
         });

@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SalesCardPayNow extends javax.swing.JFrame {
+    private static int commission_ID;
     private float priceInUSD;
     private JButton checkCardDetailsButton;
     private JButton cancelPaymentButton;
@@ -50,7 +51,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
 
     public SalesCardPayNow(int ID, String username, int customerID,
                            float price, int blankNumber, String blankType,
-                           String paymentPeriod, String paymentType, int ticketID, int date, int currencyID, Document document) {
+                           String paymentPeriod, int commission_ID, String paymentType, int ticketID, int date, int currencyID, Document document) {
         setContentPane(mainPanel);
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -67,6 +68,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
         this.date = date;
         this.currencyID = currencyID;
         this.document = document;
+        this.commission_ID = commission_ID;
 
         usdPriceLabel.setText(String.valueOf(price));
 
@@ -110,7 +112,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
                                 "(SELECT COALESCE(MAX(Sale_ID), 0) + 1 FROM Sale), '"+priceInUSD+"','"+paymentPeriod+"'," +
                                 " null,'"+date+"'," +
                                 "'"+paymentType+"', '"+ID+"','"+ SalesCardPayNow.currencyID +"'," +
-                                "'"+customerID+"',1,'"+ticketID+"','"+blankNumber+"', null, 1";
+                                "'"+customerID+"', '"+commission_ID+"','"+ticketID+"','"+blankNumber+"', null, 1 ";
                         System.out.println(query);
                         int insert = st.executeUpdate(query);
 
@@ -184,9 +186,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
                 try {
                     mail.draftEmail(customerEmail,"Dear Customer for AirVia, this" +
                             "is your receipt for your most recent flight purchase", "/Users/alexelemele/Documents/testPDF.pdf");
-                } catch (MessagingException ex) {
-                    ex.printStackTrace();
-                } catch (IOException ex) {
+                } catch (MessagingException | IOException ex) {
                     ex.printStackTrace();
                 }
                 try {
@@ -211,7 +211,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
         cancelPaymentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel?", "Cancel Confirmation", JOptionPane.YES_NO_OPTION);
+                int dialogResult = JOptionPane.showConfirmDialog(mainPanel, "Are you sure you want to cancel?", "Cancel Confirmation", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
                     // User clicked "Yes"
                     // Perform cancellation action
@@ -263,7 +263,7 @@ public class SalesCardPayNow extends javax.swing.JFrame {
 
     public static void main(String[]args){
         SalesCardPayNow salesCardPayNow = new SalesCardPayNow(ID,username,customerID,
-         price,blankNumber, blankType,paymentPeriod,paymentType,ticketID,date, currencyID, document);
+         price,blankNumber, blankType,paymentPeriod, commission_ID, paymentType,ticketID,date, currencyID, document);
     }
 
 }

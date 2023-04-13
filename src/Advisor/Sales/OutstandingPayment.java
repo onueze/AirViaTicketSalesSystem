@@ -35,8 +35,8 @@ public class OutstandingPayment extends javax.swing.JFrame {
     private int ticketID;
     private int refundID;
     private int blankNumber;
-    private int ID;
-    private String username;
+    private static int ID;
+    private static String username;
     private String blankType;
     private Document document;
 
@@ -92,7 +92,7 @@ public class OutstandingPayment extends javax.swing.JFrame {
 
                         JOptionPane.showMessageDialog(mainPanel,"pay later eligible");
 
-                        int optionSelected = JOptionPane.showOptionDialog(null, "Select payment method:", "Payment Method", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Card", "Cash" }, "Card");
+                        int optionSelected = JOptionPane.showOptionDialog(mainPanel, "Select payment method:", "Payment Method", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Card", "Cash" }, "Card");
                         String paymentMethod = "";
                         if (optionSelected == JOptionPane.YES_OPTION) {
                             paymentMethod = "Card";
@@ -148,8 +148,25 @@ public class OutstandingPayment extends javax.swing.JFrame {
                             } catch (DocumentException | FileNotFoundException ex) {
                                 ex.printStackTrace();
                             }
+
+
+
+                            Statement stRate = con.createStatement();
+                            String queryRate = "SELECT " +
+                                    " Sale.Commission_ID " +
+                                    "FROM Sale " +
+                                    "WHERE Sale.BlankNumber  = '" + blankNo  + "'";
+                            System.out.println(query);
+                            ResultSet rsRate = st.executeQuery(queryRate);
+
+                            if(rsRate.next()){
+                                commissionID = rsRate.getInt("Commission_ID");
+                            }
+
+
                             dispose();
-                            SalesCardPayNow salesCardPayNow = new SalesCardPayNow(ID,username,customerID,amount,blankNumber,blankType, "pay now","card", ticketID, paymentDate, currencyCode,document);
+                            SalesCardPayNow salesCardPayNow = new SalesCardPayNow(ID,username,customerID,amount,blankNumber,blankType, "pay now", commissionID, "card", ticketID, paymentDate, currencyCode,document);
+                            salesCardPayNow.show();
                         } else if (optionSelected == JOptionPane.NO_OPTION) {
                             paymentMethod = "Cash";
 
@@ -206,7 +223,8 @@ public class OutstandingPayment extends javax.swing.JFrame {
                             }
 
                             dispose();
-                            SalesCashPayNow salesCashPayNow = new SalesCashPayNow(ID,username,customerID,amount,blankNumber,blankType, "pay now","card", ticketID, paymentDate, currencyCode,document);
+                            SalesCashPayNow salesCashPayNow = new SalesCashPayNow(ID,username,customerID,amount,blankNumber,blankType, "pay now", commissionID, "card", ticketID, paymentDate, currencyCode,document);
+                            salesCashPayNow.show();
                             System.out.println("sales cash offen");
                         }
                         System.out.println("Payment method selected: " + paymentMethod);
@@ -220,6 +238,7 @@ public class OutstandingPayment extends javax.swing.JFrame {
 
             }
         });
+
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -227,11 +246,17 @@ public class OutstandingPayment extends javax.swing.JFrame {
                 TravelAdvisorHome travelAdvisorHome = new TravelAdvisorHome(ID,username);
             }
         });
+
         blankNumberText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
                 super.keyTyped(e);
             }
         });
+    }
+
+    public static void main(String[]args){
+        OutstandingPayment outstandingPayment = new OutstandingPayment(ID,username);
+        outstandingPayment.show();
     }
 }
