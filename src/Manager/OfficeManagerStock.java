@@ -304,12 +304,14 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                         String checkManagerQuery = "SELECT Blank.BlankNumber, Employee.Employee_ID, Employee.role " +
                                 "FROM Blank " +
                                 "JOIN Employee ON Employee.Employee_ID = Blank.Employee_ID " +
-                                "WHERE Employee.role = 'officemanager'";
+                                "WHERE Employee.role = 'officemanager' AND BlankNumber BETWEEN ? AND ? " ;
 
                         PreparedStatement checkManagerStatement = con.prepareStatement(checkManagerQuery);
                         //checkManagerStatement.setInt(1, lowerBound);
-                        //checkManagerStatement.setInt(2, upperBound);
+                        //checkManagerStatement.setInt(2, upperB1ound);
                         //checkManagerStatement.setString(3, String.valueOf(ID));
+                        checkManagerStatement.setInt(1,lowerBound);
+                        checkManagerStatement.setInt(2,upperBound);
                         ResultSet resultSet = checkManagerStatement.executeQuery();
 
                         int validBlanksCount = 0;
@@ -317,6 +319,10 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                             validBlanksCount++;
                         }
 
+                        System.out.println((upperBound - lowerBound + 1) + " UPPLOW");
+                        System.out.println(validBlanksCount + "Blsnkcount");
+                        System.out.println(upperBound + " UPPER");
+                        System.out.println(lowerBound + " LOWER");
                         if (validBlanksCount == (upperBound - lowerBound + 1)) {
                             // Proceed with the assignment
 
@@ -388,7 +394,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
 
                         if (validBlanksCount == (upperBoundReassign - lowerBoundReassign + 1)) {
                             // Proceed with the reassignment
-                            String query = "UPDATE Blank SET Employee_ID = ?, date_assign = ?, Type = ?  WHERE BlankNumber BETWEEN ? AND ? AND isSold = 0";
+                            String query = "UPDATE Blank SET Employee_ID = ?, date_assign = ?, Blank.Type = ?  WHERE BlankNumber BETWEEN ? AND ? AND isSold = 0";
                             PreparedStatement preparedStatement = con.prepareStatement(query);
                             preparedStatement.setInt(1, ReassignAdvisorid);
                             preparedStatement.setInt(2, reassignDateBlank);
