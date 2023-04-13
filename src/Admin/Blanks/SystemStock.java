@@ -329,6 +329,9 @@ public class SystemStock extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(manageCommissionRatesButton);
+
         manageCommissionRatesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -339,6 +342,9 @@ public class SystemStock extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(manageSystemStockButton);
+
         manageSystemStockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -349,6 +355,9 @@ public class SystemStock extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(createUserButton);
+
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -360,6 +369,7 @@ public class SystemStock extends javax.swing.JFrame {
         });
 
 
+        HoverButton.setButtonProperties(logOutButton);
 
         logOutButton.addActionListener(new ActionListener() {
             @Override
@@ -369,6 +379,9 @@ public class SystemStock extends javax.swing.JFrame {
                 login.show();
             }
         });
+
+        HoverButton.setButtonProperties(submitBlankAdditionButton);
+
         submitBlankAdditionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
