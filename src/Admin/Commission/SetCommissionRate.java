@@ -1,6 +1,6 @@
 package Admin.Commission;
 
-import Admin.Commission.CommissionRates;
+import ButtonUtil.HoverButton;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -37,6 +37,7 @@ public class SetCommissionRate extends javax.swing.JFrame {
         setVisible(true);
         model = (DefaultTableModel) advisorTable.getModel();
 
+        HoverButton.setButtonProperties(searchAdvisorButton);
 
         searchAdvisorButton.addActionListener(new ActionListener() {
             @Override
@@ -84,6 +85,9 @@ public class SetCommissionRate extends javax.swing.JFrame {
 
 
         });
+
+        HoverButton.setButtonProperties(showAdvisorsButton);
+
         showAdvisorsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -129,6 +133,8 @@ public class SetCommissionRate extends javax.swing.JFrame {
 
             }
         });
+        HoverButton.setButtonProperties(backButton);
+
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -137,6 +143,7 @@ public class SetCommissionRate extends javax.swing.JFrame {
                 commissionRates.show();
             }
         });
+
         advisorTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -147,6 +154,8 @@ public class SetCommissionRate extends javax.swing.JFrame {
 
             }
         });
+        HoverButton.setButtonProperties(setCommissionButton);
+
         setCommissionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 public class SystemStock extends javax.swing.JFrame {
@@ -45,14 +46,17 @@ public class SystemStock extends javax.swing.JFrame {
     private JTextField newLowBlankRange;
     private JTextField newUpperBlankRange;
     private JButton submitBlankAdditionButton;
-    private JComboBox comboBox1;
+    private JComboBox selectBlankFilter;
     private JButton deleteBlankButton;
+    private JComboBox blankPrefixFilter;
 
 
     private static int ID;
     private static String username;
     private static int dateToday;
     private int blankNumber;
+    private String blankType;
+    private int blankPrefix;
 
 
     private boolean validateInput() {
@@ -383,42 +387,66 @@ public class SystemStock extends javax.swing.JFrame {
         HoverButton.setButtonProperties(submitBlankAdditionButton);
 
         submitBlankAdditionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                validateInput();
+            
+                                                        @Override
+                                                        public void actionPerformed(ActionEvent e) {
 
-                int lowerRangeNew = Integer.parseInt(newLowBlankRange.getText());
-                int upperRangeNew = Integer.parseInt(newUpperBlankRange.getText());
-                String blankType = (String) SelectblankType.getSelectedItem();
-                String blankPrefix = (String) selectblankPrefix.getSelectedItem();
+                                                            int lowerRangeNew = Integer.parseInt(newLowBlankRange.getText());
+                                                            int upperRangeNew = Integer.parseInt(newUpperBlankRange.getText());
+                                                            blankType = Objects.requireNonNull(selectBlankFilter.getSelectedItem()).toString();
+                                                            blankPrefix = (int) selectblankPrefix.getSelectedItem();
+
+                                                            try (Connection con = DBConnectivity.getConnection()) {
+                                                                assert con != null;
+                                                                Class.forName("com.mysql.cj.jdbc.Driver");
+
+                                                                // Prepare the INSERT query for the Blank table
+                                                                String insertQuery = "INSERT INTO Blank (Blank.BlankNumber,Blank.Type, Blank.blank_prefix,Blank.isSold,Blank.isAssigned) VALUES (?, ?, ?,?,?)";
+
+                                                                // Prepare the statement to execute the INSERT query
+                                                                PreparedStatement preparedStatement = con.prepareStatement(insertQuery);
+
+                                                                // Iterate through the range of BlankNumbers to insert
+                                                                for (int blankNumber = lowerRangeNew; blankNumber <= upperRangeNew; blankNumber++) {
+                                                                    preparedStatement.setInt(1, blankNumber);
+                                                                    preparedStatement.setString(2, blankType);
+                                                                    preparedStatement.setInt(3, blankPrefix);
+                                                                    preparedStatement.setInt(4, 0);
+                                                                    preparedStatement.setInt(5, 0);
+
+                                                                    System.out.println(blankPrefix + " BLANK PREFIX");
+                                                                    System.out.println(blankType + "BLANK TYPE ");
 
 
-                try (Connection con = DBConnectivity.getConnection()) {
-                    assert con != null;
-                    Class.forName("com.mysql.cj.jdbc.Driver");
 
-                    String query = "INSERT INTO Blank(BlankNumber,Blank.Type,isSold,isAssigned,blank_prefix)" +
-                            "VALUES (?,?,?,?,?)";
+                                                                    // Execute the INSERT query
+                                                                    preparedStatement.executeUpdate();
 
-                    PreparedStatement preparedStatement = con.prepareStatement(query);
-                    for (int i = lowerRangeNew; i <= upperRangeNew; i++) {
-                        preparedStatement.setInt(1, i);
-                        preparedStatement.setString(2, blankType);
-                        preparedStatement.setInt(3, 0);
-                        preparedStatement.setInt(4, 0);
-                        preparedStatement.setString(5,blankPrefix);
 
-                        preparedStatement.executeUpdate();
-                    }
+                                                                }
 
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
 
-        });
+                                                            } catch (SQLException ex) {
+                                                                ex.printStackTrace();
+                                                            } catch (ClassNotFoundException ex) {
+                                                                ex.printStackTrace();
+                                                            }
+
+                                                        }
+                                                    });
+
+
+
+
+
+
+
+
+
+
+
+        HoverButton.setButtonProperties(deleteBlankButton);
+
         deleteBlankButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -462,6 +490,24 @@ public class SystemStock extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(systemStockPage,"Blank deleted");
             }
         });
+        SelectblankType.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selected = (String) SelectblankType.getSelectedItem();
+                if(e.getSource() == blankType){
+                    switch (selected) {
+                        case "Interline" -> {
+                            blankType = "Interline";
+                        }
+                        case "Domestic" -> {
+                            blankType = "Domestic";
+                        }
+                    }
+
+                }
+
+            }
+        });
     }
 
 
@@ -469,4 +515,5 @@ public class SystemStock extends javax.swing.JFrame {
         SystemStock systemStock = new SystemStock(ID,username);
         systemStock.show();
     }
+
 }

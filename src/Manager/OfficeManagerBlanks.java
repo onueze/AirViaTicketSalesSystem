@@ -1,4 +1,5 @@
 package Manager;
+
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -6,8 +7,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 
 public class OfficeManagerBlanks extends javax.swing.JFrame{
@@ -25,6 +28,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
     private JButton viewBlankUsageReportButton;
     private JButton saleReportsButton;
     private JLabel usernameLabel;
+    private JComboBox selectFilter;
 
 
     private static int ID;
@@ -100,7 +104,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
         });
 
 
-
+/*
         viewBlankUsageReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -114,9 +118,166 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
             }
         });
 
+ */
+
+
+/*
+
+        viewBlankUsageReportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                /*
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+
+                    // Create a query to select the card number for the given customer ID from the Card_Details table
+                    String query = "";
+                    System.out.println(query);
+                    ResultSet rs = st.executeQuery(query);
+
+                    st.close();
+
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+
+
+
+                try {
+                    Log log = new Log("src/LogFile Report.txt");
+
+                    // Logging the refund information
+                    log.logger.info("Assigned Blank Number:"  + blankNumber +  "Assigned to :" + Employee_ID);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+
+
+            }
+        });
+
+
+ */
+        /*
+        viewBlankUsageReportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+
+                    // Create a query to select the BlankNumber, Type, and Employee_ID from the Blank table
+                    String query = "SELECT BlankNumber, Type, Employee_ID FROM Blank";
+                    System.out.println(query);
+                    ResultSet rs = st.executeQuery(query);
+
+                    // Create a Log instance to write to the log file
+                    Log log = new Log("src/LogFile Report.txt");
+
+                    // Process the ResultSet and log the information
+                    while (rs.next()) {
+                        int blankNumber = rs.getInt("BlankNumber");
+                        String blankType = rs.getString("Type");
+                        int employeeID = rs.getInt("Employee_ID");
+
+                        // Logging the blank information
+                        log.logger.info("Blank Number: " + blankNumber + ", Type: " + blankType + ", Assigned to Employee_ID: " + employeeID);
+                    }
+
+                    st.close();
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+
+         */
+
+
+
+
+
         showBlanksButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
+                model.setRowCount(0);
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query;
+                    String selectedOption = (String) selectFilter.getSelectedItem();
+
+                    switch (selectedOption) {
+                        case "Sold Blanks":
+                            query = "SELECT Blank.BlankNumber, Blank.Type, Blank.Employee_ID " +
+                                    "FROM Blank " +
+                                    "WHERE Blank.isSold = '1';";
+                            model.setColumnIdentifiers(new String[]{"BlankNumber", "Type", "Employee_ID"});
+                            break;
+                        case "Assigned Blanks":
+                            query = "SELECT Blank.BlankNumber, Blank.Type, Blank.Employee_ID, Blank.date_assign " +
+                                    "FROM Blank " +
+                                    "WHERE Blank.isAssigned = '1';";
+                            model.setColumnIdentifiers(new String[]{"BlankNumber", "Type", "Employee_ID", "date_assign"});
+                            break;
+                        case "Unassigned Blanks":
+                            query = "SELECT Blank.BlankNumber, Blank.Type " +
+                                    "FROM Blank " +
+                                    "WHERE Blank.isAssigned = '0';";
+                            model.setColumnIdentifiers(new String[]{"BlankNumber", "Type"});
+                        case "Blank Types":
+                            query = "SELECT Blank.BlankNumber, Blank.Type " +
+                                    "FROM Blank;";
+                            model.setColumnIdentifiers(new String[]{"BlankNumber", "Type"});
+                            break;
+                        default:
+                            return;
+                    }
+
+                    ResultSet rs = st.executeQuery(query);
+
+                    while (rs.next()) {
+                        String[] row;
+                        switch (selectedOption) {
+                            case "Sold Blanks":
+                                row = new String[]{rs.getString("BlankNumber"), rs.getString("Type"), rs.getString("Employee_ID")};
+                                break;
+                            case "Assigned Blanks":
+                                row = new String[]{rs.getString("BlankNumber"), rs.getString("Type"), rs.getString("Employee_ID"), rs.getString("date_assign")};
+                                break;
+                            case "Unassigned Blanks":
+                                row = new String[]{rs.getString("BlankNumber"), rs.getString("Type")};
+                                break;
+                            case "Blank Types":
+                                row = new String[]{rs.getString("BlankNumber"), rs.getString("Type")};
+                                break;
+                            default:
+                                return;
+                        }
+                        model.addRow(row);
+                    }
+                    st.close();
+
+                } catch (ClassNotFoundException | SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+
+           /* public void actionPerformed(ActionEvent e) {
                 DefaultTableModel model = (DefaultTableModel) blanksTable.getModel();
                 model.setRowCount(0);
 
@@ -131,8 +292,6 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
 
                     ResultSet rs = st.executeQuery(query);
                     ResultSetMetaData rsmd = rs.getMetaData();
-
-
 
                     int cols = rsmd.getColumnCount();
                     String[] colName = new String[cols];
@@ -162,6 +321,8 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                 }
 
             }
+
+            */
         });
         saleReportsButton.addActionListener(new ActionListener() {
             @Override
@@ -171,6 +332,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                 dispose();
             }
         });
+
     }
 
 

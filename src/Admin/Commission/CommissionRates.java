@@ -6,6 +6,7 @@ import Admin.Home.SystemAdminHome;
 import Admin.UserDetails.UserDetails;
 import Admin.UserDetails.CreateUser;
 import Authentication.EnterDate;
+import ButtonUtil.HoverButton;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -45,6 +46,7 @@ public class CommissionRates extends javax.swing.JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
+        HoverButton.setButtonProperties(homeButton);
 
         homeButton.addActionListener(new ActionListener() {
             @Override
@@ -56,6 +58,7 @@ public class CommissionRates extends javax.swing.JFrame {
 
             }
         });
+        HoverButton.setButtonProperties(manageUserDetailsButton);
 
         manageUserDetailsButton.addActionListener(new ActionListener() {
             @Override
@@ -68,6 +71,9 @@ public class CommissionRates extends javax.swing.JFrame {
             }
         });
 
+
+        HoverButton.setButtonProperties(manageCustomerDetailsButton);
+
         manageCustomerDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -79,6 +85,9 @@ public class CommissionRates extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(manageCommissionRatesButton);
+
         manageCommissionRatesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -89,6 +98,9 @@ public class CommissionRates extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(manageSystemStockButton);
+
         manageSystemStockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -100,6 +112,9 @@ public class CommissionRates extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(createUserButton);
+
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -110,6 +125,8 @@ public class CommissionRates extends javax.swing.JFrame {
 
             }
         });
+
+
         typeFilter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -135,6 +152,9 @@ public class CommissionRates extends javax.swing.JFrame {
             }
 
         });
+
+        HoverButton.setButtonProperties(deactivateCommissionRateButton);
+
         deactivateCommissionRateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -187,6 +207,9 @@ public class CommissionRates extends javax.swing.JFrame {
             }
         });
 
+        HoverButton.setButtonProperties(deleteCommissionRateButton);
+
+
         deleteCommissionRateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -235,6 +258,8 @@ public class CommissionRates extends javax.swing.JFrame {
                 }
             }
         });
+        HoverButton.setButtonProperties(allocateCommissionRateButton);
+
         allocateCommissionRateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -242,6 +267,8 @@ public class CommissionRates extends javax.swing.JFrame {
                 setCommissionRate.show();
             }
         });
+        HoverButton.setButtonProperties(activateCommissionRateButton);
+
         activateCommissionRateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -291,6 +318,9 @@ public class CommissionRates extends javax.swing.JFrame {
                 }
             }
         });
+
+        HoverButton.setButtonProperties(searchCommissionButton);
+
         searchCommissionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

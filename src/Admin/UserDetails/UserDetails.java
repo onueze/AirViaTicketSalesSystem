@@ -3,8 +3,8 @@ package Admin.UserDetails;
 import Admin.Blanks.SystemStock;
 import Admin.Commission.CommissionRates;
 import Admin.CustomerDetails.CustomerDetails;
-
-
+import Authentication.Login;
+import ButtonUtil.HoverButton;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -81,6 +81,9 @@ public class UserDetails extends javax.swing.JFrame {
             }
         });
 
+
+        HoverButton.setButtonProperties(searchUserButton);
+
         searchUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -126,6 +129,8 @@ public class UserDetails extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(deleteUserButton);
 
         deleteUserButton.addActionListener(new ActionListener() {
             @Override
@@ -178,6 +183,9 @@ public class UserDetails extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(changeAccessRoleButton);
+
         changeAccessRoleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -220,6 +228,9 @@ public class UserDetails extends javax.swing.JFrame {
             }
 
         });
+
+        HoverButton.setButtonProperties(updateDetailsButton);
+
         updateDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -246,6 +257,7 @@ public class UserDetails extends javax.swing.JFrame {
 
             }
         });
+        HoverButton.setButtonProperties(manageUserDetailsButton);
 
         manageUserDetailsButton.addActionListener(new ActionListener() {
             @Override
@@ -257,6 +269,7 @@ public class UserDetails extends javax.swing.JFrame {
 
             }
         });
+        HoverButton.setButtonProperties(manageCustomerDetailsButton);
 
         manageCustomerDetailsButton.addActionListener(new ActionListener() {
             @Override
@@ -268,6 +281,9 @@ public class UserDetails extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(manageCommissionRatesButton);
+
         manageCommissionRatesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -278,6 +294,10 @@ public class UserDetails extends javax.swing.JFrame {
 
             }
         });
+
+
+        HoverButton.setButtonProperties(manageSystemStockButton);
+
         manageSystemStockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -289,6 +309,9 @@ public class UserDetails extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(createUserButton);
+
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -297,6 +320,14 @@ public class UserDetails extends javax.swing.JFrame {
                 createUserButton.setVisible(true);
 
 
+            }
+        });
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Login login = new Login();
+                login.show();
             }
         });
     }

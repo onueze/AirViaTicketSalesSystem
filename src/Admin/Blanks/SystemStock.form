@@ -281,7 +281,7 @@
           <text value="Select Blank Type"/>
         </properties>
       </component>
-      <component id="a7a38" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+      <component id="a7a38" class="javax.swing.JComboBox" binding="selectBlankFilter">
         <constraints>
           <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -302,19 +302,13 @@
           <text value="Enter Blank Prefix"/>
         </properties>
       </component>
-      <component id="44381" class="javax.swing.JComboBox">
+      <component id="44381" class="javax.swing.JComboBox" binding="blankPrefixFilter">
         <constraints>
           <grid row="7" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <model>
             <item value="Select Blank Prefix"/>
-            <item value=""/>
-            <item value="444"/>
-            <item value="440"/>
-            <item value="420"/>
-            <item value="201"/>
-            <item value="101"/>
           </model>
         </properties>
       </component>

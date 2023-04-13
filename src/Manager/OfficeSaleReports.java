@@ -154,15 +154,15 @@ public class OfficeSaleReports extends javax.swing.JFrame {
                     "Sale.Sale_ID," +
                     "Sale.Amount AS TotalSaleAmount, " +
                     "Commission.Rate AS CommissionRateApplied, " +
+                    "ROUND(CASE WHEN Commission.blankType = Blank.Type " +
+                    "THEN Sale.Amount * Commission.Rate " +
+                    "ELSE 0 " +
+                    "END, 2) AS TotalCommissionAmount, " +
+                    "ROUND(Sale.Amount - " +
                     "CASE WHEN Commission.blankType = Blank.Type " +
                     "THEN Sale.Amount * Commission.Rate " +
                     "ELSE 0 " +
-                    "END AS TotalCommissionAmount, " +
-                    "Sale.Amount - " +
-                    "CASE WHEN Commission.blankType = Blank.Type " +
-                    "THEN Sale.Amount * Commission.Rate " +
-                    "ELSE 0 " +
-                    "END AS NetSaleAmount " +
+                    "END, 2) AS NetSaleAmount " +
                     "FROM Sale " +
                     "JOIN Commission " +
                     "ON Sale.Commission_ID = Commission.Commission_ID " +
@@ -275,21 +275,22 @@ public class OfficeSaleReports extends javax.swing.JFrame {
                     "Sale.Sale_ID," +
                     "Sale.Amount AS TotalSaleAmount, " +
                     "Commission.Rate AS CommissionRateApplied, " +
+                    "ROUND(CASE WHEN Commission.blankType = Blank.Type " +
+                    "THEN Sale.Amount * Commission.Rate " +
+                    "ELSE 0 " +
+                    "END, 2) AS TotalCommissionAmount, " +
+                    "ROUND(Sale.Amount - " +
                     "CASE WHEN Commission.blankType = Blank.Type " +
                     "THEN Sale.Amount * Commission.Rate " +
                     "ELSE 0 " +
-                    "END AS TotalCommissionAmount, " +
-                    "Sale.Amount - " +
-                    "CASE WHEN Commission.blankType = Blank.Type " +
-                    "THEN Sale.Amount * Commission.Rate " +
-                    "ELSE 0 " +
-                    "END AS NetSaleAmount " +
+                    "END, 2) AS NetSaleAmount " +
                     "FROM Sale " +
                     "JOIN Commission " +
                     "ON Sale.Commission_ID = Commission.Commission_ID " +
                     "JOIN Blank " +
                     "ON Sale.BlankNumber = Blank.BlankNumber " +
                     "WHERE Sale.Employee_ID = ? AND DATE(Sale.Payment_Date) BETWEEN ? AND ? AND Blank.Type = ?";
+
 
             PreparedStatement pstmt = con.prepareStatement(sql);
             pstmt.setInt(1, advisorID);
@@ -393,13 +394,14 @@ public class OfficeSaleReports extends javax.swing.JFrame {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             String sql = "SELECT Sale.Employee_ID, SUM(Sale.Amount) AS TotalSaleAmount, " +
-                    "SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END) AS TotalCommissionAmount, " +
-                    "SUM(Sale.Amount) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END) AS NetSaleAmount " +
+                    "ROUND(SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END), 2) AS TotalCommissionAmount, " +
+                    "ROUND(SUM(Sale.Amount) - SUM(CASE WHEN Commission.blankType = Blank.Type THEN Sale.Amount * Commission.Rate ELSE 0 END), 2) AS NetSaleAmount " +
                     "FROM Sale " +
                     "JOIN Commission ON Sale.Commission_ID = Commission.Commission_ID " +
                     "JOIN Blank ON Sale.BlankNumber = Blank.BlankNumber " +
                     "WHERE DATE(Sale.Payment_Date) BETWEEN ? AND ? AND Blank.Type = ?" +
                     "GROUP BY Sale.Employee_ID";
+
 
             PreparedStatement pstmt = con.prepareStatement(sql);
             pstmt.setInt(1, lowerDateRange);

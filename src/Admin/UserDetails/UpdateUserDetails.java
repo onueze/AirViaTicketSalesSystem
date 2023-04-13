@@ -1,5 +1,6 @@
 package Admin.UserDetails;
 
+import ButtonUtil.HoverButton;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -85,6 +86,8 @@ public class UpdateUserDetails extends javax.swing.JFrame {
             e.printStackTrace();
         }
 
+        HoverButton.setButtonProperties(cancelButton);
+
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -93,6 +96,9 @@ public class UpdateUserDetails extends javax.swing.JFrame {
                 userDetails.show();
             }
         });
+
+        HoverButton.setButtonProperties(updateDetailsButton);
+
         updateDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

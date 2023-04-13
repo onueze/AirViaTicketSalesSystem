@@ -203,6 +203,7 @@ public class RefundsPayBack extends javax.swing.JFrame {
 
                 Mail mail = new Mail();
                 mail.setupServerProperties();
+
                 try {
                     mail.draftEmail(customerEmail,"Dear Customer " + customerID + ", this is to confirm that" +
                             "your refund for blankNumber: " + blankNumber + " was successfull and a amount of " + price);
