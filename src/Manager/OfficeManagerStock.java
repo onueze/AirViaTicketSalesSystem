@@ -11,9 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 
 public class OfficeManagerStock extends javax.swing.JFrame {
@@ -40,10 +38,8 @@ public class OfficeManagerStock extends javax.swing.JFrame {
     private JTextField upperRange;
     private JTextField assignDate;
     private JComboBox SelectBlankType;
-    private JComboBox SelectBlankPrefix;
     private JTextField EnterReassignDate;
     private JComboBox SelectReassignBlankType;
-    private JComboBox SelectReassignBlankPrefix;
     private JTextField lowerRangeReassign;
     private JTextField upperRangeReassign;
     private JLabel usernameLabel;
@@ -56,23 +52,9 @@ public class OfficeManagerStock extends javax.swing.JFrame {
     private boolean validateInput() {
         String lowerInput = lowerRange.getText();
         String upperInput = upperRange.getText();
-        List<String> validPrefixes = Arrays.asList("444", "440", "420", "201", "101", "451", "452");
 
         if (lowerInput.length() != 9 || upperInput.length() != 9) {
             JOptionPane.showMessageDialog(null, "Blank number must be exactly 9 digits");
-            return false;
-        }
-
-        String lowerPrefix = lowerInput.substring(0, 3);
-        String upperPrefix = upperInput.substring(0, 3);
-
-        if (!validPrefixes.contains(lowerPrefix) || !validPrefixes.contains(upperPrefix)) {
-            JOptionPane.showMessageDialog(null, "Invalid blank type provided");
-            return false;
-        }
-
-        if (!lowerPrefix.equals(upperPrefix)) {
-            JOptionPane.showMessageDialog(null, "Ensure blank types are the same");
             return false;
         }
 
@@ -189,7 +171,12 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     Statement st = con.createStatement();
-                    String query = "SELECT  Blank.BlankNumber FROM Blank;";
+                    //String query = "SELECT  Blank.BlankNumber FROM Blank";
+                    String query = "SELECT Blank.BlankNumber, Employee.Employee_ID, Employee.role " +
+                            "FROM Blank " +
+                            "JOIN Employee ON Employee.Employee_ID = Blank.Employee_ID " +
+                            "WHERE Employee.role = 'officemanager'";
+
 
 
                     ResultSet rs = st.executeQuery(query);
@@ -209,6 +196,8 @@ public class OfficeManagerStock extends javax.swing.JFrame {
 
                         String[] row = {blankNumber};
                         model.addRow(row);
+
+
                     }
                     st.close();
 
@@ -236,7 +225,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                     ResultSet rs = st.executeQuery(query);
 
                     while (rs.next()) {
-                        String Id = rs.getString("Employee_ID");
+                        int Id = rs.getInt("Employee_ID");
                         assignTravelAdvisor.addItem(Id);
                     }
 
@@ -267,7 +256,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
 
                     while (rs.next()) {
                         //assignTravelAdvisor.addItem(rs.getString("BlankNumber"));
-                        String id = rs.getString("Employee_ID");
+                        int id = rs.getInt("Employee_ID");
                         ReassignAdvisor.addItem(id);
                     }
 
@@ -295,13 +284,12 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                 validateInput();
                 String lowerRangeText = lowerRange.getText();
                 String upperRangeText = upperRange.getText();
-                String assignAdvisorID = (String) assignTravelAdvisor.getSelectedItem();
+                int assignAdvisorID = (int) assignTravelAdvisor.getSelectedItem();
 
                 int lowerBound = Integer.parseInt(lowerRangeText);
                 int upperBound = Integer.parseInt(upperRangeText);
 
                 String blankType = (String) SelectBlankType.getSelectedItem();
-                String blankPrefix = (String) SelectBlankPrefix.getSelectedItem();
 
                 try {
                     int assignDateBlank = Integer.parseInt(assignDate.getText().replace("/", ""));
@@ -311,11 +299,17 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                         Class.forName("com.mysql.cj.jdbc.Driver");
 
                         // Check if the blanks are initially assigned to the manager
-                        String checkManagerQuery = "SELECT * FROM Blank WHERE BlankNumber BETWEEN ? AND ? AND Manager_ID = ?";
+
+                        //String checkManagerQuery = "SELECT * FROM Blank WHERE BlankNumber BETWEEN ? AND ? AND Manager_ID = ?";
+                        String checkManagerQuery = "SELECT Blank.BlankNumber, Employee.Employee_ID, Employee.role " +
+                                "FROM Blank " +
+                                "JOIN Employee ON Employee.Employee_ID = Blank.Employee_ID " +
+                                "WHERE Employee.role = 'officemanager'";
+
                         PreparedStatement checkManagerStatement = con.prepareStatement(checkManagerQuery);
-                        checkManagerStatement.setInt(1, lowerBound);
-                        checkManagerStatement.setInt(2, upperBound);
-                        checkManagerStatement.setString(3, String.valueOf(ID));
+                        //checkManagerStatement.setInt(1, lowerBound);
+                        //checkManagerStatement.setInt(2, upperBound);
+                        //checkManagerStatement.setString(3, String.valueOf(ID));
                         ResultSet resultSet = checkManagerStatement.executeQuery();
 
                         int validBlanksCount = 0;
@@ -325,16 +319,16 @@ public class OfficeManagerStock extends javax.swing.JFrame {
 
                         if (validBlanksCount == (upperBound - lowerBound + 1)) {
                             // Proceed with the assignment
-                            String query = "UPDATE Blank SET Employee_ID = ?, date_assign = ?, Type = ?, blank_prefix = ?, isAssigned = ? WHERE BlankNumber BETWEEN ? AND ? AND Manager_ID = ?";
+
+                            String query = "UPDATE Blank SET Employee_ID = ?, date_assign = ?, Type = ?, isAssigned = ? WHERE BlankNumber BETWEEN ? AND ?";
                             PreparedStatement preparedStatement = con.prepareStatement(query);
-                            preparedStatement.setString(1, assignAdvisorID);
+                            preparedStatement.setInt(1, assignAdvisorID);
                             preparedStatement.setInt(2, assignDateBlank);
                             preparedStatement.setString(3, blankType);
-                            preparedStatement.setString(4, blankPrefix);
-                            preparedStatement.setInt(5, 1);
-                            preparedStatement.setInt(6, lowerBound);
-                            preparedStatement.setInt(7, upperBound);
-                            preparedStatement.setString(8, String.valueOf(ID));
+                            preparedStatement.setInt(4, 1);
+                            preparedStatement.setInt(5, lowerBound);
+                            preparedStatement.setInt(6, upperBound);
+                            //preparedStatement.setString(7, String.valueOf(ID));
                             int affectedRows = preparedStatement.executeUpdate();
 
                             if (affectedRows > 0) {
@@ -365,13 +359,12 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                 validateInput();
                 String lowerRangeReassignTextText = lowerRangeReassign.getText();
                 String upperRangeReassignTextText = upperRangeReassign.getText();
-                String ReassignAdvisorid = (String) ReassignAdvisor.getSelectedItem();
+                int ReassignAdvisorid = (int) ReassignAdvisor.getSelectedItem();
 
                 int lowerBoundReassign = Integer.parseInt(lowerRangeReassignTextText);
                 int upperBoundReassign = Integer.parseInt(upperRangeReassignTextText);
 
                 String blankType = (String) SelectReassignBlankType.getSelectedItem();
-                String blankPrefix = (String) SelectReassignBlankPrefix.getSelectedItem();
 
                 try {
                     int reassignDateBlank = Integer.parseInt(EnterReassignDate.getText().replace("/", ""));
@@ -385,7 +378,7 @@ public class OfficeManagerStock extends javax.swing.JFrame {
                         PreparedStatement checkAssignedStatement = con.prepareStatement(checkAssignedQuery);
                         checkAssignedStatement.setInt(1, lowerBoundReassign);
                         checkAssignedStatement.setInt(2, upperBoundReassign);
-                        checkAssignedStatement.setString(3, ReassignAdvisorid);
+                        checkAssignedStatement.setInt(3, ReassignAdvisorid);
                         ResultSet resultSet = checkAssignedStatement.executeQuery();
 
                         int validBlanksCount = 0;
@@ -395,14 +388,13 @@ public class OfficeManagerStock extends javax.swing.JFrame {
 
                         if (validBlanksCount == (upperBoundReassign - lowerBoundReassign + 1)) {
                             // Proceed with the reassignment
-                            String query = "UPDATE Blank SET Employee_ID = ?, date_assign = ?, Type = ?, blank_prefix = ? WHERE BlankNumber BETWEEN ? AND ? AND isSold = 0";
+                            String query = "UPDATE Blank SET Employee_ID = ?, date_assign = ?, Type = ?  WHERE BlankNumber BETWEEN ? AND ? AND isSold = 0";
                             PreparedStatement preparedStatement = con.prepareStatement(query);
-                            preparedStatement.setString(1, ReassignAdvisorid);
+                            preparedStatement.setInt(1, ReassignAdvisorid);
                             preparedStatement.setInt(2, reassignDateBlank);
                             preparedStatement.setString(3, blankType);
-                            preparedStatement.setString(4, blankPrefix);
-                            preparedStatement.setInt(5, lowerBoundReassign);
-                            preparedStatement.setInt(6, upperBoundReassign);
+                            preparedStatement.setInt(4, lowerBoundReassign);
+                            preparedStatement.setInt(5, upperBoundReassign);
                             int affectedRows = preparedStatement.executeUpdate();
 
                             if (affectedRows > 0) {
@@ -432,17 +424,6 @@ public class OfficeManagerStock extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 SelectBlankType.addItem("Interline");
                 SelectBlankType.addItem("Domestic");
-            }
-        });
-        SelectBlankPrefix.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SelectBlankPrefix.addItem("444");
-                SelectBlankPrefix.addItem("440");
-                SelectBlankPrefix.addItem("420");
-                SelectBlankPrefix.addItem("201");
-                SelectBlankPrefix.addItem("101");
-
             }
         });
 

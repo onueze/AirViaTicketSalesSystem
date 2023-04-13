@@ -124,7 +124,7 @@ public class OfficeManagerBlanks extends javax.swing.JFrame{
                     assert con != null;
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     Statement st = con.createStatement();
-                    String query = "SELECT Blank.*, Employee.first_name, Employee.last_name " +
+                    String query = "SELECT Blank (Employee.first_name, Employee.last_name) " +
                             "FROM Blank " +
                             "LEFT JOIN Employee ON Blank.Employee_ID = Employee.Employee_ID AND Employee.role = 'advisor';";
 
