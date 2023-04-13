@@ -45,12 +45,13 @@ public class SystemStock extends javax.swing.JFrame {
     private JTextField newUpperBlankRange;
     private JButton submitBlankAdditionButton;
     private JComboBox comboBox1;
+    private JButton deleteBlankButton;
 
 
     private static int ID;
     private static String username;
     private static int dateToday;
-
+    private int blankNumber;
 
 
     private boolean validateInput() {
@@ -401,6 +402,49 @@ public class SystemStock extends javax.swing.JFrame {
                 }
             }
 
+        });
+        deleteBlankButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRowBlank = blankTable.getSelectedRow();
+
+                try {
+                    blankNumber = Integer.parseInt(blankTable.getValueAt(selectedRowBlank, 0).toString());
+                }
+                catch(Exception ignored){
+                    ignored.printStackTrace();
+                }
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+
+                    String query =
+                            " UPDATE Blank " +
+                            "                SET Employee_ID = null " +
+                            "                where BlankNumber = '"+blankNumber+"';";
+                    System.out.println(query);
+                    int rs = st.executeUpdate(query);
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+
+
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = "DELETE FROM Blank " +
+                            " WHERE BlankNumber = '" + blankNumber + "'";
+                    ;
+                    System.out.println(query);
+                    int rs = st.executeUpdate(query);
+                } catch (SQLException | ClassNotFoundException ex) {
+                    JOptionPane.showMessageDialog(systemStockPage,"Blank is assigned or has been sold");
+                }
+                JOptionPane.showMessageDialog(systemStockPage,"Blank deleted");
+            }
         });
     }
 
