@@ -1,12 +1,13 @@
 package Admin.Home;
 
+
 import Admin.Blanks.SystemStock;
 import Admin.Commission.CommissionRates;
 import Admin.CustomerDetails.CustomerDetails;
-
-import Admin.UserDetails.UserDetails;
 import Admin.UserDetails.CreateUser;
+import Admin.UserDetails.UserDetails;
 import Authentication.Login;
+import ButtonUtil.HoverButton;
 import DB.DBConnectivity;
 import SMTP.Mail;
 
@@ -79,16 +80,20 @@ public class SystemAdminHome extends javax.swing.JFrame {
         }
 
 
-
+        HoverButton.setButtonProperties(logOutButton);
         logOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 Login login = new Login();
 
+
             }
         });
 
+
+
+        HoverButton.setButtonProperties(homeButton);
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -99,6 +104,8 @@ public class SystemAdminHome extends javax.swing.JFrame {
             }
         });
 
+
+        HoverButton.setButtonProperties(manageUserDetailsButton);
         manageUserDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,6 +116,8 @@ public class SystemAdminHome extends javax.swing.JFrame {
             }
         });
 
+
+        HoverButton.setButtonProperties(customerDetailsButton);
         customerDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -119,6 +128,8 @@ public class SystemAdminHome extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(manageCommissionRatesButton);
         manageCommissionRatesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -129,6 +140,8 @@ public class SystemAdminHome extends javax.swing.JFrame {
 
             }
         });
+
+        HoverButton.setButtonProperties(manageSystemStockButton);
         manageSystemStockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -139,6 +152,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
 
             }
         });
+        HoverButton.setButtonProperties(createUserButton);
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -148,6 +162,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
 
             }
         });
+        HoverButton.setButtonProperties(restoreButton);
         restoreButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -175,6 +190,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
 
             }
         });
+        HoverButton.setButtonProperties(backUpButton);
         backUpButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -217,6 +233,7 @@ public class SystemAdminHome extends javax.swing.JFrame {
             }
 
         });
+        HoverButton.setButtonProperties(showAlertsButton);
         showAlertsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

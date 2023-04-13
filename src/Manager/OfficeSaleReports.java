@@ -119,7 +119,7 @@ public class OfficeSaleReports extends javax.swing.JFrame {
             assert con != null;
             Class.forName("com.mysql.cj.jdbc.Driver");
             Statement st = con.createStatement();
-            String query = "SELECT Refund_ID FROM Refund WHERE refund_status = false";
+            String query = "SELECT Refund_ID FROM Refund WHERE refund_status = true";
             ResultSet rs = st.executeQuery(query);
 
             while (rs.next()) {
@@ -489,43 +489,76 @@ public class OfficeSaleReports extends javax.swing.JFrame {
     }
 
 
+    /*
+
+    private JPanel createRefundApprovalPanel(int customerID) {
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel label = new JLabel("CustomerID: " + customerID + " has to pay");
+        panel.add(label, BorderLayout.NORTH);
 
 
-/*
-    private void showPopup() {
-        JComponent glassPane = new JPanel();
-        glassPane.setLayout(null);
-        glassPane.setOpaque(false);
+        try (Connection con = DBConnectivity.getConnection()) {
+            assert con != null;
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Statement st = con.createStatement();
+            String query = "SELECT Email, Firstname , Surname FROM CustomerAccount WHERE Customer_ID  = '" + customerID + "'";
+            ResultSet rs = st.executeQuery(query);
+            System.out.println(query);
 
-        JPanel popup = new JPanel();
-        popup.setBounds(getWidth() - 200, 0, 200, 400);
-        popup.setBackground(Color.LIGHT_GRAY);
-        popup.setLayout(new BoxLayout(popup, BoxLayout.Y_AXIS));
+            while (rs.next()) {
 
-        List<Integer> refundIDs = refundMessage();
-        for (int refundID : refundIDs) {
-            popup.add(createRefundApprovalPanel(refundID));
-        }
-
-        JScrollPane scrollPane = new JScrollPane(popup);
-        scrollPane.setBounds(getWidth() - 200, 0, 200, 400);
-        glassPane.add(scrollPane);
-
-        JButton closePopupButton = new JButton("Close");
-        closePopupButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                glassPane.setVisible(false);
             }
-        });
-        closePopupButton.setBounds(getWidth() - 200, 400, 200, 30);
-        glassPane.add(closePopupButton);
+            st.close();
 
-        setGlassPane(glassPane);
-        glassPane.setVisible(true);
+        } catch (ClassNotFoundException | SQLException ex) {
+            ex.printStackTrace();
+
+
+
+
+        }
+        return panel;
     }
 
- */
+
+        private void showPopup () {
+            JComponent glassPane = new JPanel();
+            glassPane.setLayout(null);
+            glassPane.setOpaque(false);
+
+            JPanel popup = new JPanel();
+            popup.setBounds(getWidth() - 200, 0, 200, 400);
+            popup.setBackground(Color.LIGHT_GRAY);
+            popup.setLayout(new BoxLayout(popup, BoxLayout.Y_AXIS));
+
+            List<Integer> refundIDs = refundMessage();
+            for (int refundID : refundIDs) {
+                popup.add(createRefundApprovalPanel(refundID));
+            }
+
+            JScrollPane scrollPane = new JScrollPane(popup);
+            scrollPane.setBounds(getWidth() - 200, 0, 200, 400);
+            glassPane.add(scrollPane);
+
+            JButton closePopupButton = new JButton("Close");
+            closePopupButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    glassPane.setVisible(false);
+                }
+            });
+            closePopupButton.setBounds(getWidth() - 200, 400, 200, 30);
+            glassPane.add(closePopupButton);
+
+            setGlassPane(glassPane);
+            glassPane.setVisible(true);
+        }
+
+
+     */
+
+
+
 
 
     public OfficeSaleReports( int ID,  String username) {
@@ -540,6 +573,7 @@ public class OfficeSaleReports extends javax.swing.JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         String FileName = "Advisor Individual Report";
+
 
 
         //startRefundNotificationWatcher();

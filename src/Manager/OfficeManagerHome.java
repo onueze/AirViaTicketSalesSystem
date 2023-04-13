@@ -30,6 +30,7 @@ public class OfficeManagerHome extends javax.swing.JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
 
+
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -91,6 +92,7 @@ public class OfficeManagerHome extends javax.swing.JFrame {
             }
 
         });
+
         logOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -99,6 +101,7 @@ public class OfficeManagerHome extends javax.swing.JFrame {
                 login.show();
             }
         });
+
 
     }
 

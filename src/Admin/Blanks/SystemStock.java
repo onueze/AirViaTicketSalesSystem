@@ -7,6 +7,7 @@ import Admin.UserDetails.CreateUser;
 import Admin.UserDetails.UserDetails;
 import Authentication.EnterDate;
 import Authentication.Login;
+import ButtonUtil.HoverButton;
 import DB.DBConnectivity;
 
 import javax.swing.*;
@@ -128,7 +129,7 @@ public class SystemStock extends javax.swing.JFrame {
             }
         });
 
-
+        HoverButton.setButtonProperties(ShowBlanks);
         ShowBlanks.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -232,6 +233,7 @@ public class SystemStock extends javax.swing.JFrame {
             }
         });
 
+        HoverButton.setButtonProperties(submitAssignBlank);
 
         submitAssignBlank.addActionListener(new ActionListener() {
             @Override
@@ -294,6 +296,7 @@ public class SystemStock extends javax.swing.JFrame {
             }
         });
 
+        HoverButton.setButtonProperties(homeButton);
 
         homeButton.addActionListener(new ActionListener() {
             @Override
@@ -304,7 +307,7 @@ public class SystemStock extends javax.swing.JFrame {
 
             }
         });
-
+        HoverButton.setButtonProperties(manageUserDetailsButton);
         manageUserDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -314,7 +317,7 @@ public class SystemStock extends javax.swing.JFrame {
 
             }
         });
-
+        HoverButton.setButtonProperties(manageCustomerDetailsButton);
         manageCustomerDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
