@@ -178,7 +178,7 @@ public class SetCommissionRate extends javax.swing.JFrame {
                         ex.printStackTrace();
                     }
 
-                    JOptionPane.showMessageDialog(mainPanel,"Commission successfully set to advisor: " + ID);
+                    JOptionPane.showMessageDialog(mainPanel,"Commission successfully set to advisor: " + advisorID);
 
                     dispose();
                     CommissionRates commissionRates = new CommissionRates(ID,username);

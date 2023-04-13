@@ -1,5 +1,6 @@
 package Advisor.Sales;
 
+import Advisor.Home.TravelAdvisorHome;
 import DB.DBConnectivity;
 import SMTP.Mail;
 import com.itextpdf.text.*;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.sql.*;
 
 public class SaleSummaryPage extends javax.swing.JFrame {
+    private static int commission_ID;
     private JPanel mainPanel;
     private JButton voidTicketButton;
     private JButton payButton;
@@ -58,7 +60,7 @@ public class SaleSummaryPage extends javax.swing.JFrame {
 
 
     public SaleSummaryPage(int ID, String username, int customerID, float price,
-                           int flightID, String paymentPeriod, String paymentType, int blankNumber, String blankType, int date, int currencyID){
+                           int flightID, String paymentPeriod, int commission_ID, String paymentType, int blankNumber, String blankType, int date, int currencyID){
         this.ID = ID;
         this.username = username;
         this.price = price;
@@ -69,6 +71,7 @@ public class SaleSummaryPage extends javax.swing.JFrame {
         this.blankType = blankType;
         this.customerID = customerID;
         this.date = date;
+        this.commission_ID = commission_ID;
         setContentPane(mainPanel);
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -226,6 +229,8 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                             customerInfo.add(new Phrase("payment Method:         " + paymentType + "\n"));
                             customerInfo.add(new Phrase(Chunk.NEWLINE));
                             customerInfo.add(new Phrase("total price:          " + price + "\n"));
+                            customerInfo.add(new Phrase(Chunk.NEWLINE));
+                            customerInfo.add(new Phrase("In case you have other enquiries, please contact us under +447713956305 "));
                             document.add(customerInfo);
 
                             document.close();
@@ -239,11 +244,11 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                         if (paymentType.equals("card")) {
                             dispose();
                             SalesCardPayNow salesCardPayNow = new SalesCardPayNow(ID, username, customerID, price, blankNumber,
-                                    blankType, paymentPeriod, paymentType, ticketID, date, currencyID, document);
+                                    blankType, paymentPeriod, commission_ID ,paymentType, ticketID, date, currencyID, document);
                         } else if (paymentType.equals("cash")) {
                             dispose();
                             SalesCashPayNow salesCashPayNow = new SalesCashPayNow(ID, username, customerID, price, blankNumber,
-                                    blankType, paymentPeriod, paymentType, ticketID, date, currencyID, document);
+                                    blankType, paymentPeriod, commission_ID,  paymentType, ticketID, date, currencyID, document);
                         }
 
                     } else {
@@ -339,6 +344,8 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                         customerInfo.add(new Phrase("payment Method:         " + paymentType + "\n"));
                         customerInfo.add(new Phrase(Chunk.NEWLINE));
                         customerInfo.add(new Phrase("total price:          " + price + "\n"));
+                        customerInfo.add(new Phrase(Chunk.NEWLINE));
+                        customerInfo.add(new Phrase("In case you have other enquiries, please contact us under +447713956305 "));
                         document.add(customerInfo);
 
                         document.close();
@@ -356,7 +363,7 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                                 "(SELECT COALESCE(MAX(Sale_ID), 0) + 1 FROM Sale), '"+price+"','"+paymentPeriod+"'," +
                                 " '"+dateDue+"','"+date+"'," +
                                 "'"+paymentType+"', '"+ID+"','"+currencyID+"'," +
-                                "'"+customerID+"',1,'"+ticketID+"','"+blankNumber+"', null, 0 ";
+                                "'"+customerID+"','"+ commission_ID +"','"+ticketID+"','"+blankNumber+"', null, 0 ";
                         System.out.println(query);
                         int insert = st.executeUpdate(query);
 
@@ -403,6 +410,9 @@ public class SaleSummaryPage extends javax.swing.JFrame {
                     }
 
                     JOptionPane.showMessageDialog(mainPanel,"Customer has been emailed on late payment details");
+                    dispose();
+                    TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID,username);
+                    advisorHome.show();
                 }
 
 
@@ -413,6 +423,8 @@ public class SaleSummaryPage extends javax.swing.JFrame {
         voidTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                dispose();
+                TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID, username);
 
             }
         });
@@ -439,7 +451,7 @@ public class SaleSummaryPage extends javax.swing.JFrame {
 
     public static void main(String[]args){
         SaleSummaryPage saleSummaryPage = new SaleSummaryPage(ID,  username,customerID,  price,
-        flightID, paymentPeriod, paymentType, blankNumber, blankType,date, currencyID);
+        flightID, paymentPeriod, commission_ID, paymentType, blankNumber, blankType,date, currencyID);
         saleSummaryPage.show();
 
     }

@@ -243,7 +243,7 @@ public class SystemStock extends javax.swing.JFrame {
                 validateInput();
                 String lowerRangeText = lowerRange.getText();
                 String upperRangeText = upperRange.getText();
-                int managerID = (int) selectOfficeManagerID.getSelectedItem();
+                int managerID = Integer.parseInt(selectOfficeManagerID.getSelectedItem().toString());
 
                 int lowerBound = Integer.parseInt(lowerRangeText);
                 int upperBound = Integer.parseInt(upperRangeText);
@@ -268,7 +268,7 @@ public class SystemStock extends javax.swing.JFrame {
 
 
 
-                        String query = "INSERT INTO Blank (BlankNumber, Manager_ID, date_assign, Type, blank_prefix, isSold, isAssigned, batch_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                        String query = "INSERT INTO Blank (BlankNumber, Manager_ID, date_assign, Type, blank_prefix, isSold, isAssigned) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 
                         PreparedStatement preparedStatement = con.prepareStatement(query);
@@ -329,9 +329,6 @@ public class SystemStock extends javax.swing.JFrame {
 
             }
         });
-
-        HoverButton.setButtonProperties(manageCommissionRatesButton);
-
         manageCommissionRatesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -342,9 +339,6 @@ public class SystemStock extends javax.swing.JFrame {
 
             }
         });
-
-        HoverButton.setButtonProperties(manageSystemStockButton);
-
         manageSystemStockButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -355,9 +349,6 @@ public class SystemStock extends javax.swing.JFrame {
 
             }
         });
-
-        HoverButton.setButtonProperties(createUserButton);
-
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -369,7 +360,6 @@ public class SystemStock extends javax.swing.JFrame {
         });
 
 
-        HoverButton.setButtonProperties(logOutButton);
 
         logOutButton.addActionListener(new ActionListener() {
             @Override
@@ -379,9 +369,6 @@ public class SystemStock extends javax.swing.JFrame {
                 login.show();
             }
         });
-
-        HoverButton.setButtonProperties(submitBlankAdditionButton);
-
         submitBlankAdditionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

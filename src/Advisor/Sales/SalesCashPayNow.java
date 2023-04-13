@@ -17,6 +17,7 @@ import java.sql.Statement;
 
 public class SalesCashPayNow extends javax.swing.JFrame {
 
+    private static int commission_ID;
     private JButton voidTicketButton;
     private JButton completeSaleButton;
     private JTextField amountGivenText;
@@ -42,7 +43,7 @@ public class SalesCashPayNow extends javax.swing.JFrame {
 
     public SalesCashPayNow(int ID, String username, int customerID,
                            float price, int blankNumber, String blankType,
-                           String paymentPeriod, String paymentType, int ticketID, int date, int currencyID, Document document) {
+                           String paymentPeriod, int commission_ID, String paymentType, int ticketID, int date, int currencyID, Document document) {
         setContentPane(mainPanel);
         setSize(1000,600);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -59,6 +60,7 @@ public class SalesCashPayNow extends javax.swing.JFrame {
         this.date = date;
         this.currencyID = currencyID;
         this.document = document;
+        this.commission_ID = commission_ID;
 
         amountToBePaidText.setText(String.valueOf(price));
 
@@ -73,7 +75,7 @@ public class SalesCashPayNow extends javax.swing.JFrame {
                             "(SELECT COALESCE(MAX(Sale_ID), 0) + 1 FROM Sale), '"+price+"','"+paymentPeriod+"'," +
                             " null,'"+date+"'," +
                             "'"+paymentType+"', '"+ID+"','"+currencyID+"'," +
-                            "'"+customerID+"',1,'"+ticketID+"','"+blankNumber+"', null, 1 ";
+                            "'"+customerID+"','"+commission_ID+"','"+ticketID+"','"+blankNumber+"', null, 1 ";
                     System.out.println(query);
                     int insert = st.executeUpdate(query);
 
@@ -122,14 +124,27 @@ public class SalesCashPayNow extends javax.swing.JFrame {
                     ex.printStackTrace();
                 }
 
+                try (Connection con = DBConnectivity.getConnection()) {
+                    assert con != null;
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Statement st = con.createStatement();
+                    String query = "UPDATE CustomerAccount " +
+                            "SET sales_this_month = sales_this_month + 1 " +
+                            "WHERE CustomerAccount.Customer_ID = '" + customerID + "' ";
+                    System.out.println(query);
+                    int rowsUpdated = st.executeUpdate(query);
+
+                    st.close();
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+
                 Mail mail = new Mail();
                 mail.setupServerProperties();
                 try {
                     mail.draftEmail(customerEmail,"Dear Customer for AirVia, this" +
                             "is your receipt for your most recent flight purchase", "/Users/alexelemele/Documents/testPDF.pdf");
-                } catch (MessagingException ex) {
-                    ex.printStackTrace();
-                } catch (IOException ex) {
+                } catch (MessagingException | IOException ex) {
                     ex.printStackTrace();
                 }
                 try {
@@ -169,7 +184,7 @@ public class SalesCashPayNow extends javax.swing.JFrame {
 
     public static void main (String[]args){
         SalesCashPayNow salesCashPayNow = new SalesCashPayNow(ID, username,customerID,price,blankNumber,
-                blankType,paymentPeriod,paymentType,ticketID,date,currencyID, document);
+                blankType,paymentPeriod, commission_ID, paymentType,ticketID,date,currencyID, document);
         salesCashPayNow.show();
     }
 }

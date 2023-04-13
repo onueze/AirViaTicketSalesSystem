@@ -206,9 +206,7 @@ public class RefundsPayBack extends javax.swing.JFrame {
                 try {
                     mail.draftEmail(customerEmail,"Dear Customer " + customerID + ", this is to confirm that" +
                             "your refund for blankNumber: " + blankNumber + " was successfull and a amount of " + price);
-                } catch (MessagingException ex) {
-                    ex.printStackTrace();
-                } catch (IOException ex) {
+                } catch (MessagingException | IOException ex) {
                     ex.printStackTrace();
                 }
                 try {
@@ -228,12 +226,16 @@ public class RefundsPayBack extends javax.swing.JFrame {
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int dialog = JOptionPane.showConfirmDialog(mainPanel,"Are you sure you want to cancel the refund?");
-
-                if(dialog == -1){
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel the refund?", "Cancel Confirmation", JOptionPane.YES_NO_OPTION);
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    // User clicked "Yes"
+                    // Perform cancellation action
                     dispose();
                     TravelAdvisorHome advisorHome = new TravelAdvisorHome(ID,username);
                     advisorHome.show();
+                } else {
+                    // User clicked "No"
+                    // Do nothing or perform alternative action
                 }
 
 

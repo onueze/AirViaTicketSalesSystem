@@ -130,11 +130,6 @@ public class IndividualReport extends javax.swing.JFrame {
                             "  Sale.Employee_ID, " +
                             "  Blank.BlankNumber;";
 
-                    System.out.println(query);
-                    System.out.println(ID);
-                    System.out.println(saleType);
-                    System.out.println(dateForReportInitail);
-                    System.out.println(dateForReportTo);
 
                     //Creating PreparedStatement object for the MySQL query
                     PreparedStatement preparedStatement = con.prepareStatement(query);
