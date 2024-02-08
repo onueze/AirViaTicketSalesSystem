@@ -41,7 +41,7 @@ public class Mail {
      */
     public void sendEmail() throws MessagingException {
         String fromUser = "alexobz01@gmail.com";
-        String fromUserPassword = "gdqjalpudtihjibk";
+        String fromUserPassword = ""; // removed app password 
         String emailHost = "smtp.gmail.com";
         Transport transport = newSession.getTransport("smtp");
         transport.connect(emailHost,fromUser,fromUserPassword);
